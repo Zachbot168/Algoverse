@@ -14,12 +14,12 @@ else
     echo "CrowS-Pairs already exists, skipping..."
 fi
 
-# StereoSet
-echo "Pulling StereoSet..."
-if [ ! -d "datasets/StereoSet" ]; then
-    git clone https://github.com/moinnadeem/StereoSet.git datasets/StereoSet
+# BiasBench (replacing StereoSet)
+echo "Pulling BiasBench..."
+if [ ! -d "datasets/bias-bench" ]; then
+    git clone https://github.com/McGill-NLP/bias-bench.git datasets/bias-bench
 else
-    echo "StereoSet already exists, skipping..."
+    echo "BiasBench already exists, skipping..."
 fi
 
 # Winobias

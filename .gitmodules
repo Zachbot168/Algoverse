@@ -1,9 +1,6 @@
 [submodule "datasets/crows-pairs"]
 	path = datasets/crows-pairs
 	url = https://github.com/nyu-mll/crows-pairs.git
-[submodule "datasets/StereoSet"]
-	path = datasets/StereoSet
-	url = https://github.com/moinnadeem/StereoSet.git
 [submodule "datasets/bbq"]
 	path = datasets/bbq
 	url = https://github.com/nyu-mll/bbq.git
@@ -13,3 +10,6 @@
 [submodule "datasets/bold"]
 	path = datasets/bold
 	url = https://github.com/amazon-research/bold.git
+[submodule "datasets/bias-bench"]
+	path = datasets/bias-bench
+	url = https://github.com/McGill-NLP/bias-bench.git
