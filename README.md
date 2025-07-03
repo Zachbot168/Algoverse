@@ -2,7 +2,7 @@
 
 A collection of bias evaluation datasets for NLP research.
 
-## Datasets [Dataset Division](https://docs.google.com/document/d/1KniHEniG8daH5q5ou9aiCtROFqGAbuvgPsAHKcG_I6o/edit?tab=t.0)
+## Datasets | [Dataset Division](https://docs.google.com/document/d/1KniHEniG8daH5q5ou9aiCtROFqGAbuvgPsAHKcG_I6o/edit?tab=t.0)
 
 This repository contains the following bias evaluation datasets:
 
