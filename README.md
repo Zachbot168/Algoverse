@@ -13,6 +13,8 @@ This repository contains the following bias evaluation datasets:
 - **Bias in Bios**: Bias in Bios dataset
 - **BOLD**: Bias in Open-Ended Language Generation dataset
 - **BBQ**: Bias Benchmark for Question Answering dataset
+- **UNQOVER**: Similar QA to BBQ
+- **CEB**: Open ended generation, similar to BOLD
 
 ## Sources
 
@@ -25,3 +27,5 @@ These datasets are pulled from their respective repositories and sources:
 - Bias in Bios: https://github.com/microsoft/biosbias
 - BOLD: https://github.com/amazon-research/bold
 - BBQ: https://github.com/nyu-mll/bbq
+- UNQOVER: https://aclanthology.org/2020.findings-emnlp.311/
+- CEB: https://arxiv.org/abs/2407.02408
