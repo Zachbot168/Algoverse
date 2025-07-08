@@ -1,0 +1,56 @@
+2025-07-07 11:34:58,570 - INFO - Evaluating bert-base-uncased...
+2025-07-07 11:35:02,463 - INFO - Successfully evaluated bert-base-uncased
+2025-07-07 11:35:02,870 - INFO - Evaluating bert-large-uncased...
+2025-07-07 11:35:04,848 - INFO - Successfully evaluated bert-large-uncased
+2025-07-07 11:35:04,957 - INFO - Evaluating roberta-base...
+2025-07-07 11:35:06,904 - INFO - Successfully evaluated roberta-base
+2025-07-07 11:35:07,032 - INFO - Evaluating gpt2...
+2025-07-07 11:35:08,983 - INFO - Successfully evaluated gpt2
+2025-07-07 11:35:09,085 - INFO - Evaluating gpt2-medium...
+2025-07-07 11:35:11,003 - INFO - Successfully evaluated gpt2-medium
+2025-07-07 11:35:11,049 - WARNING - Model validation failed for Qwen2.5-1.5B-Instruct: 401 Client Error. (Request ID: Root=1-686be92f-5bf20ffa0cc1874e438f334a;8ef4e793-1359-4397-b5a3-049dabfbb181)
+
+Repository Not Found for url: https://huggingface.co/api/models/Qwen2.5-1.5B-Instruct.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated.
+Invalid username or password.
+2025-07-07 11:35:11,049 - WARNING - Skipping Qwen2.5-1.5B-Instruct (not found on HuggingFace)
+2025-07-07 11:35:11,095 - WARNING - Model validation failed for gemma-2-2b-it: 401 Client Error. (Request ID: Root=1-686be92f-3cb50d8b242a35062647181c;28128b1c-d2c2-4030-aa5d-919898801fa7)
+
+Repository Not Found for url: https://huggingface.co/api/models/gemma-2-2b-it.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated.
+Invalid username or password.
+2025-07-07 11:35:11,096 - WARNING - Skipping gemma-2-2b-it (not found on HuggingFace)
+2025-07-07 11:35:11,140 - WARNING - Model validation failed for llama-3.2-1b-it: 401 Client Error. (Request ID: Root=1-686be92f-0a2f44e26dfa80001844a075;0c437b71-5715-469c-aed3-894f7a5a22f2)
+
+Repository Not Found for url: https://huggingface.co/api/models/llama-3.2-1b-it.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated.
+Invalid username or password.
+2025-07-07 11:35:11,140 - WARNING - Skipping llama-3.2-1b-it (not found on HuggingFace)
+2025-07-07 11:35:11,140 - INFO - 
+Evaluation Summary:
+2025-07-07 11:35:11,140 - INFO - Total models: 8
+2025-07-07 11:35:11,140 - INFO - Successfully completed: 5
+2025-07-07 11:35:11,140 - INFO - Skipped: 3
+2025-07-07 11:35:11,140 - INFO - Failed: 0
+2025-07-07 13:52:53,547 - INFO - Skipping bert-base-uncased (already completed)
+2025-07-07 13:52:53,547 - INFO - Skipping bert-large-uncased (already completed)
+2025-07-07 13:52:53,547 - INFO - Skipping roberta-base (already completed)
+2025-07-07 13:52:53,547 - INFO - Skipping gpt2 (already completed)
+2025-07-07 13:52:53,547 - INFO - Skipping gpt2-medium (already completed)
+2025-07-07 13:52:53,770 - INFO - Evaluating Qwen2.5-1.5B-Instruct...
+2025-07-07 13:52:56,069 - ERROR - Failed to evaluate Qwen2.5-1.5B-Instruct: Command failed with exit code 256
+2025-07-07 13:52:56,132 - INFO - Evaluating gemma-2-2b-it...
+2025-07-07 13:52:58,355 - ERROR - Failed to evaluate gemma-2-2b-it: Command failed with exit code 256
+2025-07-07 13:52:58,409 - INFO - Evaluating llama-3.2-1b-it...
+2025-07-07 13:53:00,651 - ERROR - Failed to evaluate llama-3.2-1b-it: Command failed with exit code 256
+2025-07-07 13:53:00,652 - INFO - 
+Evaluation Summary:
+2025-07-07 13:53:00,652 - INFO - Total models: 13
+2025-07-07 13:53:00,652 - INFO - Successfully completed: 0
+2025-07-07 13:53:00,652 - INFO - Skipped (already done): 5
+2025-07-07 13:53:00,652 - INFO - Skipped (not found): 0
+2025-07-07 13:53:00,652 - INFO - Skipped (license required): 0
+2025-07-07 13:53:00,652 - INFO - Failed: 3

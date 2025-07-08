@@ -1,0 +1,69 @@
+# Model configurations for bias evaluation
+
+mlm_models:
+  bert-base-uncased:
+    class: MLMModel
+    model_path: bert-base-uncased
+    max_length: 512
+    description: BERT Base (uncased) - standard MLM baseline
+    
+  bert-large-uncased:
+    class: MLMModel
+    model_path: bert-large-uncased
+    max_length: 512
+    description: BERT Large (uncased) - scaled MLM baseline
+    
+  roberta-base:
+    class: MLMModel
+    model_path: roberta-base
+    max_length: 512
+    description: RoBERTa Base - robust MLM variant
+
+llm_models:
+  gpt2:
+    class: LLMModel
+    model_path: gpt2
+    max_length: 512
+    description: GPT-2 Small - base autoregressive model
+    
+  gpt2-medium:
+    class: LLMModel
+    model_path: gpt2-medium
+    max_length: 512
+    description: GPT-2 Medium - larger autoregressive variant
+
+instruction_models:
+  t5-small:
+    class: LLMModel
+    model_path: t5-small
+    max_length: 512
+    is_instruction_model: true
+    description: T5 Small - public instruction model
+    
+  t5-base:
+    class: LLMModel
+    model_path: t5-base
+    max_length: 512
+    is_instruction_model: true
+    description: T5 Base - public instruction model
+    
+  t5-large:
+    class: LLMModel
+    model_path: t5-large
+    max_length: 1024
+    is_instruction_model: true
+    description: T5 Large - public instruction model
+    
+  flan-t5-small:
+    class: LLMModel
+    model_path: google/flan-t5-small
+    max_length: 512
+    is_instruction_model: true
+    description: Flan-T5 Small - public instruction model
+    
+  flan-t5-base:
+    class: LLMModel
+    model_path: google/flan-t5-base
+    max_length: 512
+    is_instruction_model: true
+    description: Flan-T5 Base - public instruction model

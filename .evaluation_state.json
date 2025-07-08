@@ -1,0 +1,19 @@
+{
+  "completed": [
+    "bert-base-uncased",
+    "bert-large-uncased",
+    "roberta-base",
+    "gpt2",
+    "gpt2-medium"
+  ],
+  "skipped": [
+    "Qwen2.5-1.5B-Instruct",
+    "gemma-2-2b-it",
+    "llama-3.2-1b-it"
+  ],
+  "failed": [
+    "Qwen2.5-1.5B-Instruct",
+    "gemma-2-2b-it",
+    "llama-3.2-1b-it"
+  ]
+}

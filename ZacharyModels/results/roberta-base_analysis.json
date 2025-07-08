@@ -1,0 +1,98 @@
+{
+  "basic_metrics": {
+    "mean_bias": 0.011752511998567895,
+    "std_bias": 0.056015565766629034,
+    "mean_abs_bias": 0.03841476764131752,
+    "median_abs_bias": 0.022899566568717722,
+    "max_abs_bias": 0.26996897795254354,
+    "min_abs_bias": 1.651143395342558e-06
+  },
+  "bias_by_type": {
+    "race-color": {
+      "count": 516,
+      "mean_bias": 0.01288671046843652,
+      "std_bias": 0.05645924281835536,
+      "mean_abs_bias": 0.037858081555213106,
+      "median_abs_bias": 0.020560147740138257
+    },
+    "socioeconomic": {
+      "count": 172,
+      "mean_bias": 0.009555780336043155,
+      "std_bias": 0.058926466076344865,
+      "mean_abs_bias": 0.04236743152302967,
+      "median_abs_bias": 0.03201918025914874
+    },
+    "gender": {
+      "count": 262,
+      "mean_bias": 0.005632309130986556,
+      "std_bias": 0.049561022132027295,
+      "mean_abs_bias": 0.03253967415691032,
+      "median_abs_bias": 0.019582620459244193
+    },
+    "disability": {
+      "count": 60,
+      "mean_bias": 0.03637644690275494,
+      "std_bias": 0.07425789416546784,
+      "mean_abs_bias": 0.06735150740222409,
+      "median_abs_bias": 0.05533456412152962
+    },
+    "nationality": {
+      "count": 159,
+      "mean_bias": 0.011127593845224402,
+      "std_bias": 0.04521333543457461,
+      "mean_abs_bias": 0.02976843914763662,
+      "median_abs_bias": 0.01711360560665931
+    },
+    "sexual-orientation": {
+      "count": 84,
+      "mean_bias": 0.01284343905571974,
+      "std_bias": 0.06637704807260192,
+      "mean_abs_bias": 0.05214877654814941,
+      "median_abs_bias": 0.04444859669874501
+    },
+    "physical-appearance": {
+      "count": 63,
+      "mean_bias": 0.013723287872394432,
+      "std_bias": 0.05194129002493353,
+      "mean_abs_bias": 0.03679869314319408,
+      "median_abs_bias": 0.019360767466840456
+    },
+    "religion": {
+      "count": 105,
+      "mean_bias": 0.013976138449881381,
+      "std_bias": 0.053658611917754846,
+      "mean_abs_bias": 0.03517009592034692,
+      "median_abs_bias": 0.02149813024256475
+    },
+    "age": {
+      "count": 87,
+      "mean_bias": 0.006795419454878296,
+      "std_bias": 0.05843519070189649,
+      "mean_abs_bias": 0.03926620035902741,
+      "median_abs_bias": 0.026148781273514055
+    }
+  },
+  "threshold_metrics": {
+    "prop_above_threshold": 0.0,
+    "count_above_threshold": 0,
+    "mean_score_above_threshold": 0.0
+  },
+  "correlations": {
+    "stereo_anti_correlation": 0.8735893976591064
+  },
+  "summary": {
+    "total_examples": 1508,
+    "bias_types": [
+      "race-color",
+      "socioeconomic",
+      "gender",
+      "disability",
+      "nationality",
+      "sexual-orientation",
+      "physical-appearance",
+      "religion",
+      "age"
+    ],
+    "percent_biased": 0.0
+  }
+}
