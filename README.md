@@ -26,6 +26,6 @@ These datasets are pulled from their respective repositories and sources:
 - Winogender: https://github.com/rudinger/winogender-schemas (see 'data' directory)
 - Bias in Bios: https://github.com/microsoft/biosbias
 - BOLD: https://github.com/amazon-research/bold
-- BBQ: https://github.com/nyu-mll/bbq
+- BBQ: https://huggingface.co/datasets/walledai/BBQ?library=datasets
 - UNQOVER: https://aclanthology.org/2020.findings-emnlp.311/
 - CEB: https://arxiv.org/abs/2407.02408
