@@ -1,0 +1,74 @@
+# Pinpoint-Tuning Configuration - Training-time intervention only
+# Selective fine-tuning based on path patching results
+
+model:
+  name: "meta-llama/Llama-2-7b-chat-hf"
+  device: "auto"
+  torch_dtype: "float16"
+  trust_remote_code: false
+
+interventions:
+  enable_pinpoint_tuning: true
+  enable_steering: false
+  
+  pinpoint_tuning:
+    # Path patching parameters
+    path_patching:
+      data_path: "data/path_patching_data.jsonl"
+      target_token: "Apologies"  # Model-specific
+      record_tokens: ["Yes", "Apologies"]
+      batch_size: 4
+      
+    # Component selection
+    component_selection:
+      min_importance: 0.1  # Minimum importance score
+      max_components: 32   # Max heads/layers to tune
+      prioritize_heads: true
+      
+    # LoRA configuration  
+    lora:
+      r: 16
+      alpha: 32
+      dropout: 0.1
+      target_modules: ["q_proj", "v_proj", "o_proj"]  # Will be filtered by registry
+      
+    # Training parameters
+    training:
+      output_dir: "models/pinpoint_tuned"
+      num_epochs: 3
+      learning_rate: 5e-5
+      batch_size: 4
+      gradient_accumulation_steps: 8
+      warmup_ratio: 0.1
+      save_strategy: "epoch"
+      logging_steps: 10
+
+evaluation:
+  datasets:
+    - sycophancy_eval
+    - bbq
+    - winobias  
+    - crows_pairs
+    
+  batch_size: 8
+  max_samples: 1000
+  output_dir: "results/pinpoint"
+  
+  # Compare against baseline
+  compare_baseline: true
+  baseline_results: "results/baseline"
+
+logging:
+  level: "INFO"
+  save_detailed_results: true
+  save_activations: true  # Needed for diagnostic pass
+  save_component_registry: true
+
+data:
+  sycophancy_path: "../sycophancy-interpretability/evaluation/datasets/sycophancy_eval"
+  bbq_path: "../datasets/bbq/data"
+  winobias_path: "../datasets/winobias"
+  crows_path: "../datasets/crows-pairs/data"
+  
+  # Training data for instruction tuning
+  training_data: "../sycophancy-interpretability/prepare_training_data"

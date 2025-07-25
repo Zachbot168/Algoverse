@@ -1,0 +1,115 @@
+# Full Bias Mitigation Configuration - Both training-time and inference-time interventions
+# Complete unified pipeline with Selective Debiasing + Dynamic Bias Steering
+
+model:
+  name: "meta-llama/Llama-2-7b-chat-hf"
+  device: "auto"
+  torch_dtype: "float16"
+  trust_remote_code: false
+
+interventions:
+  enable_selective_debiasing: true
+  enable_dynamic_steering: true
+  
+  # Training-time bias mitigation
+  selective_debiasing:
+    bias_causality_analysis:
+      data_path: "data/bias_causality_data.jsonl"
+      bias_categories: ["gender", "race", "religion", "general"]
+      intervention_threshold: 0.1
+      batch_size: 4
+      
+    component_selection:
+      min_bias_impact: 0.1
+      max_components: 32
+      prioritize_bias_heads: true
+      
+    lora:
+      r: 16
+      alpha: 32
+      dropout: 0.1
+      target_modules: ["q_proj", "v_proj", "o_proj"]
+      
+    training:
+      output_dir: "models/debiased"
+      num_epochs: 3
+      learning_rate: 5e-5
+      batch_size: 4
+      gradient_accumulation_steps: 8
+      warmup_ratio: 0.1
+      save_strategy: "epoch"
+      logging_steps: 10
+  
+  # Inference-time bias mitigation (applied to debiased model)
+  dynamic_steering:
+    bias_detection:
+      training_data_size: 5000
+      layer_range: [10, 16]
+      optimal_layer: null  # Auto-select
+      classifier_params:
+        solver: "liblinear"
+        max_iter: 1000
+        random_state: 42
+        
+    steering_vectors:
+      vector_dim: null
+      magnitude_scale: 0.8  # Reduced since model is already debiased
+      bias_categories:
+        - "gender"
+        - "race"
+        - "religion" 
+        - "general"
+        
+    runtime_mitigation:
+      bias_threshold: 0.5
+      apply_scaling: true
+      hook_layers: "auto"
+      max_intervention: 1.5  # Reduced for debiased model
+
+evaluation:
+  datasets:
+    - bbq              # Bias Benchmark for QA
+    - winobias         # Gender bias in coreference
+    - crows_pairs      # Stereotype detection
+    - stereoset        # Stereotype evaluation
+    - bold             # Bias in open-ended generation
+    
+  batch_size: 8
+  max_samples: 1000
+  output_dir: "results/bias_mitigation"
+  
+  # Multi-stage bias evaluation
+  evaluation_stages:
+    - baseline           # Original biased model
+    - debiased_only     # After selective debiasing only
+    - full              # After debiasing + dynamic steering
+    
+  compare_all_stages: true
+  generate_bias_report: true
+
+logging:
+  level: "INFO"
+  save_detailed_results: true
+  save_activations: true
+  save_component_registry: true
+  save_steering_vectors: true
+  
+  # Comprehensive logging for full pipeline
+  save_intermediate_results: true
+  log_intervention_effectiveness: true
+
+data:
+  bbq_path: "../datasets/bbq/data"
+  winobias_path: "../datasets/winobias"
+  crows_path: "../datasets/crows-pairs/data"
+  stereoset_path: "../datasets/stereoset"
+  bold_path: "../datasets/bold" 
+  bias_training_data: "../bias_training_datasets"
+
+# Bias regression monitoring (only enabled for full pipeline)
+monitoring:
+  enable_bias_drift_detection: true
+  bias_regression_threshold: 0.1  # Bias increase threshold
+  refresh_schedule: "0 2 * * *"  # Daily at 2 AM
+  canary_dataset_size: 100
+  alert_email: null  # Configure as needed

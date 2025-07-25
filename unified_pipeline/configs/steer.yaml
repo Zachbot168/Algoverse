@@ -1,0 +1,68 @@
+# Steering Configuration - Inference-time intervention only
+# BAD + DSV + DAS framework without model fine-tuning
+
+model:
+  name: "meta-llama/Llama-2-7b-chat-hf"
+  device: "auto"
+  torch_dtype: "float16"
+  trust_remote_code: false
+
+interventions:
+  enable_pinpoint_tuning: false
+  enable_steering: true
+  
+  steering:
+    # BAD (Biased Activation Detection) parameters
+    bad:
+      training_data_size: 5000  # Samples for BAD training
+      layer_range: [10, 16]     # Layers to analyze
+      optimal_layer: null       # Auto-select or specify
+      classifier_params:
+        solver: "liblinear"
+        max_iter: 1000
+        random_state: 42
+        
+    # DSV (Debiasing Steering Vector) parameters  
+    dsv:
+      vector_dim: null          # Auto-infer from model
+      magnitude_scale: 1.0      # Scaling factor for intervention
+      bias_categories:
+        - "gender"
+        - "race" 
+        - "religion"
+        - "sycophancy"
+        
+    # DAS (Dynamic Activation Steering) parameters
+    das:
+      threshold: 0.5            # BAD probability threshold
+      apply_scaling: true       # Dynamic scaling based on confidence
+      hook_layers: "auto"       # Layers to apply steering
+      max_intervention: 2.0     # Cap on steering magnitude
+
+evaluation:
+  datasets:
+    - sycophancy_eval
+    - bbq
+    - winobias
+    - crows_pairs
+    
+  batch_size: 8
+  max_samples: 1000
+  output_dir: "results/steer"
+  
+  # Measure steering effectiveness
+  measure_bias_reduction: true
+  compare_baseline: true
+  baseline_results: "results/baseline"
+
+logging:
+  level: "INFO"
+  save_detailed_results: true
+  save_activations: true  # Needed for BAD training
+  save_steering_vectors: true
+
+data:
+  sycophancy_path: "../sycophancy-interpretability/evaluation/datasets/sycophancy_eval"
+  bbq_path: "../datasets/bbq/data"
+  winobias_path: "../datasets/winobias"
+  crows_path: "../datasets/crows-pairs/data"

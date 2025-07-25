@@ -1,0 +1,36 @@
+# Baseline Configuration - Raw model with no interventions
+# Used for establishing performance baselines
+
+model:
+  name: "meta-llama/Llama-2-7b-chat-hf"
+  device: "auto"  # auto, cuda, mps, cpu
+  torch_dtype: "float16"
+  trust_remote_code: false
+
+interventions:
+  # No interventions for baseline
+  enable_pinpoint_tuning: false
+  enable_steering: false
+
+evaluation:
+  datasets:
+    - sycophancy_eval
+    - bbq  
+    - winobias
+    - crows_pairs
+  
+  batch_size: 8
+  max_samples: 1000  # Per dataset
+  output_dir: "results/baseline"
+
+logging:
+  level: "INFO"
+  save_detailed_results: true
+  save_activations: false  # No need for baseline
+
+data:
+  # Symlinks to existing datasets
+  sycophancy_path: "../sycophancy-interpretability/evaluation/datasets/sycophancy_eval"
+  bbq_path: "../datasets/bbq/data"
+  winobias_path: "../datasets/winobias" 
+  crows_path: "../datasets/crows-pairs/data"
