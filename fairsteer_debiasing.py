@@ -4,7 +4,6 @@ FairSteer Implementation for Gemma-2-2b-it Bias Mitigation
 This script implements the FairSteer method for debiasing Gemma-2-2b-it model
 using a three-stage inference-time framework without requiring model retraining.
 
-Based on the paper: "FairSteer: Inference-Time Debiasing for Language Models"
 Optimized specifically for Google's Gemma-2-2b-it architecture
 """
 
@@ -109,7 +108,7 @@ class FairSteerGemmaDebiaser:
     
     def _load_gemma_model(self):
         """Load Gemma-2-2b-it model and tokenizer."""
-        print(f"🔄 Loading {self.model_name}...")
+        print(f"Loading {self.model_name}...")
         
         try:
             # Load tokenizer
@@ -140,24 +139,27 @@ class FairSteerGemmaDebiaser:
             return model, tokenizer
             
         except Exception as e:
-            print(f"Error loading Gemma model: {e}")
-            print("Make sure you have access to Gemma models and provided a valid HF token")
+            if "403 Client Error" in str(e) and "gated repo" in str(e):
+                print(f"Error: Access to the gated repository for {self.model_name} is restricted.")
+            else:
+                print(f"Error loading Gemma model: {e}")
             raise
     
     def _get_optimal_layer_range(self) -> List[int]:
         """Get optimal layer range for Gemma-2-2b-it based on the paper."""
         # For Gemma-2-2b (18 layers), optimal layers are typically in the middle-upper range
-        # Paper suggests layers 13-15 for larger models, adapt for Gemma's 18 layers
+        # Paper suggests layers 13-15 for larger models, with layer 14 being the sweet spot
         total_layers = self.num_layers
         
         if total_layers >= 15:
-            # Use layers 13-15 or adapt to model size
+            # Use layers 13-15 with preference for layer 14
             optimal_range = [13, 14, 15] if total_layers >= 16 else [total_layers-3, total_layers-2, total_layers-1]
         else:
             # For smaller models, use upper third
             start_layer = max(0, total_layers - 5)
             optimal_range = list(range(start_layer, total_layers))
         
+        print(f"Optimal layer range for {total_layers}-layer model: {optimal_range}")
         return optimal_range
     
     def construct_dbad_dataset(self, use_bbq: bool = True, use_mmlu: bool = True, 
@@ -227,7 +229,23 @@ class FairSteerGemmaDebiaser:
         
         bbq_data = []
         
-        # Since BBQ is not in bias-bench, use CROWS dataset instead
+        # First try to load actual BBQ data if available
+        bbq_path = os.path.join(bias_bench_path, "data", "bbq")
+        if os.path.exists(bbq_path):
+            print(f"Found BBQ data directory: {bbq_path}")
+            # Try to load BBQ files
+            for file in os.listdir(bbq_path):
+                if file.endswith('.json'):
+                    try:
+                        import json
+                        with open(os.path.join(bbq_path, file), 'r') as f:
+                            bbq_json_data = json.load(f)
+                        print(f"Loaded BBQ data from {file}")
+                        return self._process_bbq_json(bbq_json_data, max_samples)
+                    except Exception as e:
+                        print(f"Error loading BBQ file {file}: {e}")
+        
+        # Fallback to CROWS dataset from bias-bench
         crows_path = os.path.join(bias_bench_path, "data", "crows", "crows_pairs_anonymized.csv")
         
         if os.path.exists(crows_path):
@@ -251,7 +269,7 @@ class FairSteerGemmaDebiaser:
                         if not sent_more or not sent_less:
                             continue
                         
-                        # Create biased and unbiased versions
+                        # Create biased and unbiased versions following FairSteer paper methodology
                         # Label stereotypical as biased (0), anti-stereotypical as unbiased (1)
                         if stereo_antistereo == 'stereo':
                             biased_prompt = sent_more
@@ -284,6 +302,52 @@ class FairSteerGemmaDebiaser:
         
         print(f"Loaded {len(bbq_data)} CROWS samples from bias-bench")
         return bbq_data
+    
+    def _process_bbq_json(self, bbq_data: List[Dict], max_samples: int) -> List[Dict]:
+        """Process BBQ JSON data following the paper's methodology."""
+        processed_data = []
+        sample_count = 0
+        
+        for item in bbq_data:
+            if sample_count >= max_samples:
+                break
+                
+            context = item.get('context', '')
+            question = item.get('question', '')
+            choices = item.get('choices', [])
+            answer = item.get('answer', 0)
+            
+            if len(choices) < 3:
+                continue
+            
+            # Format prompt like in the original paper
+            prompt = f"Context: {context}\nQuestion: {question}\nChoices:\n"
+            for i, choice in enumerate(choices[:3]):  # Only use first 3 choices
+                prompt += f"{chr(65+i)}. {choice}\n"
+            prompt += "Answer:"
+            
+            # Determine bias based on answer choice and context
+            # This is a simplified heuristic - in practice, you'd want more sophisticated labeling
+            is_biased = self._detect_bias_in_bbq_item(context, question, choices, answer)
+            
+            processed_data.append({
+                'prompt': prompt,
+                'label': 0 if is_biased else 1,  # 0 = biased, 1 = unbiased
+                'source': 'bbq_json',
+                'category': item.get('category', 'unknown')
+            })
+            
+            sample_count += 1
+        
+        return processed_data
+    
+    def _detect_bias_in_bbq_item(self, context: str, question: str, choices: List[str], answer: int) -> bool:
+        """Simple heuristic to detect bias in BBQ items."""
+        # This is a simplified approach - you might want to implement more sophisticated bias detection
+        bias_keywords = ['stereotype', 'typical', 'usually', 'always', 'never', 'most', 'all']
+        text = f"{context} {question} {choices[answer] if answer < len(choices) else ''}".lower()
+        
+        return any(keyword in text for keyword in bias_keywords)
     
     def _load_bbq_from_huggingface(self, max_samples: int) -> List[Dict]:
         """Load BBQ data from HuggingFace as fallback."""
@@ -449,35 +513,72 @@ class FairSteerGemmaDebiaser:
     
     def compute_steering_vectors(self):
         """
-        Compute Debiasing Steering Vectors (DSV) for each layer.
+        Compute Debiasing Steering Vectors (DSV) for each layer using mean difference approach.
+        This follows the original FairSteer paper methodology.
         """
         if self.ddsv_dataset is None:
             raise ValueError("DDSV dataset not constructed. Call construct_ddsv_dataset() first.")
         
-        print("Computing debiasing steering vectors...")
+        print("Computing debiasing steering vectors using mean difference approach...")
         
         # Extract activations for biased and unbiased prompts
         biased_prompts = self.ddsv_dataset['biased_prompt'].tolist()
         unbiased_prompts = self.ddsv_dataset['unbiased_prompt'].tolist()
         
-        biased_activations = self.extract_activations(biased_prompts)
-        unbiased_activations = self.extract_activations(unbiased_prompts)
+        print(f"Extracting activations for {len(biased_prompts)} biased and {len(unbiased_prompts)} unbiased prompts...")
+        biased_activations = self.extract_activations(biased_prompts, batch_size=16)
+        unbiased_activations = self.extract_activations(unbiased_prompts, batch_size=16)
         
-        # Compute steering vector for each layer
-        for layer_idx in biased_activations:
-            biased_acts = biased_activations[layer_idx]
-            unbiased_acts = unbiased_activations[layer_idx]
+        # Verify we have data for both biased and unbiased
+        common_layers = set(biased_activations.keys()) & set(unbiased_activations.keys())
+        if not common_layers:
+            raise ValueError("No common layers found between biased and unbiased activations")
+        
+        print(f"Computing steering vectors for {len(common_layers)} common layers")
+        
+        # Compute steering vector for each layer using mean difference
+        steering_magnitudes = {}
+        
+        for layer_idx in sorted(common_layers):
+            biased_acts = biased_activations[layer_idx].astype(np.float64)  # Higher precision
+            unbiased_acts = unbiased_activations[layer_idx].astype(np.float64)
             
-            # DSV = average difference between unbiased and biased activations
-            steering_vector = np.mean(unbiased_acts - biased_acts, axis=0)
+            # Verify shapes match
+            if biased_acts.shape != unbiased_acts.shape:
+                print(f"Warning: Shape mismatch for layer {layer_idx}: "
+                      f"biased={biased_acts.shape}, unbiased={unbiased_acts.shape}")
+                min_samples = min(biased_acts.shape[0], unbiased_acts.shape[0])
+                biased_acts = biased_acts[:min_samples]
+                unbiased_acts = unbiased_acts[:min_samples]
             
-            self.steering_vectors[layer_idx] = steering_vector
+            # DSV = mean(unbiased) - mean(biased) following the paper
+            biased_mean = np.mean(biased_acts, axis=0)
+            unbiased_mean = np.mean(unbiased_acts, axis=0)
+            steering_vector = unbiased_mean - biased_mean
+            
+            # Store as float32 for efficiency
+            self.steering_vectors[layer_idx] = steering_vector.astype(np.float32)
             
             # Calculate magnitude for analysis
             magnitude = np.linalg.norm(steering_vector)
-            print(f"Layer {layer_idx} DSV magnitude: {magnitude:.4f}")
+            steering_magnitudes[layer_idx] = magnitude
+            
+            # Report statistics for optimal layers
+            if layer_idx in self.optimal_layer_range:
+                print(f"Layer {layer_idx} (optimal): DSV magnitude={magnitude:.4f}, "
+                      f"biased_mean={np.mean(biased_mean):.4f}, unbiased_mean={np.mean(unbiased_mean):.4f}")
+            else:
+                print(f"Layer {layer_idx}: DSV magnitude={magnitude:.4f}")
+        
+        # Analyze steering vector magnitudes across optimal layers
+        optimal_magnitudes = {k: v for k, v in steering_magnitudes.items() if k in self.optimal_layer_range}
+        if optimal_magnitudes:
+            best_magnitude_layer = max(optimal_magnitudes, key=optimal_magnitudes.get)
+            print(f"Strongest steering vector in optimal range: Layer {best_magnitude_layer} "
+                  f"(magnitude: {optimal_magnitudes[best_magnitude_layer]:.4f})")
         
         print(f"Computed steering vectors for {len(self.steering_vectors)} layers")
+        print(f"Optimal layer range {self.optimal_layer_range} magnitudes: {optimal_magnitudes}")
         
         return self.steering_vectors
     
@@ -724,8 +825,9 @@ class FairSteerGemmaDebiaser:
         train_prompts = train_data['prompt'].tolist()
         val_prompts = val_data['prompt'].tolist()
         
-        train_activations = self.extract_activations(train_prompts)
-        val_activations = self.extract_activations(val_prompts)
+        print(f"Extracting activations for {len(train_prompts)} training and {len(val_prompts)} validation prompts...")
+        train_activations = self.extract_activations(train_prompts, batch_size=16)  # Increased batch size
+        val_activations = self.extract_activations(val_prompts, batch_size=16)
         
         train_labels = train_data['label'].values
         val_labels = val_data['label'].values
@@ -739,34 +841,63 @@ class FairSteerGemmaDebiaser:
             X_train = train_activations[layer_idx]
             X_val = val_activations[layer_idx]
             
+            # Check for NaN values and handle them
+            if np.isnan(X_train).any() or np.isnan(X_val).any():
+                print(f"Warning: NaN values detected in layer {layer_idx}. Handling NaN values...")
+                # Replace NaN values with 0 (or use np.nanmean for mean imputation)
+                X_train = np.nan_to_num(X_train, nan=0.0, posinf=0.0, neginf=0.0)
+                X_val = np.nan_to_num(X_val, nan=0.0, posinf=0.0, neginf=0.0)
+                print(f"Layer {layer_idx}: Replaced NaN/inf values with 0.0")
+            
+            # Additional check for problematic values
+            if np.isinf(X_train).any() or np.isinf(X_val).any():
+                print(f"Warning: Infinite values detected in layer {layer_idx}. Cleaning...")
+                X_train = np.nan_to_num(X_train, nan=0.0, posinf=0.0, neginf=0.0)
+                X_val = np.nan_to_num(X_val, nan=0.0, posinf=0.0, neginf=0.0)
+            
             # Train logistic regression classifier
             classifier = LogisticRegression(
                 C=1/regularization,  # sklearn uses inverse of regularization
                 random_state=42,
-                max_iter=1000
+                max_iter=2000,  # Increased max_iter
+                solver='liblinear'  # Better for small datasets
             )
             
-            classifier.fit(X_train, train_labels)
-            
-            # Evaluate on validation set
-            val_predictions = classifier.predict(X_val)
-            val_accuracy = accuracy_score(val_labels, val_predictions)
-            
-            self.bias_classifiers[layer_idx] = classifier
-            layer_accuracies[layer_idx] = val_accuracy
-            
-            print(f"Layer {layer_idx} validation accuracy: {val_accuracy:.4f}")
+            try:
+                classifier.fit(X_train, train_labels)
+                
+                # Evaluate on validation set
+                val_predictions = classifier.predict(X_val)
+                val_accuracy = accuracy_score(val_labels, val_predictions)
+                
+                self.bias_classifiers[layer_idx] = classifier
+                layer_accuracies[layer_idx] = val_accuracy
+                
+                print(f"Layer {layer_idx} validation accuracy: {val_accuracy:.4f}")
+                
+            except Exception as e:
+                print(f"Error training classifier for layer {layer_idx}: {e}")
+                continue
         
-        # Find optimal layer for Gemma-2-2b-it
-        # Gemma has 18 layers, so optimal layers are typically in the range 13-15
+        if not layer_accuracies:
+            raise ValueError("No classifiers were successfully trained. Check your data for issues.")
+        
+        # Find optimal layer for Gemma-2-2b-it (prioritize layer 14)
         optimal_range = self.optimal_layer_range
         valid_layers = {k: v for k, v in layer_accuracies.items() if k in optimal_range}
         
         if valid_layers:
-            self.optimal_layer = max(valid_layers, key=valid_layers.get)
+            # Prioritize layer 14 if it has good performance
+            if 14 in valid_layers and valid_layers[14] > 0.6:
+                self.optimal_layer = 14
+                print(f"Selected layer 14 (target layer) with accuracy: {valid_layers[14]:.4f}")
+            else:
+                self.optimal_layer = max(valid_layers, key=valid_layers.get)
+                print(f"Selected best performing layer {self.optimal_layer} with accuracy: {valid_layers[self.optimal_layer]:.4f}")
         else:
             # Fallback to highest accuracy if optimal range doesn't exist
             self.optimal_layer = max(layer_accuracies, key=layer_accuracies.get)
+            print(f"No layers in optimal range, using layer {self.optimal_layer} with accuracy: {layer_accuracies[self.optimal_layer]:.4f}")
         
         print(f"Optimal layer for bias detection: {self.optimal_layer} (accuracy: {layer_accuracies[self.optimal_layer]:.4f})")
         print(f"Layer accuracies in optimal range {optimal_range}: {valid_layers}")
@@ -798,14 +929,12 @@ class FairSteerGemmaDebiaser:
         
         for layer_idx in activations:
             X = activations[layer_idx]
-            
-            # Use SVM to measure separability
-            svm = SVC(kernel='linear', random_state=42)
-            scores = cross_val_score(svm, X, labels, cv=3, scoring='accuracy')
-            separability_score = scores.mean()
-            
+            clf = SVC(kernel="linear", random_state=42)
+            # Use 3-fold cross-validation to estimate separability
+            scores = cross_val_score(clf, X, labels, cv=3)
+            separability_score = np.mean(scores)
             separability_scores[layer_idx] = separability_score
-            
+
             if layer_idx in [13, 14, 15]:  # Optimal layers
                 print(f"Layer {layer_idx} linear separability: {separability_score:.4f}")
         
@@ -893,62 +1022,104 @@ class FairSteerGemmaDebiaser:
         
         return len(intersection) / len(union) if union else 0.0
     
-    def extract_activations(self, prompts: List[str], batch_size: int = 8) -> Dict[int, np.ndarray]:
+    def extract_activations(self, prompts: List[str], batch_size: int = 32) -> Dict[int, np.ndarray]:
         """
         Extract last token activations from all layers for given prompts.
+        Optimized for speed and memory efficiency.
         
         Args:
             prompts: List of input prompts
-            batch_size: Batch size for processing
+            batch_size: Batch size for processing (increased default for speed)
             
         Returns:
             Dictionary mapping layer index to activation matrix
         """
-        print(f"Extracting activations for {len(prompts)} prompts...")
+        print(f"Extracting activations for {len(prompts)} prompts with batch_size={batch_size}...")
         
         layer_activations = defaultdict(list)
         
+        # Filter prompts to avoid empty ones
+        valid_prompts = [p for p in prompts if p and len(p.strip()) > 0]
+        print(f"Processing {len(valid_prompts)} valid prompts (filtered {len(prompts) - len(valid_prompts)} empty prompts)")
+        
         # Process in batches
-        for i in range(0, len(prompts), batch_size):
-            batch_prompts = prompts[i:i + batch_size]
+        for i in range(0, len(valid_prompts), batch_size):
+            batch_prompts = valid_prompts[i:i + batch_size]
             
-            # Tokenize batch
-            inputs = self.tokenizer(
-                batch_prompts, 
-                return_tensors="pt", 
-                padding=True, 
-                truncation=True,
-                max_length=512
-            ).to(self.device)
-            
-            with torch.no_grad():
-                # Get model outputs with hidden states
-                outputs = self.model(**inputs, output_hidden_states=True)
-                hidden_states = outputs.hidden_states
+            try:
+                # Tokenize batch with consistent max_length
+                inputs = self.tokenizer(
+                    batch_prompts, 
+                    return_tensors="pt", 
+                    padding=True, 
+                    truncation=True,
+                    max_length=256,  # Reduced from 512 for speed
+                    add_special_tokens=True
+                ).to(self.device)
                 
-                # Extract last token activations for each layer
-                # Note: For Gemma, hidden_states[0] is embeddings, hidden_states[1:] are transformer layers
-                for layer_idx, layer_hidden in enumerate(hidden_states[1:]):  # Skip embedding layer
-                    # Get last token position for each sequence
-                    last_token_positions = inputs.attention_mask.sum(dim=1) - 1
+                with torch.no_grad():
+                    # Get model outputs with hidden states
+                    outputs = self.model(**inputs, output_hidden_states=True)
+                    hidden_states = outputs.hidden_states
                     
-                    # Extract last token activations
-                    batch_activations = []
-                    for seq_idx, last_pos in enumerate(last_token_positions):
-                        last_token_activation = layer_hidden[seq_idx, last_pos, :].cpu().numpy()
-                        batch_activations.append(last_token_activation)
-                    
-                    layer_activations[layer_idx].extend(batch_activations)
+                    # Extract last token activations for each layer
+                    # Note: For Gemma, hidden_states[0] is embeddings, hidden_states[1:] are transformer layers
+                    for layer_idx, layer_hidden in enumerate(hidden_states[1:]):  # Skip embedding layer
+                        # Get actual last token position for each sequence (not padded)
+                        last_token_positions = inputs.attention_mask.sum(dim=1) - 1
+                        
+                        # Extract last token activations
+                        batch_activations = []
+                        for seq_idx, last_pos in enumerate(last_token_positions):
+                            last_token_activation = layer_hidden[seq_idx, last_pos, :].cpu().numpy()
+                            
+                            # Ensure no NaN/inf values at extraction time
+                            if np.isnan(last_token_activation).any() or np.isinf(last_token_activation).any():
+                                print(f"Warning: NaN/inf in layer {layer_idx}, sequence {seq_idx}. Replacing with zeros.")
+                                last_token_activation = np.nan_to_num(last_token_activation, nan=0.0, posinf=0.0, neginf=0.0)
+                            
+                            batch_activations.append(last_token_activation)
+                        
+                        layer_activations[layer_idx].extend(batch_activations)
+                
+                # Clear GPU memory
+                del outputs, hidden_states, inputs
+                torch.cuda.empty_cache() if torch.cuda.is_available() else None
+                
+            except Exception as e:
+                print(f"Error processing batch {i//batch_size + 1}: {e}")
+                # Continue with next batch rather than failing completely
+                continue
             
-            if (i // batch_size + 1) % 10 == 0:
-                print(f"Processed {i + len(batch_prompts)} prompts...")
+            # Progress update
+            if (i // batch_size + 1) % 5 == 0:
+                print(f"Processed {i + len(batch_prompts)}/{len(valid_prompts)} prompts...")
         
-        # Convert to numpy arrays
+        # Convert to numpy arrays and filter optimal layers for Gemma
+        final_activations = {}
+        optimal_layers = self.optimal_layer_range
+        
         for layer_idx in layer_activations:
-            layer_activations[layer_idx] = np.array(layer_activations[layer_idx])
+            if layer_activations[layer_idx]:  # Only if we have data
+                layer_array = np.array(layer_activations[layer_idx])
+                
+                # Final NaN/inf check
+                if np.isnan(layer_array).any() or np.isinf(layer_array).any():
+                    print(f"Final cleanup: NaN/inf values in layer {layer_idx}")
+                    layer_array = np.nan_to_num(layer_array, nan=0.0, posinf=0.0, neginf=0.0)
+                
+                final_activations[layer_idx] = layer_array
+                
+                # Report layer statistics for optimal layers
+                if layer_idx in optimal_layers:
+                    mean_val = np.mean(layer_array)
+                    std_val = np.std(layer_array)
+                    print(f"Layer {layer_idx} (optimal): shape={layer_array.shape}, mean={mean_val:.4f}, std={std_val:.4f}")
         
-        print(f"Extracted activations for {len(layer_activations)} layers")
-        return dict(layer_activations)
+        print(f"Extracted activations for {len(final_activations)} layers")
+        print(f"Optimal layers available: {[l for l in optimal_layers if l in final_activations]}")
+        
+        return final_activations
     
     def save_model(self, filepath: str):
         """Save trained FairSteer components."""
@@ -1076,46 +1247,145 @@ def main_fairsteer_demo(hf_token: Optional[str] = None):
     
     return debiaser
 
-def evaluate_fairsteer_on_winobias(debiaser: FairSteerGemmaDebiaser):
+def evaluate_fairsteer_on_winobias(debiaser: FairSteerGemmaDebiaser, sample_size: int = 100):
     """
     Evaluate FairSteer performance on WinoBias dataset with actual Gemma-2-2b-it model.
+    Follows the evaluation methodology from the original paper.
+    
+    Args:
+        debiaser: Trained FairSteer debiaser
+        sample_size: Number of samples to evaluate (default 100 for thorough evaluation)
     """
-    print("Evaluating FairSteer on WinoBias dataset using actual Gemma model...")
+    print(f"Evaluating FairSteer on WinoBias dataset using actual Gemma model (sample size: {sample_size})...")
     
-    # Load WinoBias dataset
-    val_data = load_dataset("uclanlp/wino_bias", "type1_anti", split="validation")
+    # Load both WinoBias dataset types for comprehensive evaluation
+    eval_datasets = [
+        ("type1_pro", "pro-stereotypical"),
+        ("type1_anti", "anti-stereotypical"),
+        ("type2_pro", "pro-stereotypical"),
+        ("type2_anti", "anti-stereotypical")
+    ]
     
-    # Sample some examples for evaluation
-    sample_size = 50
-    results = []
+    all_results = []
     
-    for i, sample in enumerate(val_data):
-        if i >= sample_size:
-            break
+    for dataset_type, bias_direction in eval_datasets:
+        print(f"\nEvaluating {dataset_type} ({bias_direction})...")
         
-        sentence = " ".join(sample["tokens"])
-        
-        # Generate original and debiased versions using actual Gemma model
-        original = debiaser._generate_normal(sentence, max_new_tokens=30, temperature=0.1)
-        debiased = debiaser.debias_generation(sentence, intervention_strength=1.0, max_new_tokens=30)
-        
-        results.append({
-            'original_sentence': sentence,
-            'original_generation': original,
-            'debiased_generation': debiased
-        })
-        
-        if i % 10 == 0:
-            print(f"Processed {i+1}/{sample_size} samples...")
+        try:
+            val_data = load_dataset("uclanlp/wino_bias", dataset_type, split="validation")
+            
+            # Sample examples for evaluation
+            dataset_sample_size = min(sample_size // len(eval_datasets), len(val_data))
+            results = []
+            
+            for i, sample in enumerate(val_data):
+                if i >= dataset_sample_size:
+                    break
+                
+                # Reconstruct sentence from tokens
+                sentence = " ".join(sample["tokens"])
+                
+                # Only process if sentence contains clear gender indicators
+                gender_indicators = ["he", "she", "his", "her", "him", "man", "woman", "male", "female"]
+                if not any(indicator.lower() in sentence.lower() for indicator in gender_indicators):
+                    continue
+                
+                try:
+                    # Generate original and debiased versions using actual Gemma model
+                    original = debiaser._generate_normal(sentence, max_new_tokens=30, temperature=0.1)
+                    debiased = debiaser.debias_generation(sentence, intervention_strength=1.0, max_new_tokens=30, temperature=0.1)
+                    
+                    # Check if intervention was applied
+                    bias_probability = debiaser.detect_bias(sentence)
+                    intervention_applied = bias_probability > 0.5
+                    
+                    # Analyze gender bias in outputs
+                    original_bias_score = analyze_gender_bias(original)
+                    debiased_bias_score = analyze_gender_bias(debiased)
+                    
+                    results.append({
+                        'dataset_type': dataset_type,
+                        'bias_direction': bias_direction,
+                        'original_sentence': sentence,
+                        'original_generation': original,
+                        'debiased_generation': debiased,
+                        'bias_probability': bias_probability,
+                        'intervention_applied': intervention_applied,
+                        'original_bias_score': original_bias_score,
+                        'debiased_bias_score': debiased_bias_score,
+                        'bias_reduction': original_bias_score - debiased_bias_score
+                    })
+                    
+                except Exception as e:
+                    print(f"Error processing sample {i}: {e}")
+                    continue
+                
+                if i % 10 == 0 and i > 0:
+                    print(f"Processed {i}/{dataset_sample_size} samples for {dataset_type}...")
+            
+            all_results.extend(results)
+            print(f"Completed {dataset_type}: {len(results)} samples processed")
+            
+        except Exception as e:
+            print(f"Error loading dataset {dataset_type}: {e}")
+            continue
     
-    # Save results
-    results_df = pd.DataFrame(results)
+    if not all_results:
+        print("No results generated. Check data loading and processing.")
+        return None
+    
+    # Save detailed results
+    results_df = pd.DataFrame(all_results)
     results_path = "/Users/arnav/Documents/Algoverse Research/Model Training/fairsteer_gemma_winobias_evaluation.csv"
     results_df.to_csv(results_path, index=False)
     
-    print(f"WinoBias evaluation completed! Results saved to {results_path}")
+    # Generate summary statistics
+    print("\n" + "="*60)
+    print("WINOBIAS EVALUATION SUMMARY")
+    print("="*60)
+    
+    # Overall statistics
+    total_samples = len(results_df)
+    interventions_applied = results_df['intervention_applied'].sum()
+    avg_bias_reduction = results_df['bias_reduction'].mean()
+    
+    print(f"Total samples processed: {total_samples}")
+    print(f"Interventions applied: {interventions_applied} ({interventions_applied/total_samples*100:.1f}%)")
+    print(f"Average bias reduction: {avg_bias_reduction:.4f}")
+    
+    # Statistics by dataset type
+    for dataset_type in results_df['dataset_type'].unique():
+        subset = results_df[results_df['dataset_type'] == dataset_type]
+        avg_reduction = subset['bias_reduction'].mean()
+        intervention_rate = subset['intervention_applied'].mean()
+        print(f"{dataset_type}: avg_reduction={avg_reduction:.4f}, intervention_rate={intervention_rate:.2f}")
+    
+    # Check effectiveness
+    effective_debiasing = avg_bias_reduction > 0.1  # Threshold for meaningful bias reduction
+    print(f"\nDebiasing effectiveness: {'✓ EFFECTIVE' if effective_debiasing else '⚠ NEEDS IMPROVEMENT'}")
+    
+    print(f"\nDetailed results saved to: {results_path}")
     
     return results_df
+
+def analyze_gender_bias(text: str) -> float:
+    """
+    Simple gender bias analysis based on gendered word usage.
+    Returns a bias score between -1 (female-biased) and 1 (male-biased).
+    """
+    male_words = ['he', 'him', 'his', 'man', 'male', 'guy', 'boy', 'father', 'son', 'brother', 'husband']
+    female_words = ['she', 'her', 'hers', 'woman', 'female', 'girl', 'mother', 'daughter', 'sister', 'wife']
+    
+    text_lower = text.lower()
+    male_count = sum(1 for word in male_words if word in text_lower)
+    female_count = sum(1 for word in female_words if word in text_lower)
+    
+    total_gendered = male_count + female_count
+    if total_gendered == 0:
+        return 0.0
+    
+    # Return bias score: positive = male-biased, negative = female-biased
+    return (male_count - female_count) / total_gendered
 
 if __name__ == "__main__":
     # Set your Hugging Face token here (required for Gemma access)
@@ -1136,103 +1406,6 @@ if __name__ == "__main__":
         
     except Exception as e:
         print(f"Error: {e}")
-        print("Make sure you have:")
-
-def main_fairsteer_demo(hf_token: Optional[str] = None):
-    """
-    Main function demonstrating FairSteer training and usage with Gemma-2-2b-it.
-    
-    Args:
-        hf_token: Hugging Face token for accessing Gemma model
-    """
-    print("FairSteer Bias Mitigation Demo for Gemma-2-2b-it")
-    print("=" * 50)
-    
-    # Initialize FairSteer with Gemma-2-2b-it
-    debiaser = FairSteerGemmaDebiaser(hf_token=hf_token)
-    
-    # Stage 1: Biased Activation Detection (BAD)
-    print("\nStage 1: Constructing DBAD dataset and training bias classifiers...")
-    debiaser.construct_dbad_dataset(max_bbq_samples=1000, max_mmlu_samples=200)
-    layer_accuracies = debiaser.train_bias_classifiers()
-    
-    # Stage 2: Debiasing Steering Vector (DSV) Computation
-    print("\nStage 2: Computing debiasing steering vectors...")
-    debiaser.construct_ddsv_dataset(num_pairs=50)
-    steering_vectors = debiaser.compute_steering_vectors()
-    
-    # Stage 3: Demonstration of debiased generation
-    print("\nStage 3: Testing debiased generation...")
-    
-    test_prompts = [
-        "The engineer walked into the meeting. She",
-        "The nurse prepared the medication. He", 
-        "The CEO announced the decision. They",
-        "The teacher explained the lesson to"
-    ]
-    
-    print("\nComparing original vs debiased generations:")
-    print("-" * 50)
-    
-    for prompt in test_prompts:
-        print(f"\nPrompt: {prompt}")
-        
-        # Original generation
-        original = debiaser._generate_normal(prompt, max_new_tokens=20, temperature=0.7)
-        print(f"Original: {original}")
-        
-        # Debiased generation
-        debiased = debiaser.debias_generation(prompt, intervention_strength=1.0, max_new_tokens=20)
-        print(f"Debiased: {debiased}")
-    
-    # Save the trained model
-    save_path = "/Users/arnav/Documents/Algoverse Research/Model Training/fairsteer_gemma2b.pkl"
-    debiaser.save_model(save_path)
-    
-    print(f"\nFairSteer demo completed! Model saved to {save_path}")
-    
-    return debiaser
-
-def evaluate_fairsteer_on_winobias(debiaser: FairSteerGemmaDebiaser):
-    """
-    Evaluate FairSteer performance on WinoBias dataset with Gemma-2-2b-it.
-    """
-    print("Evaluating FairSteer on WinoBias dataset...")
-    
-    # Load WinoBias dataset
-    val_data = load_dataset("uclanlp/wino_bias", "type1_anti", split="validation")
-    
-    # Sample some examples for evaluation
-    sample_size = 50
-    results = []
-    
-    for i, sample in enumerate(val_data):
-        if i >= sample_size:
-            break
-        
-        sentence = " ".join(sample["tokens"])
-        
-        # Generate original and debiased versions
-        original = debiaser._generate_normal(sentence, max_new_tokens=30, temperature=0.1)
-        debiased = debiaser.debias_generation(sentence, intervention_strength=1.0, max_new_tokens=30)
-        
-        results.append({
-            'original_sentence': sentence,
-            'original_generation': original,
-            'debiased_generation': debiased
-        })
-        
-        if i % 10 == 0:
-            print(f"Processed {i+1}/{sample_size} samples...")
-    
-    # Save results
-    results_df = pd.DataFrame(results)
-    results_path = "/Users/arnav/Documents/Algoverse Research/Model Training/fairsteer_gemma_winobias_evaluation.csv"
-    results_df.to_csv(results_path, index=False)
-    
-    print(f"WinoBias evaluation completed! Results saved to {results_path}")
-    
-    return results_df
 
 if __name__ == "__main__":
     # Set your Hugging Face token here (required for Gemma access)
@@ -1240,7 +1413,7 @@ if __name__ == "__main__":
     hf_token = os.getenv("HF_TOKEN", None)  # Set your token here or as env variable
     
     if hf_token is None:
-        print(" Warning: No Hugging Face token provided!")
+        print("Warning: No Hugging Face token provided!")
         # Uncomment and add your token:
         # hf_token = "your_hf_token_here"
     
@@ -1248,8 +1421,11 @@ if __name__ == "__main__":
         # Run main demo
         debiaser = main_fairsteer_demo(hf_token=hf_token)
         
-        # Evaluate on WinoBias
-        winobias_results = evaluate_fairsteer_on_winobias(debiaser)
+        # Evaluate on WinoBias with comprehensive evaluation
+        winobias_results = evaluate_fairsteer_on_winobias(debiaser, sample_size=200)
+        
+        print("\nFairSteer evaluation completed successfully!")
+        print("Check the generated CSV files for detailed results.")
         
     except Exception as e:
         print(f"Error: {e}")
