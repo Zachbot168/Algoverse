@@ -1,0 +1,34 @@
+# Unified Bias Mitigation Pipeline Dependencies
+
+# Core ML/NLP Dependencies
+torch>=2.0.0
+transformers>=4.30.0
+accelerate>=0.20.0
+peft>=0.4.0
+datasets>=2.12.0
+
+# Scientific Computing
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Configuration and Data
+pyyaml>=6.0
+pydantic>=1.10.0
+
+# Utilities
+tqdm>=4.65.0
+huggingface-hub>=0.15.0
+
+# Optional GPU acceleration
+# nvidia-ml-py3  # For GPU monitoring
+# flash-attn      # For flash attention (optional)
+
+# Development and Testing  
+pytest>=7.0.0
+jupyter>=1.0.0
+
+# Bias evaluation datasets (optional)
+# These may need to be installed separately or accessed via HuggingFace
+# winobias
+# stereoset

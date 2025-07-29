@@ -29,12 +29,17 @@ import yaml
 sys.path.append(str(Path(__file__).parent))
 
 # Import all unified pipeline components
-from eval.run_diagnostic import UnifiedDiagnosticPass
-from train.component_registry import ComponentRegistryManager
-from train.run_pinpoint_tuning import UnifiedPinpointTuner
-from steer.compute_dsv import DSVComputer
-from eval.run_benchmark import UnifiedBenchmark
-from eval.metrics import UnifiedMetrics
+try:
+    from eval.run_diagnostic import UnifiedDiagnosticPass
+    from train.component_registry import ComponentRegistryManager
+    from train.run_pinpoint_tuning import UnifiedPinpointTuner
+    from steer.compute_dsv import DSVComputer
+    from eval.run_benchmark import UnifiedBenchmark
+    from eval.metrics import UnifiedMetrics
+except ImportError as e:
+    print(f"Error importing pipeline components: {e}")
+    print("Please ensure all required dependencies are installed")
+    sys.exit(1)
 
 warnings.filterwarnings('ignore')
 
@@ -52,8 +57,19 @@ class BiasMitigationPipelineRunner:
         self.config_path = config_path
         
         # Load configuration
-        with open(config_path, 'r') as f:
-            self.config = yaml.safe_load(f)
+        try:
+            with open(config_path, 'r') as f:
+                self.config = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            raise ValueError(f"Invalid YAML configuration file: {e}")
+        except Exception as e:
+            raise ValueError(f"Error loading configuration file: {e}")
+        
+        # Validate required configuration sections
+        required_sections = ['model', 'interventions', 'evaluation']
+        for section in required_sections:
+            if section not in self.config:
+                raise ValueError(f"Missing required configuration section: {section}")
         
         self.model_name = self.config['model']['name']
         
@@ -480,6 +496,20 @@ class BiasMitigationPipelineRunner:
             
             return report_path
             
+        except KeyboardInterrupt:
+            print(f"\n⚠️  Pipeline execution interrupted by user")
+            
+            # Save partial state
+            self.pipeline_state['interrupted'] = True
+            self.pipeline_state['end_time'] = datetime.now().isoformat()
+            
+            partial_path = os.path.join(self.output_base, "pipeline_partial.json")
+            with open(partial_path, 'w') as f:
+                json.dump(self.pipeline_state, f, indent=2)
+            
+            print(f"Partial results saved to: {self.output_base}")
+            raise
+            
         except Exception as e:
             print(f"\n❌ Pipeline execution failed: {e}")
             
@@ -491,6 +521,7 @@ class BiasMitigationPipelineRunner:
             with open(error_path, 'w') as f:
                 json.dump(self.pipeline_state, f, indent=2)
             
+            print(f"Error details saved to: {error_path}")
             raise
 
 
@@ -510,7 +541,7 @@ def main():
     
     # Initialize and run pipeline
     try:
-        runner = UnifiedPipelineRunner(args.config)
+        runner = BiasMitigationPipelineRunner(args.config)
         report_path = runner.run_full_pipeline(args.dataset_size)
         
         print(f"\n🎉 Pipeline execution completed successfully!")
@@ -518,8 +549,16 @@ def main():
         
         return 0
         
+    except KeyboardInterrupt:
+        print(f"\n⚠️  Pipeline execution interrupted by user")
+        print("Partial results may be available in the output directory")
+        return 130  # Standard exit code for SIGINT
+        
     except Exception as e:
         print(f"\n💥 Pipeline execution failed: {e}")
+        import traceback
+        print("Full traceback:")
+        traceback.print_exc()
         return 1
 
 

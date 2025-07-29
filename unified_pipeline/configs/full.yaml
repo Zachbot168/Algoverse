@@ -10,6 +10,8 @@ model:
 interventions:
   enable_selective_debiasing: true
   enable_dynamic_steering: true
+  enable_pinpoint_tuning: true  # For backward compatibility
+  enable_steering: true         # For backward compatibility
   
   # Training-time bias mitigation
   selective_debiasing:

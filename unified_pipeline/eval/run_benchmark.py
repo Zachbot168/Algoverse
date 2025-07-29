@@ -137,10 +137,17 @@ class UnifiedBenchmark:
             file_path = os.path.join(data_path, eval_file)
             if os.path.exists(file_path):
                 with open(file_path, 'r') as f:
-                    for line in f:
-                        item = json.loads(line.strip())
-                        item['source_file'] = eval_file
-                        data.append(item)
+                    for line_num, line in enumerate(f, 1):
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            item = json.loads(line)
+                            item['source_file'] = eval_file
+                            data.append(item)
+                        except json.JSONDecodeError as e:
+                            print(f"Warning: JSON decode error in {eval_file} line {line_num}: {e}")
+                            continue
         
         return data[:self.max_samples]
     
@@ -155,11 +162,18 @@ class UnifiedBenchmark:
         # Load from JSONL files in BBQ directory
         for file_path in Path(data_path).glob("*.jsonl"):
             with open(file_path, 'r') as f:
-                for line in f:
-                    item = json.loads(line.strip())
-                    item['dataset'] = 'bbq'
-                    item['category'] = file_path.stem
-                    data.append(item)
+                for line_num, line in enumerate(f, 1):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        item = json.loads(line)
+                        item['dataset'] = 'bbq'
+                        item['category'] = file_path.stem
+                        data.append(item)
+                    except json.JSONDecodeError as e:
+                        print(f"Warning: JSON decode error in {file_path} line {line_num}: {e}")
+                        continue
         
         return data[:self.max_samples]
     

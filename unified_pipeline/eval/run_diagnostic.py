@@ -196,8 +196,16 @@ class UnifiedDiagnosticPass:
             
         dataset = []
         with open(data_path, 'r') as f:
-            for line in f:
-                dataset.append(json.loads(line.strip()))
+            for line_num, line in enumerate(f, 1):
+                line = line.strip()
+                if not line:  # Skip empty lines
+                    continue
+                try:
+                    dataset.append(json.loads(line))
+                except json.JSONDecodeError as e:
+                    print(f"Warning: JSON decode error in {data_path} line {line_num}: {e}")
+                    print(f"Problematic line: {line[:100]}...")
+                    continue
                 
         return dataset
     

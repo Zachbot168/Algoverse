@@ -8,7 +8,9 @@ model:
   trust_remote_code: false
 
 interventions:
-  # No interventions for baseline
+  # No interventions for baseline - matches expected schema
+  enable_selective_debiasing: false
+  enable_dynamic_steering: false
   enable_pinpoint_tuning: false
   enable_steering: false
 
