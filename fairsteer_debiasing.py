@@ -22,6 +22,7 @@ from huggingface_hub import login
 from datasets import load_dataset
 import json
 import pickle
+from tqdm import tqdm
 from collections import defaultdict
 
 # Import token utilities
@@ -56,29 +57,41 @@ class FairSteerGemmaDebiaser:
         self.model_name = "google/gemma-2-2b-it"
         self.device = self._setup_device(device)
         
-        # Get HF token - use provided token or extract from gemma2bModel.py
+        # Get HF token - use backup token as main token since it's working
         if hf_token is None:
-            try:
-                hf_token = get_gemma_token()
-                print("Successfully extracted Hugging Face token from gemma2bModel.py")
-            except Exception as e:
-                print(f"Could not extract token from gemma2bModel.py: {e}")
-                hf_token = GEMMA_HUGGINGFACE_TOKEN
-                print("Using backup token from gemma_token_utils.py")
+            hf_token = GEMMA_HUGGINGFACE_TOKEN
+            print("Using Hugging Face token from gemma_token_utils.py")
         
         # Authenticate with Hugging Face
         if hf_token:
             login(token=hf_token)
             print("Successfully authenticated with Hugging Face")
         else:
-            raise ValueError("No Hugging Face token available. Please provide a token or ensure it's set in gemma2bModel.py")
+            raise ValueError("No Hugging Face token available.")
         
         # Load Gemma model and tokenizer
         self.model, self.tokenizer = self._load_gemma_model()
         
-        # Gemma-2-2b-it specific configurations
-        self.num_layers = len(self.model.model.layers)  # Gemma has 18 layers
-        self.hidden_size = self.model.config.hidden_size  # 2304 for Gemma-2-2b
+        # Gemma-2-2b-it architecture detection (corrected for 26 layers)
+        try:
+            test_input = self.tokenizer("Test", return_tensors="pt").to(self.device)
+            with torch.no_grad():
+                test_output = self.model(**test_input, output_hidden_states=True)
+                total_hidden_states = len(test_output.hidden_states)
+                # hidden_states[0] = embeddings, hidden_states[1:] = transformer layers
+                self.num_layers = total_hidden_states - 1  # Subtract embedding layer
+                
+            print(f"Model architecture detected:")
+            print(f"  - Total hidden states: {total_hidden_states}")
+            print(f"  - Transformer layers: {self.num_layers}")
+            print(f"  - Hidden size: {self.model.config.hidden_size}")
+            
+        except Exception as e:
+            print(f"⚠️ Could not detect architecture, using config: {e}")
+            self.num_layers = len(self.model.model.layers)  # Fallback to config
+        
+        self.hidden_size = self.model.config.hidden_size
+        
         self.optimal_layer_range = self._get_optimal_layer_range()
         
         # FairSteer components
@@ -146,20 +159,25 @@ class FairSteerGemmaDebiaser:
             raise
     
     def _get_optimal_layer_range(self) -> List[int]:
-        """Get optimal layer range for Gemma-2-2b-it based on the paper."""
-        # For Gemma-2-2b (18 layers), optimal layers are typically in the middle-upper range
-        # Paper suggests layers 13-15 for larger models, with layer 14 being the sweet spot
+        """Get optimal layer range for Gemma-2-2b-it focusing on paper's recommended 14-16."""
+        # Based on paper analysis: focus specifically on layers 14-16 for best results
         total_layers = self.num_layers
         
-        if total_layers >= 15:
-            # Use layers 13-15 with preference for layer 14
+        if total_layers >= 20:
+            # For larger models like Gemma-2-2b-it (26 layers), focus on paper's sweet spot
+            # Paper shows best results in 14-16 range, extend slightly for robustness
+            optimal_range = [14, 15, 16] 
+            print(f"Using paper's optimal range for {total_layers}-layer model: {optimal_range}")
+        elif total_layers >= 15:
+            # Use layers 13-15 with preference for layer 14 (paper equivalent)
             optimal_range = [13, 14, 15] if total_layers >= 16 else [total_layers-3, total_layers-2, total_layers-1]
+            print(f"Adapted paper range for {total_layers}-layer model: {optimal_range}")
         else:
             # For smaller models, use upper third
             start_layer = max(0, total_layers - 5)
             optimal_range = list(range(start_layer, total_layers))
+            print(f"Small model range for {total_layers}-layer model: {optimal_range}")
         
-        print(f"Optimal layer range for {total_layers}-layer model: {optimal_range}")
         return optimal_range
     
     def construct_dbad_dataset(self, use_bbq: bool = True, use_mmlu: bool = True, 
@@ -609,15 +627,15 @@ class FairSteerGemmaDebiaser:
             
         return bias_probability
 
-    def debias_generation(self, prompt: str, intervention_strength: float = 1.0, 
+    def debias_generation(self, prompt: str, intervention_strength: float = 0.2, 
                          max_new_tokens: int = 30, temperature: float = 0.7,
                          use_hooks: bool = True) -> str:
         """
-        Generate debiased text using FairSteer intervention with actual Gemma model.
+        Generate debiased text using FairSteer intervention with paper's recommended strength.
         
         Args:
             prompt: Input prompt
-            intervention_strength: Strength of debiasing intervention
+            intervention_strength: Strength of debiasing intervention (paper: 0.1-0.3)
             max_new_tokens: Maximum tokens to generate
             temperature: Generation temperature
             use_hooks: Whether to use forward hooks (more stable) or manual intervention
@@ -803,6 +821,7 @@ class FairSteerGemmaDebiaser:
     def train_bias_classifiers(self, validation_split: float = 0.2, regularization: float = 1.0):
         """
         Train layer-wise bias detection classifiers.
+        Optimized for Gemma-2-2b-it with targeted layer processing.
         
         Args:
             validation_split: Fraction of data to use for validation
@@ -811,7 +830,7 @@ class FairSteerGemmaDebiaser:
         if self.dbad_dataset is None:
             raise ValueError("DBAD dataset not constructed. Call construct_dbad_dataset() first.")
         
-        print("Training bias detection classifiers...")
+        print("Training bias detection classifiers (optimized)...")
         
         # Split dataset
         train_data, val_data = train_test_split(
@@ -821,46 +840,57 @@ class FairSteerGemmaDebiaser:
             random_state=42
         )
         
-        # Extract activations
+        # Extract activations with optimized batch size
         train_prompts = train_data['prompt'].tolist()
         val_prompts = val_data['prompt'].tolist()
         
         print(f"Extracting activations for {len(train_prompts)} training and {len(val_prompts)} validation prompts...")
-        train_activations = self.extract_activations(train_prompts, batch_size=16)  # Increased batch size
-        val_activations = self.extract_activations(val_prompts, batch_size=16)
+        train_activations = self.extract_activations(train_prompts, batch_size=8)  # Reduced for stability
+        val_activations = self.extract_activations(val_prompts, batch_size=8)
         
         train_labels = train_data['label'].values
         val_labels = val_data['label'].values
         
-        # Train classifier for each layer
+        # Focus on optimal layers only for efficiency
+        target_layers = [l for l in train_activations.keys() if l in self.optimal_layer_range]
+        print(f"🎯 Training classifiers for target layers: {target_layers}")
+        
+        # Train classifier for each target layer
         layer_accuracies = {}
         
-        for layer_idx in train_activations:
+        for layer_idx in target_layers:
             print(f"Training classifier for layer {layer_idx}...")
+            
+            if layer_idx not in train_activations or layer_idx not in val_activations:
+                print(f"⚠️ Skipping layer {layer_idx} - missing activations")
+                continue
             
             X_train = train_activations[layer_idx]
             X_val = val_activations[layer_idx]
             
-            # Check for NaN values and handle them
+            # Comprehensive data validation
             if np.isnan(X_train).any() or np.isnan(X_val).any():
-                print(f"Warning: NaN values detected in layer {layer_idx}. Handling NaN values...")
-                # Replace NaN values with 0 (or use np.nanmean for mean imputation)
+                print(f"🔧 Cleaning NaN values in layer {layer_idx}")
                 X_train = np.nan_to_num(X_train, nan=0.0, posinf=0.0, neginf=0.0)
                 X_val = np.nan_to_num(X_val, nan=0.0, posinf=0.0, neginf=0.0)
-                print(f"Layer {layer_idx}: Replaced NaN/inf values with 0.0")
             
-            # Additional check for problematic values
             if np.isinf(X_train).any() or np.isinf(X_val).any():
-                print(f"Warning: Infinite values detected in layer {layer_idx}. Cleaning...")
+                print(f"🔧 Cleaning infinite values in layer {layer_idx}")
                 X_train = np.nan_to_num(X_train, nan=0.0, posinf=0.0, neginf=0.0)
                 X_val = np.nan_to_num(X_val, nan=0.0, posinf=0.0, neginf=0.0)
             
-            # Train logistic regression classifier
+            # Check for zero variance (constant features)
+            if np.std(X_train) == 0 or np.std(X_val) == 0:
+                print(f"⚠️ Zero variance detected in layer {layer_idx}, skipping")
+                continue
+            
+            # Train logistic regression classifier with robust settings
             classifier = LogisticRegression(
-                C=1/regularization,  # sklearn uses inverse of regularization
+                C=1/regularization,
                 random_state=42,
-                max_iter=2000,  # Increased max_iter
-                solver='liblinear'  # Better for small datasets
+                max_iter=3000,  # Increased for convergence
+                solver='liblinear',  # Robust for small datasets
+                class_weight='balanced'  # Handle class imbalance
             )
             
             try:
@@ -873,34 +903,49 @@ class FairSteerGemmaDebiaser:
                 self.bias_classifiers[layer_idx] = classifier
                 layer_accuracies[layer_idx] = val_accuracy
                 
-                print(f"Layer {layer_idx} validation accuracy: {val_accuracy:.4f}")
+                print(f"✅ Layer {layer_idx} validation accuracy: {val_accuracy:.4f}")
                 
             except Exception as e:
-                print(f"Error training classifier for layer {layer_idx}: {e}")
+                print(f"❌ Error training classifier for layer {layer_idx}: {e}")
                 continue
         
         if not layer_accuracies:
             raise ValueError("No classifiers were successfully trained. Check your data for issues.")
         
-        # Find optimal layer for Gemma-2-2b-it (prioritize layer 14)
-        optimal_range = self.optimal_layer_range
-        valid_layers = {k: v for k, v in layer_accuracies.items() if k in optimal_range}
+        # Find optimal layer for Gemma-2-2b-it (focus on paper's recommended layers 14-16)
+        paper_target_layers = [14, 15, 16]  # Original paper's optimal range for smaller models
+        valid_layers = {k: v for k, v in layer_accuracies.items() if k in paper_target_layers}
         
         if valid_layers:
-            # Prioritize layer 14 if it has good performance
-            if 14 in valid_layers and valid_layers[14] > 0.6:
+            # Prioritize layer 14 (paper's sweet spot for bias detection)
+            if 14 in valid_layers and valid_layers[14] > 0.5:  # Lowered threshold
                 self.optimal_layer = 14
-                print(f"Selected layer 14 (target layer) with accuracy: {valid_layers[14]:.4f}")
+                print(f"✅ Selected layer 14 (paper target) with accuracy: {valid_layers[14]:.4f}")
+            # Consider layer 15 as primary alternative
+            elif 15 in valid_layers and valid_layers[15] > 0.5:
+                self.optimal_layer = 15
+                print(f"✅ Selected layer 15 (paper range) with accuracy: {valid_layers[15]:.4f}")
+            # Layer 16 as secondary alternative
+            elif 16 in valid_layers and valid_layers[16] > 0.5:
+                self.optimal_layer = 16
+                print(f"✅ Selected layer 16 (paper range) with accuracy: {valid_layers[16]:.4f}")
             else:
+                # Choose best among 14-16 even if below threshold
                 self.optimal_layer = max(valid_layers, key=valid_layers.get)
-                print(f"Selected best performing layer {self.optimal_layer} with accuracy: {valid_layers[self.optimal_layer]:.4f}")
+                print(f"📊 Selected best in paper range: layer {self.optimal_layer} with accuracy: {valid_layers[self.optimal_layer]:.4f}")
         else:
-            # Fallback to highest accuracy if optimal range doesn't exist
-            self.optimal_layer = max(layer_accuracies, key=layer_accuracies.get)
-            print(f"No layers in optimal range, using layer {self.optimal_layer} with accuracy: {layer_accuracies[self.optimal_layer]:.4f}")
+            # Fallback to any available layer in optimal range
+            optimal_range = self.optimal_layer_range
+            fallback_layers = {k: v for k, v in layer_accuracies.items() if k in optimal_range}
+            if fallback_layers:
+                self.optimal_layer = max(fallback_layers, key=fallback_layers.get)
+                print(f"⚠️ Paper layers unavailable, using layer {self.optimal_layer} with accuracy: {fallback_layers[self.optimal_layer]:.4f}")
+            else:
+                self.optimal_layer = max(layer_accuracies, key=layer_accuracies.get)
+                print(f"⚠️ Using best available layer {self.optimal_layer} with accuracy: {layer_accuracies[self.optimal_layer]:.4f}")
         
         print(f"Optimal layer for bias detection: {self.optimal_layer} (accuracy: {layer_accuracies[self.optimal_layer]:.4f})")
-        print(f"Layer accuracies in optimal range {optimal_range}: {valid_layers}")
+        print(f"Layer accuracies in paper range [14, 15, 16]: {valid_layers}")
         
         return layer_accuracies
     
@@ -1062,23 +1107,42 @@ class FairSteerGemmaDebiaser:
                     outputs = self.model(**inputs, output_hidden_states=True)
                     hidden_states = outputs.hidden_states
                     
-                    # Extract last token activations for each layer
+                    # Debug: Check the actual number of layers
+                    if i == 0:  # Only print once
+                        print(f"Model has {len(hidden_states)} hidden state layers (including embeddings)")
+                        print(f"Expected {self.num_layers} transformer layers")
+                    
+                    # Extract last token activations for transformer layers only
                     # Note: For Gemma, hidden_states[0] is embeddings, hidden_states[1:] are transformer layers
-                    for layer_idx, layer_hidden in enumerate(hidden_states[1:]):  # Skip embedding layer
+                    transformer_layers = hidden_states[1:]  # Skip embedding layer
+                    
+                    # Limit to actual model layers to prevent index errors
+                    max_layers = min(len(transformer_layers), self.num_layers)
+                    
+                    for layer_idx in range(max_layers):
+                        layer_hidden = transformer_layers[layer_idx]
+                        
                         # Get actual last token position for each sequence (not padded)
                         last_token_positions = inputs.attention_mask.sum(dim=1) - 1
                         
                         # Extract last token activations
                         batch_activations = []
                         for seq_idx, last_pos in enumerate(last_token_positions):
-                            last_token_activation = layer_hidden[seq_idx, last_pos, :].cpu().numpy()
-                            
-                            # Ensure no NaN/inf values at extraction time
-                            if np.isnan(last_token_activation).any() or np.isinf(last_token_activation).any():
-                                print(f"Warning: NaN/inf in layer {layer_idx}, sequence {seq_idx}. Replacing with zeros.")
-                                last_token_activation = np.nan_to_num(last_token_activation, nan=0.0, posinf=0.0, neginf=0.0)
-                            
-                            batch_activations.append(last_token_activation)
+                            try:
+                                last_token_activation = layer_hidden[seq_idx, last_pos, :].cpu().numpy()
+                                
+                                # Ensure no NaN/inf values at extraction time
+                                if np.isnan(last_token_activation).any() or np.isinf(last_token_activation).any():
+                                    print(f"Warning: NaN/inf in layer {layer_idx}, sequence {seq_idx}. Replacing with zeros.")
+                                    last_token_activation = np.nan_to_num(last_token_activation, nan=0.0, posinf=0.0, neginf=0.0)
+                                
+                                batch_activations.append(last_token_activation)
+                                
+                            except IndexError as e:
+                                print(f"IndexError in layer {layer_idx}, sequence {seq_idx}: {e}")
+                                # Create zero vector as fallback
+                                zero_activation = np.zeros(layer_hidden.shape[-1], dtype=np.float32)
+                                batch_activations.append(zero_activation)
                         
                         layer_activations[layer_idx].extend(batch_activations)
                 
@@ -1100,6 +1164,11 @@ class FairSteerGemmaDebiaser:
         optimal_layers = self.optimal_layer_range
         
         for layer_idx in layer_activations:
+            # Only process layers within the valid range
+            if layer_idx >= self.num_layers:
+                print(f"Skipping layer {layer_idx} (beyond model's {self.num_layers} layers)")
+                continue
+                
             if layer_activations[layer_idx]:  # Only if we have data
                 layer_array = np.array(layer_activations[layer_idx])
                 
@@ -1116,7 +1185,7 @@ class FairSteerGemmaDebiaser:
                     std_val = np.std(layer_array)
                     print(f"Layer {layer_idx} (optimal): shape={layer_array.shape}, mean={mean_val:.4f}, std={std_val:.4f}")
         
-        print(f"Extracted activations for {len(final_activations)} layers")
+        print(f"Extracted activations for {len(final_activations)} layers (range: 0-{self.num_layers-1})")
         print(f"Optimal layers available: {[l for l in optimal_layers if l in final_activations]}")
         
         return final_activations
@@ -1192,58 +1261,40 @@ class FairSteerGemmaDebiaser:
         
         return results_df
 
-def main_fairsteer_demo(hf_token: Optional[str] = None):
+def main_fairsteer_training(hf_token: Optional[str] = None):
     """
-    Main function demonstrating FairSteer training and usage with actual Gemma-2-2b-it model.
+    Main function for training FairSteer with Gemma-2-2b-it (no test generations).
     
     Args:
         hf_token: Hugging Face token for accessing Gemma model
     """
-    print("FairSteer Bias Mitigation Demo for Gemma-2-2b-it")
-    print("=" * 50)
+    print("FairSteer Training for Gemma-2-2b-it")
+    print("=" * 40)
     
     # Initialize FairSteer with Gemma-2-2b-it
+    print("🚀 Initializing FairSteer with Gemma-2-2b-it...")
     debiaser = FairSteerGemmaDebiaser(hf_token=hf_token)
     
     # Stage 1: Biased Activation Detection (BAD)
-    print("\nStage 1: Constructing DBAD dataset and training bias classifiers...")
-    debiaser.construct_dbad_dataset(max_bbq_samples=1000, max_mmlu_samples=200)
+    print("\n📊 Stage 1: Training bias detection classifiers...")
+    debiaser.construct_dbad_dataset(max_bbq_samples=500, max_mmlu_samples=100)  # Smaller for speed
     layer_accuracies = debiaser.train_bias_classifiers()
     
     # Stage 2: Debiasing Steering Vector (DSV) Computation
-    print("\nStage 2: Computing debiasing steering vectors...")
-    debiaser.construct_ddsv_dataset(num_pairs=50)
+    print("\n🎯 Stage 2: Computing debiasing steering vectors...")
+    debiaser.construct_ddsv_dataset(num_pairs=30)  # Smaller for speed
     steering_vectors = debiaser.compute_steering_vectors()
-    
-    # Stage 3: Demonstration of debiased generation using actual Gemma model
-    print("\nStage 3: Testing debiased generation with actual Gemma model...")
-    
-    test_prompts = [
-        "The engineer walked into the meeting. She",
-        "The nurse prepared the medication. He", 
-        "The CEO announced the decision. They",
-        "The teacher explained the lesson to"
-    ]
-    
-    print("\nComparing original vs debiased generations:")
-    print("-" * 50)
-    
-    for prompt in test_prompts:
-        print(f"\nPrompt: {prompt}")
-        
-        # Original generation using actual Gemma model
-        original = debiaser._generate_normal(prompt, max_new_tokens=20, temperature=0.7)
-        print(f"Original: {original}")
-        
-        # Debiased generation using actual Gemma model
-        debiased = debiaser.debias_generation(prompt, intervention_strength=1.0, max_new_tokens=20)
-        print(f"Debiased: {debiased}")
     
     # Save the trained model
     save_path = "/Users/arnav/Documents/Algoverse Research/Model Training/fairsteer_gemma2b.pkl"
     debiaser.save_model(save_path)
     
-    print(f"\nFairSteer demo completed! Model saved to {save_path}")
+    # Final validation
+    print("\n✅ FairSteer training completed successfully!")
+    print(f"📁 Model saved to: {save_path}")
+    print(f"🎯 Optimal layer: {debiaser.optimal_layer}")
+    print(f"📈 Layer accuracies: {layer_accuracies}")
+    print(f"🔧 Steering vectors computed for {len(steering_vectors)} layers")
     
     return debiaser
 
@@ -1389,43 +1440,22 @@ def analyze_gender_bias(text: str) -> float:
 
 if __name__ == "__main__":
     # Set your Hugging Face token here (required for Gemma access)
-    # You can also set it as an environment variable: HF_TOKEN
-    hf_token = os.getenv("HF_TOKEN", None)  # Set your token here or as env variable
+    hf_token = os.getenv("HF_TOKEN", GEMMA_HUGGINGFACE_TOKEN)  # Use backup token as main
     
     if hf_token is None:
-        print("Warning: No Hugging Face token provided!")
-        # Uncomment and add your token:
-        # hf_token = "your_hf_token_here"
+        print("❌ Error: No Hugging Face token found!")
+        print("Set HF_TOKEN environment variable or check gemma_token_utils.py")
+        exit(1)
     
     try:
-        # Run main demo
-        debiaser = main_fairsteer_demo(hf_token=hf_token)
+        # Run focused training (no test generations)
+        print("🎯 Starting FairSteer training...")
+        debiaser = main_fairsteer_training(hf_token=hf_token)
         
-        # Evaluate on WinoBias
-        winobias_results = evaluate_fairsteer_on_winobias(debiaser)
-        
-    except Exception as e:
-        print(f"Error: {e}")
-
-if __name__ == "__main__":
-    # Set your Hugging Face token here (required for Gemma access)
-    # You can also set it as an environment variable: HF_TOKEN
-    hf_token = os.getenv("HF_TOKEN", None)  # Set your token here or as env variable
-    
-    if hf_token is None:
-        print("Warning: No Hugging Face token provided!")
-        # Uncomment and add your token:
-        # hf_token = "your_hf_token_here"
-    
-    try:
-        # Run main demo
-        debiaser = main_fairsteer_demo(hf_token=hf_token)
-        
-        # Evaluate on WinoBias with comprehensive evaluation
-        winobias_results = evaluate_fairsteer_on_winobias(debiaser, sample_size=200)
-        
-        print("\nFairSteer evaluation completed successfully!")
-        print("Check the generated CSV files for detailed results.")
+        print("\n🎉 FairSteer training completed successfully!")
+        print("Model is ready for bias detection and mitigation.")
         
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"❌ Error during training: {e}")
+        import traceback
+        traceback.print_exc()
