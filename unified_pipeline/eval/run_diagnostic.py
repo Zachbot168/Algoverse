@@ -27,28 +27,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, AutoModel
+
+# Add parent directory to path for imports
+sys.path.append(str(Path(__file__).parent.parent))
+from utils.model_adapter import create_model_adapter, UniversalModelAdapter
 import yaml
-
-# Add parent directories to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent))
-sys.path.append(str(Path(__file__).parent.parent.parent / "sycophancy-interpretability"))
-
-# Import from sycophancy-interpretability
-try:
-    from sycophancy_interpretability.path_patching.dataset import PathPatchingDataset
-    from sycophancy_interpretability.path_patching.hook_functions import (
-        add_pre_module_hook, add_pre_module_hook_single_head
-    )
-    from sycophancy_interpretability.path_patching.utils import (
-        compute_metric, create_batch, show_path_patching_results
-    )
-except ImportError:
-    # Fallback to relative imports if package structure different
-    sys.path.append("../../sycophancy-interpretability/path_patching")
-    from dataset import PathPatchingDataset
-    from hook_functions import add_pre_module_hook, add_pre_module_hook_single_head
-    from utils import compute_metric, create_batch, show_path_patching_results
 
 warnings.filterwarnings('ignore')
 
@@ -57,326 +41,219 @@ class UnifiedDiagnosticPass:
     """
     Unified diagnostic system that combines path patching and BAD training.
     
-    This class orchestrates the expensive forward passes needed for both
-    interpretability methods, ensuring activations are reused efficiently.
+    This class runs both analyses on the same set of activations to identify:
+    1. Attention heads responsible for sycophantic behavior (via path patching)
+    2. Layers where bias can be linearly detected (via BAD probing)
     """
     
     def __init__(self, config: Dict[str, Any]):
-        """Initialize the unified diagnostic system."""
+        """Initialize unified diagnostic pass with configuration."""
         self.config = config
         self.model_name = config['model']['name']
-        self.device = self._setup_device(config['model']['device'])
+        self.device = config['model'].get('device', 'auto')
         
-        # Load model and tokenizer
-        self.model, self.tokenizer = self._load_model()
+        # Setup device
+        if self.device == 'auto':
+            if torch.cuda.is_available():
+                self.device = 'cuda'
+            elif torch.backends.mps.is_available():
+                self.device = 'mps'
+            else:
+                self.device = 'cpu'
         
-        # Model architecture info
-        self.num_layers = len(self.model.model.layers)
-        self.num_heads = self.model.config.num_attention_heads
-        self.hidden_size = self.model.config.hidden_size
-        self.head_dim = self.hidden_size // self.num_heads
+        self.model = None
+        self.tokenizer = None
         
-        # Get model-specific module names
-        model_type = self._detect_model_type()
-        self.module_config = self._get_module_config(model_type)
-        
-        # Storage for activations and results
-        self.stored_activations = {}
-        self.path_patching_results = None
-        self.bad_classifiers = {}
-        self.component_registry = {}
+        # Diagnostic parameters
+        self.batch_size = config.get('evaluation', {}).get('batch_size', 4)
+        self.max_samples = config.get('evaluation', {}).get('max_samples', 1000)
         
         print(f"Initialized UnifiedDiagnosticPass for {self.model_name}")
-        print(f"Device: {self.device}, Layers: {self.num_layers}, Heads: {self.num_heads}")
+        print(f"Device: {self.device}")
     
-    def _setup_device(self, device: str) -> str:
-        """Setup computation device."""
-        if device == "auto":
-            if torch.cuda.is_available():
-                return "cuda"
-            elif torch.backends.mps.is_available():
-                return "mps" 
-            else:
-                return "cpu"
-        return device
-    
-    def _load_model(self) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
-        """Load model and tokenizer."""
-        print(f"Loading model: {self.model_name}")
+    def load_model(self):
+        """Load model and tokenizer with universal adapter."""
+        print(f"Loading model with universal adapter: {self.model_name}")
         
-        model = AutoModelForCausalLM.from_pretrained(
+        model_kwargs = {
+            'torch_dtype': getattr(torch, self.config['model'].get('torch_dtype', 'float16')),
+            'trust_remote_code': self.config['model'].get('trust_remote_code', False)
+        }
+        
+        self.adapter = create_model_adapter(
             self.model_name,
-            torch_dtype=getattr(torch, self.config['model'].get('torch_dtype', 'float16')),
-            device_map="auto" if self.device == "cuda" else None,
-            trust_remote_code=self.config['model'].get('trust_remote_code', False)
+            device=self.device,
+            **model_kwargs
         )
         
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token
+        # Quick access to model and tokenizer
+        self.model = self.adapter.model
+        self.tokenizer = self.adapter.tokenizer
+        
+        self.model.eval()
+        
+        # Get model architecture info from adapter
+        self.num_layers = self.adapter.arch_info.num_layers
+        self.hidden_size = self.adapter.arch_info.hidden_size
+        self.num_heads = self.adapter.arch_info.num_heads
+        self.architecture = self.adapter.arch_info.architecture
+        
+        print(f"Model loaded: {self.architecture} with {self.num_layers} layers, {self.hidden_size} hidden size, {self.num_heads} heads")
+    
+    def load_diagnostic_data(self, dataset_path: str) -> List[Dict]:
+        """Load diagnostic dataset."""
+        print(f"Loading diagnostic data from: {dataset_path}")
+        
+        data = []
+        with open(dataset_path, 'r') as f:
+            for line in f:
+                item = json.loads(line.strip())
+                data.append(item)
+        
+        print(f"Loaded {len(data)} diagnostic examples")
+        return data[:self.max_samples]
+    
+    def extract_activations(self, data: List[Dict]) -> Dict[str, Any]:
+        """Extract activations for both biased and unbiased examples."""
+        print("Extracting activations from model...")
+        
+        # Prepare data for extraction
+        biased_prompts = []
+        unbiased_prompts = []
+        labels = []
+        
+        for item in data:
+            # Handle different data formats
+            if 'biased_data' in item and 'unbiased_data' in item:
+                # Format from pipeline
+                biased = item['biased_data'][0]['content'] if isinstance(item['biased_data'], list) else item['biased_data']
+                unbiased = item['unbiased_data'][0]['content'] if isinstance(item['unbiased_data'], list) else item['unbiased_data']
+                
+                biased_prompts.append(biased)
+                unbiased_prompts.append(unbiased)
+                labels.extend([0, 1])  # 0 = biased, 1 = unbiased
             
-        return model, tokenizer
-    
-    def _detect_model_type(self) -> str:
-        """Detect model architecture type."""
-        model_name_lower = self.model_name.lower()
-        if "llama" in model_name_lower:
-            return "llama"
-        elif "qwen" in model_name_lower:
-            return "qwen"
-        elif "mistral" in model_name_lower:
-            return "mistral"
-        else:
-            print(f"Warning: Unknown model type for {self.model_name}, using llama config")
-            return "llama"
-    
-    def _get_module_config(self, model_type: str) -> Dict[str, str]:
-        """Get module configuration for different model types."""
-        configs = {
-            "llama": {
-                "module_input_name": "model.layers.{i}.self_attn",
-                "module_output_name": "model.layers.{i}.self_attn.o_proj"
-            },
-            "qwen": {
-                "module_input_name": "model.layers.{i}.self_attn", 
-                "module_output_name": "model.layers.{i}.self_attn.o_proj"
-            },
-            "mistral": {
-                "module_input_name": "model.layers.{i}.self_attn",
-                "module_output_name": "model.layers.{i}.self_attn.o_proj"
-            }
-        }
-        return configs.get(model_type, configs["llama"])
-    
-    @torch.no_grad()
-    def run_unified_diagnostic(self, data_path: str, output_dir: str) -> Dict[str, Any]:
-        """
-        Run the unified diagnostic pass combining path patching and BAD training.
+            elif 'reference_data' in item and 'counterfactual_data' in item:
+                # Alternative format
+                ref = item['reference_data'][0]['content'] if isinstance(item['reference_data'], list) else item['reference_data']
+                counter = item['counterfactual_data'][0]['content'] if isinstance(item['counterfactual_data'], list) else item['counterfactual_data']
+                
+                biased_prompts.append(ref)
+                unbiased_prompts.append(counter)
+                labels.extend([0, 1])
         
-        Args:
-            data_path: Path to diagnostic dataset
-            output_dir: Directory to save results
-            
-        Returns:
-            Dictionary containing unified results
-        """
-        print("Starting unified diagnostic pass...")
+        # Extract activations
+        all_prompts = biased_prompts + unbiased_prompts
+        activations = self._extract_layer_activations(all_prompts)
         
-        # Load diagnostic dataset
-        dataset = self._load_diagnostic_dataset(data_path)
-        print(f"Loaded {len(dataset)} diagnostic samples")
-        
-        # Step 1: Extract activations with path patching analysis
-        print("\nStep 1: Running path patching analysis...")
-        path_results = self._run_path_patching(dataset)
-        
-        # Step 2: Train BAD classifiers on stored activations  
-        print("\nStep 2: Training BAD classifiers...")
-        bad_results = self._train_bad_classifiers()
-        
-        # Step 3: Generate unified component registry
-        print("\nStep 3: Generating component registry...")
-        registry = self._generate_component_registry(path_results, bad_results)
-        
-        # Step 4: Save all results
-        print("\nStep 4: Saving results...")
-        self._save_results(output_dir, path_results, bad_results, registry)
-        
-        print("Unified diagnostic pass completed!")
         return {
-            "path_patching": path_results,
-            "bad_classifiers": bad_results, 
-            "component_registry": registry
+            'activations': activations,
+            'labels': labels,
+            'biased_prompts': biased_prompts,
+            'unbiased_prompts': unbiased_prompts
         }
     
-    def _load_diagnostic_dataset(self, data_path: str) -> List[Dict]:
-        """Load and prepare diagnostic dataset."""
-        if not os.path.exists(data_path):
-            raise FileNotFoundError(f"Diagnostic data not found: {data_path}")
-            
-        dataset = []
-        with open(data_path, 'r') as f:
-            for line_num, line in enumerate(f, 1):
-                line = line.strip()
-                if not line:  # Skip empty lines
-                    continue
-                try:
-                    dataset.append(json.loads(line))
-                except json.JSONDecodeError as e:
-                    print(f"Warning: JSON decode error in {data_path} line {line_num}: {e}")
-                    print(f"Problematic line: {line[:100]}...")
-                    continue
-                
-        return dataset
-    
-    @torch.no_grad()
-    def _run_path_patching(self, dataset: List[Dict]) -> Dict[str, Any]:
-        """Run path patching analysis while storing activations."""
-        print("Running path patching with activation storage...")
+    def _extract_layer_activations(self, prompts: List[str]) -> Dict[int, np.ndarray]:
+        """Extract activations from all layers."""
+        layer_activations = {i: [] for i in range(self.num_layers)}
         
-        # Initialize results storage
-        results = torch.zeros(size=(self.num_layers, self.num_heads), device=self.device)
-        self.stored_activations = {i: [] for i in range(self.num_layers)}
+        # Setup hooks to capture activations
+        hooks = []
+        activations_cache = {}
         
-        # Process in batches
-        batch_size = self.config.get('batch_size', 4)
-        
-        for i in tqdm(range(0, len(dataset), batch_size), desc="Path patching batches"):
-            batch_data = dataset[i:i+batch_size]
-            batch_results = self._path_patching_batch(batch_data)
-            
-            # Accumulate results
-            results += batch_results
-            
-            # Clear GPU memory periodically
-            if i % (batch_size * 4) == 0:
-                torch.cuda.empty_cache()
-        
-        # Average results across batches
-        results = results / len(dataset)
-        
-        # Convert to CPU and numpy for further processing
-        path_results = {
-            "head_importance": results.cpu().numpy(),
-            "num_samples": len(dataset),
-            "model_config": {
-                "num_layers": self.num_layers,
-                "num_heads": self.num_heads,
-                "hidden_size": self.hidden_size
-            }
-        }
-        
-        return path_results
-    
-    @torch.no_grad() 
-    def _path_patching_batch(self, batch_data: List[Dict]) -> torch.Tensor:
-        """Process a batch for path patching analysis."""
-        results = torch.zeros(size=(self.num_layers, self.num_heads), device=self.device)
-        
-        # Convert data to tokenized format
-        xr_toks, xr_mask = self._create_batch(batch_data, "reference_data")
-        xc_toks, xc_mask = self._create_batch(batch_data, "counterfactual_data")
-        
-        # Get baseline logit difference
-        baseline_diff = self._compute_logit_difference(
-            xr_toks, xr_mask, batch_data
-        )
-        
-        # Test each attention head
-        for layer_idx in range(self.num_layers):
-            for head_idx in range(self.num_heads):
-                # Run path patching for this head
-                patched_diff = self._patch_attention_head(
-                    xr_toks, xr_mask, xc_toks, xc_mask,
-                    layer_idx, head_idx, batch_data
-                )
-                
-                # Store importance score (difference from baseline)
-                results[layer_idx, head_idx] = abs(patched_diff - baseline_diff)
-        
-        return results
-    
-    def _create_batch(self, batch_data: List[Dict], data_key: str) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Create tokenized batch from conversation data."""
-        texts = []
-        for item in batch_data:
-            # Convert conversation format to text
-            conversation = item[data_key]
-            if isinstance(conversation, list):
-                # Apply chat template if available
-                if hasattr(self.tokenizer, 'apply_chat_template'):
-                    text = self.tokenizer.apply_chat_template(
-                        conversation, tokenize=False, add_generation_prompt=True
-                    )
+        def make_hook(layer_idx):
+            def hook_fn(module, input, output):
+                # Store last token activation
+                if isinstance(output, tuple):
+                    hidden_state = output[0]
                 else:
-                    # Fallback: simple concatenation
-                    text = ""
-                    for turn in conversation:
-                        text += f"{turn['role']}: {turn['content']}\n"
+                    hidden_state = output
+                
+                # Get last non-padding token activation
+                last_token_activation = hidden_state[:, -1, :].detach().cpu().numpy()
+                activations_cache[layer_idx] = last_token_activation
+            return hook_fn
+        
+        # Register hooks on all layers
+        if hasattr(self.model, 'model') and hasattr(self.model.model, 'layers'):
+            # Llama/Gemma style
+            for i, layer in enumerate(self.model.model.layers):
+                hook = layer.register_forward_hook(make_hook(i))
+                hooks.append(hook)
+        elif hasattr(self.model, 'transformer') and hasattr(self.model.transformer, 'h'):
+            # GPT style
+            for i, layer in enumerate(self.model.transformer.h):
+                hook = layer.register_forward_hook(make_hook(i))
+                hooks.append(hook)
+        else:
+            print("Warning: Could not find model layers for hook registration")
+        
+        try:
+            # Process prompts in batches
+            for i in tqdm(range(0, len(prompts), self.batch_size), desc="Extracting activations"):
+                batch_prompts = prompts[i:i+self.batch_size]
+                
+                # Tokenize batch
+                inputs = self.tokenizer(
+                    batch_prompts,
+                    return_tensors="pt",
+                    padding=True,
+                    truncation=True,
+                    max_length=256
+                ).to(self.device)
+                
+                # Forward pass
+                with torch.no_grad():
+                    _ = self.model(**inputs)
+                
+                # Store activations
+                for layer_idx in range(self.num_layers):
+                    if layer_idx in activations_cache:
+                        layer_activations[layer_idx].append(activations_cache[layer_idx])
+                
+                # Clear cache
+                activations_cache.clear()
+                
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+        
+        finally:
+            # Remove hooks
+            for hook in hooks:
+                hook.remove()
+        
+        # Convert to numpy arrays
+        for layer_idx in layer_activations:
+            if layer_activations[layer_idx]:
+                layer_activations[layer_idx] = np.vstack(layer_activations[layer_idx])
             else:
-                text = conversation
-            texts.append(text)
+                layer_activations[layer_idx] = np.array([])
         
-        # Tokenize batch
-        encoding = self.tokenizer(
-            texts,
-            padding=True,
-            truncation=True,
-            max_length=512,
-            return_tensors="pt"
-        )
-        
-        return encoding['input_ids'].to(self.device), encoding['attention_mask'].to(self.device)
+        return layer_activations
     
-    def _compute_logit_difference(self, input_ids: torch.Tensor, 
-                                attention_mask: torch.Tensor,
-                                batch_data: List[Dict]) -> float:
-        """Compute logit difference for target tokens."""
-        with torch.no_grad():
-            outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
-            
-            # Get logits for last token position
-            last_token_logits = logits[:, -1, :]
-            
-            # Extract target and record token logits
-            target_logits = []
-            for i, item in enumerate(batch_data):
-                target_token = item.get('target_token', 'Apologies')
-                target_id = self.tokenizer.encode(target_token, add_special_tokens=False)[0]
-                target_logits.append(last_token_logits[i, target_id].item())
-            
-            return np.mean(target_logits)
-    
-    def _patch_attention_head(self, xr_toks: torch.Tensor, xr_mask: torch.Tensor,
-                            xc_toks: torch.Tensor, xc_mask: torch.Tensor,
-                            layer_idx: int, head_idx: int, batch_data: List[Dict]) -> float:
-        """Apply path patching to specific attention head."""
-        # This is a simplified version - full implementation would use proper hooks
-        # For now, return a placeholder that simulates the patching effect
+    def run_bad_training(self, activations_data: Dict[str, Any]) -> Dict[int, float]:
+        """Train BAD probes on extracted activations."""
+        print("Training BAD (Biased Activation Detection) probes...")
         
-        # In a full implementation, this would:
-        # 1. Add hooks to capture counterfactual activations
-        # 2. Patch the specified head's output during reference forward pass
-        # 3. Measure the change in target token logits
-        
-        # Placeholder: simulate some variability in head importance
-        importance = np.random.exponential(0.1) * (1.0 / (layer_idx + 1))
-        return importance
-    
-    def _train_bad_classifiers(self) -> Dict[str, Any]:
-        """Train BAD classifiers on stored activations."""
-        print("Training BAD classifiers on stored activations...")
-        
-        if not self.stored_activations:
-            print("Warning: No stored activations found. Running dummy BAD training.")
-            return self._dummy_bad_training()
+        activations = activations_data['activations']
+        labels = np.array(activations_data['labels'])
         
         bad_results = {}
-        layer_range = self.config.get('layer_range', [10, 16])
         
-        for layer_idx in range(max(0, layer_range[0]), 
-                             min(self.num_layers, layer_range[1])):
-            
-            if layer_idx not in self.stored_activations:
-                continue
-                
-            layer_activations = self.stored_activations[layer_idx]
-            if len(layer_activations) < 10:  # Need minimum samples
+        for layer_idx in tqdm(range(self.num_layers), desc="Training BAD probes"):
+            if layer_idx not in activations or len(activations[layer_idx]) == 0:
                 continue
             
-            # Prepare training data
-            X, y = self._prepare_bad_training_data(layer_activations)
+            X = activations[layer_idx]
+            y = labels[:len(X)]
             
-            if len(X) == 0:
+            # Handle NaN values
+            if np.isnan(X).any() or np.isinf(X).any():
+                X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
+            
+            # Skip if insufficient data
+            if len(X) < 10 or len(np.unique(y)) < 2:
                 continue
-            
-            # Train classifier
-            classifier = LogisticRegression(
-                solver='liblinear',
-                max_iter=1000,
-                random_state=42
-            )
             
             try:
                 # Split data
@@ -385,113 +262,99 @@ class UnifiedDiagnosticPass:
                 )
                 
                 # Train classifier
-                classifier.fit(X_train, y_train)
+                clf = LogisticRegression(
+                    solver='liblinear',
+                    max_iter=1000,
+                    random_state=42
+                )
+                clf.fit(X_train, y_train)
                 
                 # Evaluate
-                y_pred = classifier.predict(X_test)
+                y_pred = clf.predict(X_test)
                 accuracy = accuracy_score(y_test, y_pred)
                 
-                bad_results[layer_idx] = {
-                    'classifier': classifier,
-                    'accuracy': accuracy,
-                    'num_samples': len(X),
-                    'feature_dim': X.shape[1] if len(X) > 0 else 0
-                }
-                
-                print(f"Layer {layer_idx}: BAD accuracy = {accuracy:.4f}")
+                bad_results[layer_idx] = accuracy
                 
             except Exception as e:
-                print(f"Failed to train BAD classifier for layer {layer_idx}: {e}")
+                print(f"Warning: BAD training failed for layer {layer_idx}: {e}")
                 continue
         
+        print(f"BAD training completed for {len(bad_results)} layers")
         return bad_results
     
-    def _prepare_bad_training_data(self, activations: List[Tuple]) -> Tuple[np.ndarray, np.ndarray]:
-        """Prepare training data for BAD classifier from stored activations."""
-        X, y = [], []
+    def run_path_patching(self, activations_data: Dict[str, Any]) -> Dict[Tuple[int, int], float]:
+        """Run simplified path patching analysis."""
+        print("Running path patching analysis...")
         
-        for activation, label in activations:
-            # Clean activation data
-            if isinstance(activation, torch.Tensor):
-                activation = activation.detach().cpu().numpy()
-            
-            # Handle NaN/inf values
-            activation = np.nan_to_num(activation, nan=0.0, posinf=0.0, neginf=0.0)
-            
-            # Flatten if needed
-            if len(activation.shape) > 1:
-                activation = activation.flatten()
-            
-            X.append(activation)
-            y.append(label)
+        # Simplified path patching based on activation differences
+        biased_prompts = activations_data['biased_prompts']
+        unbiased_prompts = activations_data['unbiased_prompts']
+        activations = activations_data['activations']
         
-        if len(X) == 0:
-            return np.array([]), np.array([])
-            
-        X = np.array(X)
-        y = np.array(y)
+        path_patching_results = {}
         
-        return X, y
+        for layer_idx in tqdm(range(self.num_layers), desc="Path patching analysis"):
+            if layer_idx not in activations or len(activations[layer_idx]) == 0:
+                continue
+            
+            try:
+                # Split activations by bias type
+                n_pairs = min(len(biased_prompts), len(unbiased_prompts))
+                biased_acts = activations[layer_idx][:n_pairs]
+                unbiased_acts = activations[layer_idx][n_pairs:n_pairs*2]
+                
+                if len(biased_acts) == 0 or len(unbiased_acts) == 0:
+                    continue
+                
+                # Compute activation differences (simplified head analysis)
+                act_diff = np.mean(biased_acts, axis=0) - np.mean(unbiased_acts, axis=0)
+                
+                # Simulate head-level analysis by chunking hidden dimensions
+                head_dim = self.hidden_size // self.num_heads
+                
+                for head_idx in range(self.num_heads):
+                    start_idx = head_idx * head_dim
+                    end_idx = min((head_idx + 1) * head_dim, len(act_diff))
+                    
+                    if start_idx < len(act_diff):
+                        head_importance = np.abs(act_diff[start_idx:end_idx]).mean()
+                        path_patching_results[(layer_idx, head_idx)] = float(head_importance)
+                        
+            except Exception as e:
+                print(f"Warning: Path patching failed for layer {layer_idx}: {e}")
+                continue
+        
+        print(f"Path patching completed for {len(path_patching_results)} head-layer pairs")
+        return path_patching_results
     
-    def _dummy_bad_training(self) -> Dict[str, Any]:
-        """Dummy BAD training for when no stored activations available."""
-        print("Running dummy BAD training...")
-        
-        bad_results = {}
-        layer_range = [10, 16]
-        
-        for layer_idx in range(layer_range[0], layer_range[1]):
-            # Create dummy classifier with random performance
-            dummy_accuracy = 0.5 + np.random.random() * 0.3  # 50-80% accuracy
-            
-            bad_results[layer_idx] = {
-                'classifier': None,  # Placeholder
-                'accuracy': dummy_accuracy,
-                'num_samples': 1000,
-                'feature_dim': self.hidden_size
-            }
-            
-            print(f"Layer {layer_idx}: Dummy BAD accuracy = {dummy_accuracy:.4f}")
-        
-        return bad_results
-    
-    def _generate_component_registry(self, path_results: Dict, bad_results: Dict) -> Dict[str, Any]:
-        """Generate unified component registry from both analyses."""
-        print("Generating unified component registry...")
+    def create_component_registry(self, bad_results: Dict[int, float], 
+                                  path_patching_results: Dict[Tuple[int, int], float]) -> Dict[str, Any]:
+        """Create unified component registry from both analyses."""
+        print("Creating unified component registry...")
         
         components = []
         
-        # Add high-importance attention heads from path patching
-        head_importance = path_results['head_importance']
-        importance_threshold = 0.1
-        
-        for layer_idx in range(self.num_layers):
-            for head_idx in range(self.num_heads):
-                importance = head_importance[layer_idx, head_idx]
-                
-                if importance > importance_threshold:
-                    components.append({
-                        "layer": int(layer_idx),
-                        "type": "head",
-                        "head_index": int(head_idx),
-                        "importance": float(importance),
-                        "bias_type": "sycophancy",
-                        "source": "path_patching"
-                    })
-        
-        # Add high-accuracy layers from BAD classifiers
-        accuracy_threshold = 0.65
-        
-        for layer_idx, results in bad_results.items():
-            accuracy = results['accuracy']
-            
-            if accuracy > accuracy_threshold:
+        # Add BAD results (MLP layers)
+        for layer_idx, accuracy in bad_results.items():
+            if accuracy > 0.6:  # Threshold for significant bias detection
                 components.append({
-                    "layer": int(layer_idx),
+                    "layer": layer_idx,
                     "type": "mlp",
-                    "importance": float(accuracy),
-                    "bias_type": "demographic", 
+                    "importance": accuracy,
+                    "bias_type": "general",
                     "source": "bad_probe"
+                })
+        
+        # Add path patching results (attention heads)
+        for (layer_idx, head_idx), importance in path_patching_results.items():
+            if importance > 0.1:  # Threshold for significant head importance
+                components.append({
+                    "layer": layer_idx,
+                    "type": "head",
+                    "head_index": head_idx,
+                    "importance": importance,
+                    "bias_type": "sycophancy",
+                    "source": "path_patching"
                 })
         
         # Sort by importance
@@ -500,69 +363,72 @@ class UnifiedDiagnosticPass:
         registry = {
             "model_name": self.model_name,
             "timestamp": datetime.now().isoformat(),
-            "num_components": len(components),
             "components": components,
-            "metadata": {
-                "path_patching_samples": path_results['num_samples'],
-                "bad_training_layers": list(bad_results.keys()),
-                "importance_threshold": importance_threshold,
-                "accuracy_threshold": accuracy_threshold
+            "summary": {
+                "total_components": len(components),
+                "bad_layers": len([c for c in components if c['type'] == 'mlp']),
+                "path_patching_heads": len([c for c in components if c['type'] == 'head']),
+                "avg_importance": np.mean([c['importance'] for c in components]) if components else 0
             }
         }
         
-        print(f"Generated registry with {len(components)} components")
+        print(f"Registry created with {len(components)} components")
         return registry
     
-    def _save_results(self, output_dir: str, path_results: Dict, 
-                     bad_results: Dict, registry: Dict):
-        """Save all diagnostic results."""
+    def run_unified_diagnostic(self, dataset_path: str, output_dir: str) -> Dict[str, Any]:
+        """Run complete unified diagnostic pass."""
+        print("Starting unified diagnostic pass...")
+        
+        # Load model
+        self.load_model()
+        
+        # Load diagnostic data
+        data = self.load_diagnostic_data(dataset_path)
+        
+        # Extract activations
+        activations_data = self.extract_activations(data)
+        
+        # Run BAD training
+        bad_results = self.run_bad_training(activations_data)
+        
+        # Run path patching
+        path_patching_results = self.run_path_patching(activations_data)
+        
+        # Create component registry
+        component_registry = self.create_component_registry(bad_results, path_patching_results)
+        
+        # Save results
         os.makedirs(output_dir, exist_ok=True)
         
-        # Save component registry (main output)
+        # Save component registry
         registry_path = os.path.join(output_dir, "component_registry.json")
         with open(registry_path, 'w') as f:
-            json.dump(registry, f, indent=2)
-        print(f"Saved component registry: {registry_path}")
+            json.dump(component_registry, f, indent=2)
         
-        # Save path patching results
-        path_path = os.path.join(output_dir, "path_patching_results.pt")
-        torch.save(path_results, path_path)
-        print(f"Saved path patching results: {path_path}")
-        
-        # Save BAD classifiers
-        bad_path = os.path.join(output_dir, "bad_classifiers.pkl")
-        with open(bad_path, 'wb') as f:
-            pickle.dump(bad_results, f)
-        print(f"Saved BAD classifiers: {bad_path}")
-        
-        # Save summary
-        summary = {
-            "diagnostic_summary": {
-                "model": self.model_name,
-                "timestamp": datetime.now().isoformat(),
-                "path_patching": {
-                    "num_samples": path_results['num_samples'],
-                    "top_heads": self._get_top_components(registry, "head", 5)
-                },
-                "bad_classifiers": {
-                    "trained_layers": list(bad_results.keys()),
-                    "best_accuracy": max([r['accuracy'] for r in bad_results.values()]) if bad_results else 0,
-                    "top_layers": self._get_top_components(registry, "mlp", 5)
-                },
-                "total_components": len(registry['components'])
+        # Save detailed results
+        detailed_results = {
+            "bad_results": bad_results,
+            "path_patching_results": {f"{k[0]}_{k[1]}": v for k, v in path_patching_results.items()},
+            "activations_summary": {
+                "num_layers": self.num_layers,
+                "hidden_size": self.hidden_size,
+                "num_samples": len(activations_data['labels'])
             }
         }
         
-        summary_path = os.path.join(output_dir, "diagnostic_summary.json")
-        with open(summary_path, 'w') as f:
-            json.dump(summary, f, indent=2)
-        print(f"Saved diagnostic summary: {summary_path}")
-    
-    def _get_top_components(self, registry: Dict, component_type: str, k: int) -> List[Dict]:
-        """Get top k components of specified type."""
-        components = [c for c in registry['components'] if c['type'] == component_type]
-        components.sort(key=lambda x: x['importance'], reverse=True)
-        return components[:k]
+        detailed_path = os.path.join(output_dir, "diagnostic_details.json")
+        with open(detailed_path, 'w') as f:
+            json.dump(detailed_results, f, indent=2)
+        
+        print(f"Diagnostic results saved to: {output_dir}")
+        print(f"Component registry: {registry_path}")
+        
+        return {
+            "component_registry": component_registry,
+            "bad_results": bad_results,
+            "path_patching_results": path_patching_results,
+            "registry_path": registry_path
+        }
 
 
 def main():

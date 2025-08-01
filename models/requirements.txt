@@ -1,0 +1,22 @@
+# Model Download Manager Requirements
+# Core dependencies for downloading and managing models
+
+# HuggingFace ecosystem
+transformers>=4.35.0
+huggingface_hub>=0.19.0
+tokenizers>=0.14.0
+safetensors>=0.4.0
+
+# PyTorch (CPU version - users can upgrade to GPU version if needed)
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Utilities
+requests>=2.28.0
+tqdm>=4.64.0
+numpy>=1.21.0
+
+# Optional but recommended
+accelerate>=0.24.0  # For efficient model loading
+datasets>=2.14.0    # For dataset handling

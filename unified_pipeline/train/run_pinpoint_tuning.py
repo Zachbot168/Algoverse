@@ -36,7 +36,7 @@ except ImportError:
     print("Falling back to standalone implementation")
 
 # Local imports
-from component_registry import ComponentRegistryManager, ComponentInfo
+from .component_registry import ComponentRegistryManager, ComponentInfo
 
 warnings.filterwarnings('ignore')
 

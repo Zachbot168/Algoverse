@@ -1,0 +1,65 @@
+# Test Configuration - Using GPT-2 for testing
+# Non-gated model for demonstration purposes
+
+model:
+  name: "gpt2"
+  device: "auto"
+  torch_dtype: "float16"
+  trust_remote_code: false
+
+interventions:
+  enable_selective_debiasing: true
+  enable_dynamic_steering: true
+  enable_pinpoint_tuning: true
+  enable_steering: true
+  
+  # Training-time bias mitigation
+  pinpoint_tuning:
+    component_selection:
+      min_importance: 0.1
+      max_components: 16
+      prioritize_heads: true
+      
+    lora:
+      r: 8
+      alpha: 16
+      dropout: 0.1
+      target_modules: ["c_attn", "c_proj"]
+      
+    training:
+      output_dir: "models/test_debiased"
+      num_epochs: 1
+      learning_rate: 5e-5
+      batch_size: 2
+      gradient_accumulation_steps: 4
+      warmup_ratio: 0.1
+      save_strategy: "epoch"
+      logging_steps: 10
+  
+  # Inference-time bias mitigation
+  steering:
+    dsv:
+      bias_categories: ["gender", "race", "general"]
+      magnitude_scale: 0.5
+      
+    das:
+      threshold: 0.5
+      apply_scaling: true
+      hook_layers: "auto"
+      max_intervention: 1.0
+
+evaluation:
+  datasets: []  # Skip evaluation datasets for testing
+  batch_size: 2
+  max_samples: 10
+  output_dir: "results/test"
+
+logging:
+  level: "INFO"
+  save_detailed_results: true
+  save_activations: true
+  save_component_registry: true
+  save_steering_vectors: true
+
+data:
+  # No external data paths needed for basic testing

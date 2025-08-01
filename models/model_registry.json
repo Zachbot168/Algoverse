@@ -1,0 +1,150 @@
+{
+  "model_registry": {
+    "version": "1.0",
+    "description": "Registry of open-source models for bias evaluation and testing",
+    "last_updated": "2025-01-01",
+    "models": {
+      "bert-base-uncased": {
+        "huggingface_id": "bert-base-uncased",
+        "model_type": "encoder",
+        "architecture": "BERT",
+        "size": "110M parameters",
+        "description": "Base BERT model, uncased",
+        "use_cases": ["bias_evaluation", "benchmark_baseline"],
+        "requires_auth": false,
+        "approximate_size_gb": 0.44,
+        "supported_tasks": ["fill-mask", "feature-extraction"]
+      },
+      "bert-large-uncased": {
+        "huggingface_id": "bert-large-uncased", 
+        "model_type": "encoder",
+        "architecture": "BERT",
+        "size": "340M parameters",
+        "description": "Large BERT model, uncased",
+        "use_cases": ["bias_evaluation", "benchmark_comparison"],
+        "requires_auth": false,
+        "approximate_size_gb": 1.34,
+        "supported_tasks": ["fill-mask", "feature-extraction"]
+      },
+      "roberta-base": {
+        "huggingface_id": "roberta-base",
+        "model_type": "encoder", 
+        "architecture": "RoBERTa",
+        "size": "125M parameters",
+        "description": "Base RoBERTa model",
+        "use_cases": ["bias_evaluation", "benchmark_comparison"],
+        "requires_auth": false,
+        "approximate_size_gb": 0.5,
+        "supported_tasks": ["fill-mask", "feature-extraction"]
+      },
+      "gemma-2-2b-it": {
+        "huggingface_id": "google/gemma-2-2b-it",
+        "model_type": "decoder",
+        "architecture": "Gemma",
+        "size": "2B parameters", 
+        "description": "Gemma 2 2B Instruction-Tuned model",
+        "use_cases": ["bias_mitigation", "fairsteer_testing", "instruction_following"],
+        "requires_auth": true,
+        "auth_note": "Requires Hugging Face token and Gemma license acceptance",
+        "approximate_size_gb": 4.9,
+        "supported_tasks": ["text-generation", "chat"]
+      },
+      "gemma-2-9b-it": {
+        "huggingface_id": "google/gemma-2-9b-it",
+        "model_type": "decoder",
+        "architecture": "Gemma",
+        "size": "9B parameters",
+        "description": "Gemma 2 9B Instruction-Tuned model",
+        "use_cases": ["bias_mitigation", "advanced_testing"],
+        "requires_auth": true,
+        "auth_note": "Requires Hugging Face token and Gemma license acceptance",
+        "approximate_size_gb": 18.5,
+        "supported_tasks": ["text-generation", "chat"]
+      },
+      "llama-3.2-1b": {
+        "huggingface_id": "meta-llama/Llama-3.2-1B",
+        "model_type": "decoder",
+        "architecture": "Llama",
+        "size": "1B parameters",
+        "description": "Llama 3.2 1B base model",
+        "use_cases": ["bias_evaluation", "sycophancy_testing"],
+        "requires_auth": true,
+        "auth_note": "Requires Hugging Face token and Meta license acceptance",
+        "approximate_size_gb": 2.5,
+        "supported_tasks": ["text-generation"]
+      },
+      "llama-3.2-3b": {
+        "huggingface_id": "meta-llama/Llama-3.2-3B",
+        "model_type": "decoder", 
+        "architecture": "Llama",
+        "size": "3B parameters",
+        "description": "Llama 3.2 3B base model",
+        "use_cases": ["bias_evaluation", "sycophancy_testing"],
+        "requires_auth": true,
+        "auth_note": "Requires Hugging Face token and Meta license acceptance", 
+        "approximate_size_gb": 6.2,
+        "supported_tasks": ["text-generation"]
+      },
+      "gpt2": {
+        "huggingface_id": "gpt2",
+        "model_type": "decoder",
+        "architecture": "GPT-2",
+        "size": "124M parameters",
+        "description": "Original GPT-2 model",
+        "use_cases": ["bias_evaluation", "benchmark_baseline"],
+        "requires_auth": false,
+        "approximate_size_gb": 0.5,
+        "supported_tasks": ["text-generation"]
+      },
+      "gpt2-medium": {
+        "huggingface_id": "gpt2-medium",
+        "model_type": "decoder",
+        "architecture": "GPT-2", 
+        "size": "355M parameters",
+        "description": "Medium-sized GPT-2 model",
+        "use_cases": ["bias_evaluation", "benchmark_comparison"],
+        "requires_auth": false,
+        "approximate_size_gb": 1.42,
+        "supported_tasks": ["text-generation"]
+      },
+      "gpt2-large": {
+        "huggingface_id": "gpt2-large",
+        "model_type": "decoder",
+        "architecture": "GPT-2",
+        "size": "774M parameters", 
+        "description": "Large GPT-2 model",
+        "use_cases": ["bias_evaluation", "benchmark_comparison"],
+        "requires_auth": false,
+        "approximate_size_gb": 3.09,
+        "supported_tasks": ["text-generation"]
+      }
+    },
+    "model_collections": {
+      "bert_family": ["bert-base-uncased", "bert-large-uncased", "roberta-base"],
+      "gemma_family": ["gemma-2-2b-it", "gemma-2-9b-it"],
+      "llama_family": ["llama-3.2-1b", "llama-3.2-3b"],
+      "gpt2_family": ["gpt2", "gpt2-medium", "gpt2-large"],
+      "small_models": ["bert-base-uncased", "roberta-base", "llama-3.2-1b", "gpt2"],
+      "medium_models": ["bert-large-uncased", "gemma-2-2b-it", "llama-3.2-3b", "gpt2-medium"],
+      "large_models": ["gemma-2-9b-it", "gpt2-large"],
+      "no_auth_required": ["bert-base-uncased", "bert-large-uncased", "roberta-base", "gpt2", "gpt2-medium", "gpt2-large"],
+      "auth_required": ["gemma-2-2b-it", "gemma-2-9b-it", "llama-3.2-1b", "llama-3.2-3b"],
+      "bias_testing": ["bert-base-uncased", "bert-large-uncased", "roberta-base", "gemma-2-2b-it", "llama-3.2-1b", "llama-3.2-3b", "gpt2"],
+      "fairsteer_compatible": ["gemma-2-2b-it", "gemma-2-9b-it", "llama-3.2-1b", "llama-3.2-3b"],
+      "sycophancy_compatible": ["gemma-2-2b-it", "gemma-2-9b-it", "llama-3.2-1b", "llama-3.2-3b", "gpt2", "gpt2-medium"]
+    }
+  },
+  "download_settings": {
+    "default_cache_dir": "./models/cache",
+    "use_symlinks": true,
+    "verify_downloads": true,
+    "auto_cleanup_failed": true,
+    "parallel_downloads": 2,
+    "retry_attempts": 3
+  },
+  "storage_requirements": {
+    "minimum_free_space_gb": 20,
+    "recommended_free_space_gb": 50,
+    "warning_threshold_gb": 10
+  }
+}

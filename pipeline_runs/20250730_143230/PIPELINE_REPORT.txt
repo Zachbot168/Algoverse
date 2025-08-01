@@ -1,0 +1,36 @@
+================================================================================
+UNIFIED PIPELINE EXECUTION REPORT
+================================================================================
+Execution Time: 2025-07-30T14:32:30.747953
+Model: gpt2
+Configuration: unified_pipeline/configs/test.yaml
+Output Directory: pipeline_runs/20250730_143230
+
+PIPELINE STAGES COMPLETED:
+----------------------------------------
+✓ Diagnostic
+✓ Evaluation
+
+DIAGNOSTIC PASS RESULTS:
+----------------------------------------
+Total Components Identified: 144
+Attention Heads (Sycophancy): 144
+MLP Layers (Bias): 0
+
+EVALUATION SUMMARY:
+----------------------------------------
+Stages Evaluated: baseline, steering_only
+Datasets Evaluated: 
+
+METRICS IMPROVEMENT:
+----------------------------------------
+
+RECOMMENDATIONS:
+----------------------------------------
+• Consider enabling pinpoint tuning for better bias reduction
+• Consider enabling steering for runtime bias detection
+• Monitor model performance regularly using drift_monitor.py
+• Review component registry for insights into model bias patterns
+• Consider expanding diagnostic dataset for more robust analysis
+
+================================================================================

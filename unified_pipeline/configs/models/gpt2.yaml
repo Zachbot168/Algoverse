@@ -1,0 +1,79 @@
+# Configuration for gpt2
+# Small decoder model for fast testing and development
+
+model:
+  name: "gpt2"
+  device: "auto"
+  torch_dtype: "float16"
+  trust_remote_code: false
+  architecture: "gpt2"
+  model_type: "decoder"
+
+evaluation:
+  batch_size: 8
+  max_samples: 1000
+  datasets:
+    - "sycophancy"
+    - "bias_bench"
+  output_dir: "results/gpt2"
+
+interventions:
+  enable_pinpoint_tuning: true
+  enable_steering: true
+  
+  pinpoint_tuning:
+    component_selection:
+      max_components: 24  # GPT2 has 12 layers * 2 components
+      prioritize_heads: true
+      min_importance: 0.1
+    
+    lora:
+      r: 8
+      alpha: 16  
+      dropout: 0.1
+      target_modules: ["c_attn", "c_proj", "c_fc"]
+    
+    training:
+      output_dir: "training/gpt2"
+      num_epochs: 3
+      learning_rate: 1e-4
+      batch_size: 4
+      gradient_accumulation_steps: 4
+      warmup_ratio: 0.1
+      save_strategy: "epoch"
+      logging_steps: 25
+
+  steering:
+    bad:
+      training_data_size: 2000
+      layers_to_probe: [6, 7, 8, 9, 10, 11]  # Upper layers
+      accuracy_threshold: 0.6
+    
+    dsv:
+      bias_categories: ["gender", "race", "sycophancy"]
+      magnitude_scale: 1.0
+      num_contrastive_pairs: 500
+    
+    das:
+      threshold: 0.6
+      apply_scaling: true
+      max_intervention: 1.5
+      hook_layers: "auto"
+
+data:
+  diagnostic_path: "data/sycophancy_diagnostic.jsonl" 
+  sycophancy_path: "../sycophancy-interpretability/evaluation/datasets/sycophancy_eval"
+  bias_bench_path: "../YangModels/datasets/bias_bench"
+  training_data: "../sycophancy-interpretability/prepare_training_data"
+
+# GPT-2 specific settings
+gpt2_settings:
+  max_sequence_length: 512
+  use_past_key_values: true
+  
+# Diagnostic settings optimized for small decoder model
+diagnostic:
+  use_attention_analysis: true
+  use_mlp_probing: true
+  save_activations: true
+  layer_range: [6, 11]  # Focus on upper layers

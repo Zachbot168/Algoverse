@@ -1,0 +1,40 @@
+# Model files and directories - NEVER commit these to repository
+# These files can be very large (GBs) and should be downloaded locally
+
+# All model directories and files
+*
+!.gitignore
+!README.md
+!download_models.py
+!model_registry.json
+!requirements.txt
+
+# Specific model patterns
+*.bin
+*.safetensors
+*.h5
+*.onnx
+*.pt
+*.pth
+*.pkl
+*.json.bak
+*.lock
+
+# Model cache directories
+cache/
+cached_models/
+transformers_cache/
+huggingface_cache/
+
+# Model-specific directories (explicit exclusions)
+bert-*/
+roberta-*/
+gemma-*/
+llama-*/
+gpt2*/
+models--*/
+
+# Temporary download files
+*.tmp
+*.download
+*.partial

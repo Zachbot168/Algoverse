@@ -1,0 +1,64 @@
+# Configuration for roberta-base
+# RoBERTa encoder model for bias evaluation
+
+model:
+  name: "roberta-base"
+  device: "auto"
+  torch_dtype: "float32"  # RoBERTa works better with float32
+  trust_remote_code: false
+  architecture: "roberta"
+  model_type: "encoder"
+
+evaluation:
+  batch_size: 16  # RoBERTa can handle larger batches
+  max_samples: 2000
+  datasets:
+    - "crows_pairs"
+    - "winobias"
+    - "bias_bench"
+  output_dir: "results/roberta-base"
+
+interventions:
+  enable_pinpoint_tuning: true
+  enable_steering: false  # Encoder models don't support steering
+  
+  pinpoint_tuning:
+    component_selection:
+      max_components: 24  # RoBERTa has 12 layers
+      prioritize_heads: true  
+      min_importance: 0.05
+    
+    lora:
+      r: 8
+      alpha: 16
+      dropout: 0.1
+      target_modules: ["query", "value", "key", "dense"]
+    
+    training:
+      output_dir: "training/roberta-base"
+      num_epochs: 3
+      learning_rate: 5e-5
+      batch_size: 8
+      gradient_accumulation_steps: 2
+      warmup_ratio: 0.1
+      save_strategy: "epoch"
+      logging_steps: 50
+
+data:
+  diagnostic_path: "data/bias_diagnostic.jsonl"
+  bias_bench_path: "../YangModels/datasets/bias_bench"
+  crows_pairs_path: "../ZacharyModels/datasets/crows_pairs"
+  winobias_path: "../YangModels/datasets/winobias"
+
+# RoBERTa-specific settings
+roberta_settings:
+  max_sequence_length: 512
+  use_cls_token: true
+  pooling_strategy: "cls"
+  
+# Diagnostic settings optimized for RoBERTa
+diagnostic:
+  use_attention_analysis: true
+  use_mlp_probing: true
+  save_activations: true
+  layer_range: [6, 11]  # Focus on middle to upper layers

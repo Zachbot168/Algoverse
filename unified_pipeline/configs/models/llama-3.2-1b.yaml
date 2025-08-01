@@ -1,0 +1,84 @@
+# Configuration for llama-3.2-1b
+# Small Llama model for efficient testing
+
+model:
+  name: "meta-llama/Llama-3.2-1B"
+  device: "auto"
+  torch_dtype: "float16"
+  trust_remote_code: false
+  architecture: "llama"
+  model_type: "decoder"
+
+evaluation:
+  batch_size: 6
+  max_samples: 1200
+  datasets:
+    - "sycophancy"
+    - "bias_bench"
+  output_dir: "results/llama-3.2-1b"
+
+interventions:
+  enable_pinpoint_tuning: true
+  enable_steering: true
+  
+  pinpoint_tuning:
+    component_selection:
+      max_components: 32  # Llama 3.2 1B has 16 layers
+      prioritize_heads: true
+      min_importance: 0.08
+    
+    lora:
+      r: 8
+      alpha: 16
+      dropout: 0.1
+      target_modules: ["q_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+    
+    training:
+      output_dir: "training/llama-3.2-1b"
+      num_epochs: 3
+      learning_rate: 1e-4
+      batch_size: 4
+      gradient_accumulation_steps: 4
+      warmup_ratio: 0.1
+      save_strategy: "epoch"
+      logging_steps: 25
+
+  steering:
+    bad:
+      training_data_size: 2500
+      layers_to_probe: [8, 9, 10, 11, 12, 13, 14, 15]  # Upper half
+      accuracy_threshold: 0.6
+    
+    dsv:
+      bias_categories: ["gender", "race", "sycophancy"]
+      magnitude_scale: 1.0
+      num_contrastive_pairs: 800
+    
+    das:
+      threshold: 0.55
+      apply_scaling: true
+      max_intervention: 1.8
+      hook_layers: [12, 13]  # Multiple steering layers
+
+data:
+  diagnostic_path: "data/llama_diagnostic.jsonl"
+  sycophancy_path: "../sycophancy-interpretability/evaluation/datasets/sycophancy_eval"
+  bias_bench_path: "../YangModels/datasets/bias_bench"
+  training_data: "../sycophancy-interpretability/prepare_training_data"
+
+# Llama-specific settings
+llama_settings:
+  max_sequence_length: 1024  # Conservative for 1B model
+  rope_scaling: null
+  
+# Diagnostic settings
+diagnostic:
+  use_attention_analysis: true
+  use_mlp_probing: true
+  save_activations: true
+  layer_range: [8, 15]  # Upper half of layers
+
+# Authentication settings
+auth:
+  requires_hf_token: true
+  license_acceptance_required: true

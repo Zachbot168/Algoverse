@@ -1,2 +1,31 @@
 .DS_Store
 **/.DS_Store
+
+# Model files and directories - NEVER commit these to repository
+models/*/
+!models/.gitignore
+!models/README.md
+!models/download_models.py
+!models/model_registry.json
+!models/requirements.txt
+!models/test_download_system.py
+
+# HuggingFace cache
+.cache/
+transformers_cache/
+huggingface_hub/
+
+# Large model files anywhere in repository
+*.bin
+*.safetensors
+*.h5
+*.onnx
+**/*.bin
+**/*.safetensors
+**/*.h5
+**/*.onnx
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

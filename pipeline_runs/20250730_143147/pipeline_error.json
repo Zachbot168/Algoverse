@@ -1,0 +1,10 @@
+{
+  "start_time": "2025-07-30T14:31:47.748102",
+  "config_path": "unified_pipeline/configs/test.yaml",
+  "model_name": "gpt2",
+  "output_directory": "pipeline_runs/20250730_143147",
+  "completed_stages": [],
+  "results": {},
+  "error": "'GPT2LMHeadModel' object has no attribute 'model'",
+  "end_time": "2025-07-30T14:31:55.290799"
+}

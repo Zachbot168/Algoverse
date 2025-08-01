@@ -472,7 +472,7 @@ class BiasMitigationPipelineRunner:
         
         try:
             # Stage 1: Create diagnostic dataset
-            dataset_path = self.create_diagnostic_dataset(diagnostic_dataset_size)
+            dataset_path = self.create_bias_diagnostic_dataset(diagnostic_dataset_size)
             
             # Stage 2: Run diagnostic pass
             diagnostic_results = self.run_diagnostic_pass(dataset_path)

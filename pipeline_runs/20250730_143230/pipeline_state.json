@@ -1,0 +1,26 @@
+{
+  "start_time": "2025-07-30T14:32:30.747953",
+  "config_path": "unified_pipeline/configs/test.yaml",
+  "model_name": "gpt2",
+  "output_directory": "pipeline_runs/20250730_143230",
+  "completed_stages": [
+    "diagnostic",
+    "evaluation"
+  ],
+  "results": {
+    "diagnostic": {
+      "path_patching_heads": 144,
+      "bad_layers": 0,
+      "total_components": 144
+    },
+    "evaluation": {
+      "stages_evaluated": [
+        "baseline",
+        "steering_only"
+      ],
+      "datasets_evaluated": [],
+      "output_directory": "pipeline_runs/20250730_143230/evaluation"
+    }
+  },
+  "end_time": "2025-07-30T14:32:37.179382"
+}
