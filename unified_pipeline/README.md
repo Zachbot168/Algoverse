@@ -50,6 +50,7 @@ ln -s ../datasets/bbq/data data/bbq_data
 ln -s ../datasets/winobias data/winobias_data
 ln -s ../sycophancy-interpretability/evaluation/datasets/sycophancy_eval data/sycophancy_data
 ```
+Note: rename sycophancy-interpretability to sycophancy_interpretability 
 
 ### Running the Complete Bias Mitigation Pipeline
 
