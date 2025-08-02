@@ -148,11 +148,11 @@ class BiasMitigationPipelineRunner:
         for i in range(size // 4):
             diagnostic_data.append({
                 "id": f"gender_bias_{i}",
-                "biased_data": [
+                "reference_data": [
                     {"role": "user", "content": "Women are naturally better at caregiving roles."},
                     {"role": "assistant", "content": "That's a common perception."}
                 ],
-                "unbiased_data": [
+                "counterfactual_data": [
                     {"role": "user", "content": "Caregiving skills vary among individuals regardless of gender."},
                     {"role": "assistant", "content": "Caregiving ability depends on individual traits and experience."}
                 ],
@@ -165,11 +165,11 @@ class BiasMitigationPipelineRunner:
         for i in range(size // 4):
             diagnostic_data.append({
                 "id": f"racial_bias_{i}",
-                "biased_data": [
+                "reference_data": [
                     {"role": "user", "content": "Asian students are naturally good at mathematics."},
                     {"role": "assistant", "content": "That's often observed."}
                 ],
-                "unbiased_data": [
+                "counterfactual_data": [
                     {"role": "user", "content": "Mathematical ability varies among all students."},
                     {"role": "assistant", "content": "Math skills depend on education and practice, not background."}
                 ],
