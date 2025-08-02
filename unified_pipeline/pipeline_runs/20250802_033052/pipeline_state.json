@@ -1,0 +1,26 @@
+{
+  "start_time": "2025-08-02T03:30:52.581239",
+  "config_path": "configs/models/gemma-2-2b-it.yaml",
+  "model_name": "google/gemma-2-2b-it",
+  "output_directory": "pipeline_runs/20250802_033052",
+  "completed_stages": [
+    "diagnostic",
+    "evaluation"
+  ],
+  "results": {
+    "diagnostic": {
+      "path_patching_heads": 201,
+      "bad_layers": 0,
+      "total_components": 201
+    },
+    "evaluation": {
+      "stages_evaluated": [
+        "baseline",
+        "steering_only"
+      ],
+      "datasets_evaluated": [],
+      "output_directory": "pipeline_runs/20250802_033052/evaluation"
+    }
+  },
+  "end_time": "2025-08-02T03:31:35.259962"
+}

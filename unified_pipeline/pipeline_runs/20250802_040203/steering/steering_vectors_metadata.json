@@ -1,0 +1,37 @@
+{
+  "bias_categories": [
+    "gender",
+    "race",
+    "religion",
+    "sycophancy",
+    "general"
+  ],
+  "vector_dimensions": 2304,
+  "magnitude_scale": 1.2,
+  "model_name": "google/gemma-2-2b-it",
+  "optimal_layers": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    10,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "model_name": "google/gemma-2-2b-it",
+    "timestamp": "2025-08-02T03:31:29.857690",
+    "config": {
+      "model": {
+        "name": "google/gemma-2-2b-it",
+        "device": "auto",
+        "torch_dtype": "float16",
+        "trust_remote_code": false,
+        "architecture": "gemma",
+        "model_type": "decoder"
+      },
+      "evaluation": {
+        "batch_size": 4,
+        "max_samples": 1500,
+        "datasets": [
+          "sycophancy",
+          "bias_bench",
+          "winobias",
+          "crows_pairs"
+        ],
+        "output_dir": "pipeline_runs/20250802_033052/evaluation"
+      },
+      "interventions": {
+        "enable_pinpoint_tuning": true,
+        "enable_steering": true,
+        "pinpoint_tuning": {
+          "component_selection": {
+            "max_components": 32,
+            "prioritize_heads": true,
+            "min_importance": 0.05
+          },
+          "lora": {
+            "r": 16,
+            "alpha": 32,
+            "dropout": 0.1,
+            "target_modules": [
+              "q_proj",
+              "v_proj",
+              "o_proj",
+              "gate_proj",
+              "up_proj",
+              "down_proj"
+            ]
+          },
+          "training": {
+            "output_dir": "training/gemma-2-2b-it",
+            "num_epochs": 2,
+            "learning_rate": "5e-5",
+            "batch_size": 2,
+            "gradient_accumulation_steps": 8,
+            "warmup_ratio": 0.1,
+            "save_strategy": "epoch",
+            "logging_steps": 50
+          }
+        },
+        "steering": {
+          "bad": {
+            "training_data_size": 3000,
+            "layers_to_probe": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ],
+            "accuracy_threshold": 0.65
+          },
+          "dsv": {
+            "bias_categories": [
+              "gender",
+              "race",
+              "religion",
+              "sycophancy"
+            ],
+            "magnitude_scale": 1.2,
+            "num_contrastive_pairs": 1000
+          },
+          "das": {
+            "threshold": 0.5,
+            "apply_scaling": true,
+            "max_intervention": 2.0,
+            "hook_layers": [
+              14
+            ]
+          }
+        }
+      },
+      "data": {
+        "diagnostic_path": "data/gemma_diagnostic.jsonl",
+        "sycophancy_path": "../sycophancy-interpretability/evaluation/datasets/sycophancy_eval",
+        "bias_bench_path": "../YangModels/datasets/bias_bench",
+        "winobias_path": "../YangModels/datasets/winobias",
+        "crows_pairs_path": "../ZacharyModels/datasets/crows_pairs",
+        "training_data": "../sycophancy-interpretability/prepare_training_data"
+      },
+      "gemma_settings": {
+        "max_sequence_length": 2048,
+        "use_chat_template": true,
+        "system_prompt": "You are a helpful, harmless, and honest assistant."
+      },
+      "diagnostic": {
+        "use_attention_analysis": true,
+        "use_mlp_probing": true,
+        "save_activations": true,
+        "layer_range": [
+          10,
+          17
+        ]
+      },
+      "auth": {
+        "requires_hf_token": true,
+        "license_acceptance_required": true
+      }
+    }
+  },
+  "datasets": {},
+  "stages": {
+    "baseline": {},
+    "steering_only": {}
+  },
+  "summary": {
+    "baseline": {},
+    "steering_only": {}
+  }
+}

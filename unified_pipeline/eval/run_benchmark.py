@@ -113,7 +113,7 @@ class UnifiedBenchmark:
         elif dataset_name == 'winobias':
             return self._load_winobias_data(data_config.get('winobias_path'))
         elif dataset_name == 'crows_pairs':
-            return self._load_crows_data(data_config.get('crows_path'))
+            return self._load_crows_data(data_config.get('crows_pairs_path'))
         else:
             print(f"Warning: Unknown dataset {dataset_name}")
             return []
@@ -190,11 +190,23 @@ class UnifiedBenchmark:
             if split_dir.is_dir():
                 for json_file in split_dir.glob("*.json"):
                     with open(json_file, 'r') as f:
-                        split_data = json.load(f)
-                        for item in split_data:
-                            item['dataset'] = 'winobias'
-                            item['split'] = split_dir.name
-                            data.append(item)
+                        # Handle both JSON and JSONL formats
+                        content = f.read().strip()
+                        if content.startswith('['):
+                            # Regular JSON array
+                            split_data = json.loads(content)
+                            for item in split_data:
+                                item['dataset'] = 'winobias'
+                                item['split'] = split_dir.name
+                                data.append(item)
+                        else:
+                            # JSONL format - one JSON object per line
+                            for line in content.split('\n'):
+                                if line.strip():
+                                    item = json.loads(line)
+                                    item['dataset'] = 'winobias'
+                                    item['split'] = split_dir.name
+                                    data.append(item)
         
         return data[:self.max_samples]
     

@@ -1,0 +1,300 @@
+{
+  "training_type": "unified_pinpoint_tuning",
+  "model_name": "google/gemma-2-2b-it",
+  "timestamp": null,
+  "selected_components": [
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 2,
+      "importance": 5.27734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 0,
+      "importance": 5.17578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 3,
+      "importance": 5.078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 7,
+      "importance": 5.05078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 6,
+      "importance": 5.0078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 4,
+      "importance": 4.703125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 5,
+      "importance": 4.6875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 2,
+      "importance": 4.67578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 0,
+      "importance": 4.640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 1,
+      "importance": 4.60546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 7,
+      "importance": 4.40234375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 2,
+      "importance": 4.39453125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 3,
+      "importance": 4.35546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 6,
+      "importance": 4.3203125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 2,
+      "importance": 4.26171875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 4,
+      "importance": 4.2578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 0,
+      "importance": 4.1953125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 7,
+      "importance": 4.16796875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 5,
+      "importance": 4.11328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 6,
+      "importance": 4.0703125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 1,
+      "importance": 4.0625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 3,
+      "importance": 4.046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 4,
+      "importance": 4.02734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 7,
+      "importance": 4.0078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 1,
+      "importance": 3.998046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 1,
+      "importance": 3.994140625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 0,
+      "importance": 3.974609375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 4,
+      "importance": 3.96875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 6,
+      "importance": 3.923828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 4,
+      "importance": 3.908203125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 5,
+      "importance": 3.880859375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 2,
+      "importance": 3.853515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    }
+  ],
+  "training_config": {
+    "component_selection": {
+      "max_components": 32,
+      "prioritize_heads": true,
+      "min_importance": 0.05
+    },
+    "lora": {
+      "r": 16,
+      "alpha": 32,
+      "dropout": 0.1,
+      "target_modules": [
+        "q_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj"
+      ]
+    },
+    "training": {
+      "output_dir": "pipeline_runs/20250802_035006/training",
+      "num_epochs": 2,
+      "learning_rate": "5e-5",
+      "batch_size": 2,
+      "gradient_accumulation_steps": 8,
+      "warmup_ratio": 0.1,
+      "save_strategy": "epoch",
+      "logging_steps": 50
+    }
+  },
+  "component_summary": {
+    "total_components": 32,
+    "attention_heads": 32,
+    "mlp_layers": 0,
+    "sycophancy_components": 32,
+    "demographic_components": 0
+  }
+}

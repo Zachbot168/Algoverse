@@ -1,0 +1,35 @@
+{
+  "start_time": "2025-08-02T03:44:25.580748",
+  "config_path": "configs/models/gemma-2-2b-it.yaml",
+  "model_name": "google/gemma-2-2b-it",
+  "output_directory": "pipeline_runs/20250802_034425",
+  "completed_stages": [
+    "diagnostic",
+    "pinpoint_tuning",
+    "dsv_computation"
+  ],
+  "results": {
+    "diagnostic": {
+      "path_patching_heads": 201,
+      "bad_layers": 0,
+      "total_components": 201
+    },
+    "pinpoint_tuning": {
+      "model_path": "pipeline_runs/20250802_034425/training",
+      "components_trained": 32,
+      "training_directory": "pipeline_runs/20250802_034425/training"
+    },
+    "dsv_computation": {
+      "steering_vectors": [
+        "gender",
+        "race",
+        "religion",
+        "sycophancy",
+        "general"
+      ],
+      "output_path": "pipeline_runs/20250802_034425/steering/steering_vectors.pkl"
+    }
+  },
+  "error": "Extra data: line 2 column 1 (char 857)",
+  "end_time": "2025-08-02T03:44:42.700867"
+}

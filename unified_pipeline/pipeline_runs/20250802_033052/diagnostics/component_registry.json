@@ -1,0 +1,1620 @@
+{
+  "model_name": "google/gemma-2-2b-it",
+  "timestamp": "2025-08-02T03:31:27.176765",
+  "components": [
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 2,
+      "importance": 5.27734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 0,
+      "importance": 5.17578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 3,
+      "importance": 5.078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 7,
+      "importance": 5.05078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 6,
+      "importance": 5.0078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 4,
+      "importance": 4.703125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 5,
+      "importance": 4.6875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 2,
+      "importance": 4.67578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 0,
+      "importance": 4.640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 25,
+      "type": "head",
+      "head_index": 1,
+      "importance": 4.60546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 7,
+      "importance": 4.40234375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 2,
+      "importance": 4.39453125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 3,
+      "importance": 4.35546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 6,
+      "importance": 4.3203125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 2,
+      "importance": 4.26171875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 4,
+      "importance": 4.2578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 0,
+      "importance": 4.1953125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 7,
+      "importance": 4.16796875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 5,
+      "importance": 4.11328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 6,
+      "importance": 4.0703125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 1,
+      "importance": 4.0625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 3,
+      "importance": 4.046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 4,
+      "importance": 4.02734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 7,
+      "importance": 4.0078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 1,
+      "importance": 3.998046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 1,
+      "importance": 3.994140625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 0,
+      "importance": 3.974609375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 24,
+      "type": "head",
+      "head_index": 4,
+      "importance": 3.96875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 6,
+      "importance": 3.923828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 4,
+      "importance": 3.908203125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 23,
+      "type": "head",
+      "head_index": 5,
+      "importance": 3.880859375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 2,
+      "importance": 3.853515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 3,
+      "importance": 3.83984375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 0,
+      "importance": 3.771484375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 22,
+      "type": "head",
+      "head_index": 5,
+      "importance": 3.767578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 6,
+      "importance": 3.677734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 7,
+      "importance": 3.572265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 2,
+      "importance": 3.556640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 1,
+      "importance": 3.546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 0,
+      "importance": 3.42578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 3,
+      "importance": 3.423828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 5,
+      "importance": 3.412109375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 6,
+      "importance": 3.3828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 4,
+      "importance": 3.375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 6,
+      "importance": 3.353515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 7,
+      "importance": 3.3125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 0,
+      "importance": 3.283203125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 1,
+      "importance": 3.27734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 2,
+      "importance": 3.271484375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 4,
+      "importance": 3.234375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 2,
+      "importance": 3.212890625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 7,
+      "importance": 3.197265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 5,
+      "importance": 3.193359375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 1,
+      "importance": 3.1796875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 6,
+      "importance": 3.17578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 4,
+      "importance": 3.12890625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 0,
+      "importance": 3.123046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 3,
+      "importance": 3.111328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 5,
+      "importance": 3.087890625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 3,
+      "importance": 3.06640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 2,
+      "importance": 3.025390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 7,
+      "importance": 2.994140625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 1,
+      "importance": 2.927734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 3,
+      "importance": 2.896484375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 5,
+      "importance": 2.859375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 2,
+      "importance": 2.79296875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 4,
+      "importance": 2.759765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 5,
+      "importance": 2.74609375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 6,
+      "importance": 2.728515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 7,
+      "importance": 2.7265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 0,
+      "importance": 2.712890625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 6,
+      "importance": 2.662109375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 5,
+      "importance": 2.60546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 0,
+      "importance": 2.578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 3,
+      "importance": 2.572265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 7,
+      "importance": 2.564453125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 1,
+      "importance": 2.5546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 1,
+      "importance": 2.53515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 3,
+      "importance": 2.525390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 4,
+      "importance": 2.509765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 2,
+      "importance": 2.388671875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 6,
+      "importance": 2.359375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 5,
+      "importance": 2.328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 4,
+      "importance": 2.1875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 7,
+      "importance": 2.17578125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 1,
+      "importance": 2.15625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 0,
+      "importance": 2.1171875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 2,
+      "importance": 2.115234375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 2,
+      "importance": 2.10546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": 3,
+      "importance": 2.05078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 0,
+      "importance": 1.9638671875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 5,
+      "importance": 1.958984375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 7,
+      "importance": 1.9345703125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 3,
+      "importance": 1.923828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 0,
+      "importance": 1.916015625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 4,
+      "importance": 1.9111328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 5,
+      "importance": 1.8955078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 6,
+      "importance": 1.8779296875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 6,
+      "importance": 1.857421875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 7,
+      "importance": 1.83984375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 1,
+      "importance": 1.833984375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 1,
+      "importance": 1.818359375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 13,
+      "type": "head",
+      "head_index": 3,
+      "importance": 1.8046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 14,
+      "type": "head",
+      "head_index": 4,
+      "importance": 1.7734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 5,
+      "importance": 1.7666015625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 2,
+      "importance": 1.73046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 2,
+      "importance": 1.6748046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 1,
+      "importance": 1.6650390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 7,
+      "importance": 1.6435546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 4,
+      "importance": 1.6396484375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 7,
+      "importance": 1.6171875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 1,
+      "importance": 1.5751953125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 4,
+      "importance": 1.56640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 6,
+      "importance": 1.5302734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 5,
+      "importance": 1.5263671875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 3,
+      "importance": 1.525390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 12,
+      "type": "head",
+      "head_index": 0,
+      "importance": 1.4560546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 6,
+      "importance": 1.4423828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 0,
+      "importance": 1.416015625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 11,
+      "type": "head",
+      "head_index": 3,
+      "importance": 1.4111328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 1,
+      "importance": 1.265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 2,
+      "importance": 1.2509765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 5,
+      "importance": 1.1943359375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 7,
+      "importance": 1.1884765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 3,
+      "importance": 1.1650390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 6,
+      "importance": 1.1181640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 4,
+      "importance": 1.1083984375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 10,
+      "type": "head",
+      "head_index": 0,
+      "importance": 1.087890625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 7,
+      "importance": 1.037109375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 1,
+      "importance": 1.0126953125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 5,
+      "importance": 1.0009765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.97705078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.95703125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.9482421875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.9345703125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 9,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.9287109375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.888671875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.8583984375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.85009765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.84716796875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.84375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.83447265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.81005859375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.78564453125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.78515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.77685546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.76708984375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.76025390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.75146484375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 8,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.75048828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.73876953125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 7,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.72314453125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.62939453125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.611328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.59912109375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.5927734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.58935546875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.5859375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.5537109375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 5,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.55322265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.54541015625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.51025390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.5009765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.494140625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.486572265625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.483154296875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.477783203125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.47705078125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.4765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.474853515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 6,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.474853515625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.45361328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.44873046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.4375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.434326171875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 4,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.4306640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.32861328125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.327880859375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.312255859375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.310302734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.306884765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.302734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.301025390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 3,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.294677734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.1903076171875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.18994140625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.1854248046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.1817626953125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.181640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.1766357421875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.176513671875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.17431640625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 2,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.1732177734375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.16650390625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.16064453125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.159423828125,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.1588134765625,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 4,
+      "importance": 0.1488037109375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.1484375,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 1,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.1473388671875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    },
+    {
+      "layer": 0,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.104248046875,
+      "bias_type": "sycophancy",
+      "source": "path_patching"
+    }
+  ],
+  "summary": {
+    "total_components": 201,
+    "bad_layers": 0,
+    "path_patching_heads": 201,
+    "avg_importance": 2.0317565006996268
+  }
+}

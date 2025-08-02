@@ -363,8 +363,9 @@ class UnifiedDiagnosticPass:
         registry = {
             "model_name": self.model_name,
             "timestamp": datetime.now().isoformat(),
+            "num_components": len(components),
             "components": components,
-            "summary": {
+            "metadata": {
                 "total_components": len(components),
                 "bad_layers": len([c for c in components if c['type'] == 'mlp']),
                 "path_patching_heads": len([c for c in components if c['type'] == 'head']),

@@ -13,7 +13,7 @@ evaluation:
   batch_size: 4  # Gemma 2B requires more memory
   max_samples: 1500
   datasets:
-    - "sycophancy"
+    - "sycophancy_eval"
     - "bias_bench"
     - "winobias"
     - "crows_pairs"
@@ -65,9 +65,9 @@ interventions:
 data:
   diagnostic_path: "data/gemma_diagnostic.jsonl"
   sycophancy_path: "../sycophancy-interpretability/evaluation/datasets/sycophancy_eval"
-  bias_bench_path: "../YangModels/datasets/bias_bench" 
-  winobias_path: "../YangModels/datasets/winobias"
-  crows_pairs_path: "../ZacharyModels/datasets/crows_pairs"
+  bias_bench_path: "../datasets/bias-bench" 
+  winobias_path: "../datasets/winobias"
+  crows_pairs_path: "../datasets/crows-pairs"
   training_data: "../sycophancy-interpretability/prepare_training_data"
 
 # Gemma-specific settings

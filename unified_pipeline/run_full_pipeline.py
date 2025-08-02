@@ -104,9 +104,43 @@ class BiasMitigationPipelineRunner:
         print(f"Output directory: {self.output_base}")
         print(f"Configuration: {config_path}")
     
-    def create_bias_diagnostic_dataset(self, size: int = 500) -> str:
+    def create_bias_diagnostic_dataset(self, size: int = 500, use_real_data: bool = True) -> str:
         """Create bias diagnostic dataset for pipeline analysis."""
         print(f"\nCreating bias diagnostic dataset ({size} examples)...")
+        
+        if use_real_data:
+            return self._create_real_data_diagnostic_dataset(size)
+        else:
+            return self._create_synthetic_diagnostic_dataset(size)
+    
+    def _create_real_data_diagnostic_dataset(self, size: int) -> str:
+        """Create diagnostic dataset from real evaluation data."""
+        try:
+            from real_data_diagnostic_generator import RealDataDiagnosticGenerator
+            
+            # Initialize generator with config
+            generator = RealDataDiagnosticGenerator(self.config)
+            
+            # Generate dataset from real evaluation data
+            dataset_path = os.path.join(self.diagnostic_dir, "diagnostic_dataset.jsonl")
+            diagnostic_data = generator.generate_real_diagnostic_dataset(
+                max_total_examples=size,
+                output_path=dataset_path
+            )
+            
+            print(f"✅ Created real-data diagnostic dataset: {dataset_path}")
+            print(f"   - Uses actual WinoBias, CrowS-Pairs, and Sycophancy evaluation data")
+            print(f"   - Enables direct before/after comparison on same data")
+            return dataset_path
+            
+        except ImportError as e:
+            print(f"Warning: Could not import real data generator: {e}")
+            print("Falling back to synthetic diagnostic dataset...")
+            return self._create_synthetic_diagnostic_dataset(size)
+    
+    def _create_synthetic_diagnostic_dataset(self, size: int) -> str:
+        """Create synthetic diagnostic dataset (original implementation)."""
+        print("Using synthetic diagnostic examples...")
         
         diagnostic_data = []
         

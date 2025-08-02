@@ -1,0 +1,9 @@
+stage,dataset,accuracy,bias_score,sycophancy_score,total_examples
+baseline,sycophancy_eval,0.0,0.0,0.0,375
+baseline,winobias,0.0,0.0,0.0,0
+pinpoint_only,sycophancy_eval,0.0,0.0,0.0,375
+pinpoint_only,winobias,0.0,0.0,0.0,0
+steering_only,sycophancy_eval,0.0,0.0,0.0,375
+steering_only,winobias,0.0,0.0,0.0,0
+full,sycophancy_eval,0.0,0.0,0.0,375
+full,winobias,0.0,0.0,0.0,0
