@@ -1,0 +1,45 @@
+model:
+  name: "meta-llama/Llama-2-7b-hf"  # No official 2B, using 7B
+  type: "llama"
+  architecture: "decoder"
+  huggingface_id: "meta-llama/Llama-2-7b-hf"
+  
+  # Model specifications  
+  parameters: "7B"
+  layers: 32
+  hidden_size: 4096
+  attention_heads: 32
+  max_position_embeddings: 4096
+  
+  # Bias evaluation settings
+  supports_generation: true
+  supports_masked_lm: false
+  evaluation_modes:
+    - "generation"
+    - "classification"
+    - "perplexity"
+  
+  # Expected bias characteristics
+  bias_profile:
+    description: "Llama-2-7B trained on diverse internet data. Generally shows moderate biases but can exhibit stereotypes, especially in generation tasks."
+    expected_bias_level: "moderate_to_high"
+    common_biases:
+      - "gender_stereotypes"
+      - "cultural_biases"
+      - "occupational_stereotypes"
+    
+  # Loading configuration
+  torch_dtype: "float16"
+  device_map: "auto"
+  trust_remote_code: false
+  
+# Pipeline settings
+base_data_path: "/workspace/Algoverse"
+output_base: "llama_2_7b_results"
+
+# Note: Requires HuggingFace access token
+# Evaluation configuration
+evaluation:
+  suite: "working_baseline"  # Smaller suite due to model size
+  sample_size: 500
+  timeout_per_dataset: 900

@@ -1,0 +1,44 @@
+model:
+  name: "bert-large-uncased"
+  type: "bert"
+  architecture: "encoder"
+  huggingface_id: "bert-large-uncased"
+  
+  # Model specifications
+  parameters: "340M"
+  layers: 24
+  hidden_size: 1024
+  attention_heads: 16
+  max_position_embeddings: 512
+  
+  # Bias evaluation settings
+  supports_generation: false
+  supports_masked_lm: true
+  evaluation_modes:
+    - "classification" 
+    - "masked_lm"
+    - "association_test"
+  
+  # Expected bias characteristics
+  bias_profile:
+    description: "BERT-Large trained on BooksCorpus + Wikipedia. Known to exhibit occupational gender stereotypes and racial biases from training data."
+    expected_bias_level: "high"
+    common_biases:
+      - "occupational_gender_stereotypes"
+      - "racial_associations"
+      - "religious_stereotypes"
+    
+  # Loading configuration
+  torch_dtype: "float32"
+  device_map: "auto"
+  trust_remote_code: false
+  
+# Pipeline settings
+base_data_path: "/workspace/Algoverse"
+output_base: "bert_large_results"
+
+# Evaluation configuration
+evaluation:
+  suite: "comprehensive"
+  sample_size: null
+  timeout_per_dataset: 600

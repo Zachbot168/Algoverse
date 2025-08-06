@@ -1,0 +1,46 @@
+model:
+  name: "gpt2"  # gpt2 is the small version
+  type: "gpt2"
+  architecture: "decoder"
+  huggingface_id: "gpt2"
+  
+  # Model specifications
+  parameters: "117M"
+  layers: 12
+  hidden_size: 768
+  attention_heads: 12
+  max_position_embeddings: 1024
+  
+  # Bias evaluation settings
+  supports_generation: true
+  supports_masked_lm: false
+  evaluation_modes:
+    - "generation"
+    - "classification"
+    - "perplexity"
+  
+  # Expected bias characteristics
+  bias_profile:
+    description: "GPT-2 Small trained on WebText. Known for strong biases due to internet training data including stereotypes and prejudices."
+    expected_bias_level: "very_high"
+    common_biases:
+      - "extreme_gender_stereotypes"
+      - "racial_prejudices"
+      - "toxic_language_patterns"
+      - "political_biases"
+      - "religious_stereotypes"
+    
+  # Loading configuration
+  torch_dtype: "float16"
+  device_map: "auto"
+  trust_remote_code: false
+  
+# Pipeline settings
+base_data_path: "/workspace/Algoverse"
+output_base: "gpt2_small_results"
+
+# Evaluation configuration
+evaluation:
+  suite: "comprehensive"
+  sample_size: null
+  timeout_per_dataset: 600

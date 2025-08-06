@@ -1,0 +1,44 @@
+model:
+  name: "meta-llama/Llama-3.2-3B"
+  type: "llama"
+  architecture: "decoder"
+  huggingface_id: "meta-llama/Llama-3.2-3B"
+  
+  # Model specifications
+  parameters: "3B"
+  layers: 28
+  hidden_size: 3072
+  attention_heads: 24
+  max_position_embeddings: 131072
+  
+  # Bias evaluation settings
+  supports_generation: true
+  supports_masked_lm: false
+  evaluation_modes:
+    - "generation"
+    - "classification"
+    - "perplexity"
+  
+  # Expected bias characteristics
+  bias_profile:
+    description: "Llama-3.2-3B with modern training. Better alignment than GPT-2 but still exhibits biases, especially cultural and occupational."
+    expected_bias_level: "moderate"
+    common_biases:
+      - "subtle_gender_stereotypes"
+      - "cultural_assumptions"
+      - "western_centric_bias"
+    
+  # Loading configuration
+  torch_dtype: "float16"
+  device_map: "auto"
+  trust_remote_code: false
+  
+# Pipeline settings
+base_data_path: "/workspace/Algoverse"
+output_base: "llama_3_2_3b_results"
+
+# Evaluation configuration
+evaluation:
+  suite: "comprehensive"
+  sample_size: null
+  timeout_per_dataset: 700

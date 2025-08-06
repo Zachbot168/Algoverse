@@ -1,0 +1,44 @@
+model:
+  name: "google/gemma-3-1b-it"  
+  type: "gemma"
+  architecture: "decoder"
+  huggingface_id: "google/gemma-3-1b-it"
+  
+  # Model specifications
+  parameters: "1B"
+  layers: 16
+  hidden_size: 2048
+  attention_heads: 16
+  max_position_embeddings: 8192
+  
+  # Bias evaluation settings
+  supports_generation: true
+  supports_masked_lm: false
+  evaluation_modes:
+    - "generation"
+    - "classification"
+    - "perplexity"
+  
+  # Expected bias characteristics
+  bias_profile:
+    description: "Gemma-3-1B-IT with instruction tuning. Relatively well-aligned but smaller model may show more bias patterns."
+    expected_bias_level: "low_to_moderate"
+    common_biases:
+      - "mild_occupational_stereotypes"
+      - "cultural_assumptions"
+      - "instruction_following_biases"
+    
+  # Loading configuration
+  torch_dtype: "float16"
+  device_map: "auto"
+  trust_remote_code: true
+  
+# Pipeline settings
+base_data_path: "/workspace/Algoverse"
+output_base: "gemma_3_1b_it_results"
+
+# Evaluation configuration
+evaluation:
+  suite: "comprehensive"
+  sample_size: null
+  timeout_per_dataset: 600

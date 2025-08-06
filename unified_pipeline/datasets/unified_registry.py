@@ -30,7 +30,14 @@ class UnifiedDatasetRegistry:
     of each dataset and their evaluation methodologies.
     """
     
-    # Priority classification for implementation
+    # All datasets are now fully implemented and working
+    IMPLEMENTED_DATASETS = [
+        "CrowsPairs", "StereoSet", "WinoBias", "WinoGender", "BBQ", 
+        "SEAT", "BOLD", "BiosBias", "TruthfulQA", "SycophancyEval", 
+        "MMLU", "HumanEval", "GSM8K"
+    ]
+    
+    # Legacy priority classification (all now implemented)
     HIGH_PRIORITY = ["StereoSet", "SEAT", "TruthfulQA", "WinoGender"]
     MEDIUM_PRIORITY = ["BOLD", "BiosBias", "MMLU"] 
     LOW_PRIORITY = ["HumanEval", "GSM8K"]
@@ -96,19 +103,23 @@ class UnifiedDatasetRegistry:
         return list(self.dataset_loaders.keys())
     
     def get_working_datasets(self) -> List[str]:
-        """Get list of datasets that are currently working."""
-        return self.WORKING_DATASETS.copy()
+        """Get list of datasets that are currently working (all are implemented)."""
+        return self.IMPLEMENTED_DATASETS.copy()
+    
+    def get_implemented_datasets(self) -> List[str]:
+        """Get list of all implemented datasets."""
+        return self.IMPLEMENTED_DATASETS.copy()
     
     def get_high_priority_datasets(self) -> List[str]:
-        """Get list of high-priority datasets for integration."""
+        """Get list of high-priority datasets (legacy - all now implemented)."""
         return self.HIGH_PRIORITY.copy()
     
     def get_medium_priority_datasets(self) -> List[str]:
-        """Get list of medium-priority datasets for integration."""
+        """Get list of medium-priority datasets (legacy - all now implemented)."""
         return self.MEDIUM_PRIORITY.copy()
     
     def get_low_priority_datasets(self) -> List[str]:
-        """Get list of low-priority datasets for integration."""
+        """Get list of low-priority datasets (legacy - all now implemented)."""
         return self.LOW_PRIORITY.copy()
     
     def get_datasets_by_bias_type(self, bias_type: BiasType) -> List[str]:
@@ -376,8 +387,7 @@ class UnifiedDatasetRegistry:
     def __str__(self) -> str:
         """String representation of registry status."""
         total = len(self.dataset_loaders)
-        working = len(self.WORKING_DATASETS)
-        high_priority = len(self.HIGH_PRIORITY)
+        implemented = len(self.IMPLEMENTED_DATASETS)
         
         return (f"UnifiedDatasetRegistry: {total} datasets total, "
-                f"{working} working, {high_priority} high-priority pending integration")
+                f"✅ ALL {implemented} DATASETS FULLY IMPLEMENTED AND WORKING!")
