@@ -1,0 +1,275 @@
+# Unified Dataset Configuration for Bias Mitigation Pipeline
+# Defines all available datasets and their integration settings
+
+# Dataset Priority Levels
+priority_levels:
+  high_priority:
+    - StereoSet
+    - SEAT  
+    - TruthfulQA
+    - WinoGender
+  
+  medium_priority:
+    - BOLD
+    - BiosBias
+    - MMLU
+  
+  low_priority:
+    - HumanEval
+    - GSM8K
+  
+  working_datasets:
+    - CrowsPairs
+    - WinoBias
+    - SycophancyEval
+    - BBQ
+
+# Dataset-specific configurations
+dataset_configs:
+  # BIAS DATASETS
+  CrowsPairs:
+    enabled: true
+    sample_size: 500
+    split: "test"
+    evaluation_mode: "crows_pairs_comparison"
+    bias_types: ["stereotype", "gender", "racial", "religious"]
+    requires_generation: false
+    
+  StereoSet:
+    enabled: true
+    sample_size: 1000
+    split: "dev"
+    evaluation_mode: "stereoset_classification"
+    bias_types: ["stereotype", "gender", "racial", "religious"]
+    requires_generation: false
+    unique_features:
+      - "stereotype_anti-stereotype_unrelated_triples"
+      - "intersentence_intrasentence_variants"
+    
+  WinoBias:
+    enabled: true
+    sample_size: 500
+    split: "test"
+    evaluation_mode: "winobias_classification"
+    bias_types: ["gender"]
+    requires_generation: false
+    variants: ["type1_anti", "type1_pro", "type2_anti", "type2_pro"]
+    
+  WinoGender:
+    enabled: true
+    sample_size: 300
+    split: "test"
+    evaluation_mode: "winogender_classification"
+    bias_types: ["gender"]
+    requires_generation: false
+    fallback_if_missing: true
+    
+  BBQ:
+    enabled: true
+    sample_size: 1000
+    split: "test"
+    evaluation_mode: "bbq_qa"
+    bias_types: ["demographic", "gender", "racial", "religious"]
+    requires_generation: false
+    
+  SEAT:
+    enabled: true
+    sample_size: 42  # All WEAT tests
+    split: "test"
+    evaluation_mode: "seat_association"
+    bias_types: ["gender", "racial", "religious", "demographic"]
+    requires_generation: false
+    unique_features:
+      - "word_embedding_association_tests"
+      - "40_plus_weat_variants"
+    
+  BOLD:
+    enabled: true
+    sample_size: 500
+    split: "test"
+    evaluation_mode: "bold_generation"
+    bias_types: ["demographic", "gender", "racial", "profession"]
+    requires_generation: true
+    categories: ["American_actors", "European_actors", "professions", "gender", "race", "religion"]
+    
+  BiosBias:
+    enabled: true
+    sample_size: 1000
+    split: "test"
+    evaluation_mode: "biosbias_classification"
+    bias_types: ["profession", "gender"]
+    requires_generation: false
+    fallback_if_missing: true
+
+  # SYCOPHANCY DATASETS
+  TruthfulQA:
+    enabled: true
+    sample_size: 300
+    split: "test"
+    evaluation_mode: "truthfulqa_truthfulness"
+    bias_types: ["sycophancy"]
+    requires_generation: true
+    unique_features:
+      - "truth_vs_agreeableness_tradeoff"
+      - "human_falsehood_detection"
+    
+  SycophancyEval:
+    enabled: true
+    sample_size: 1000
+    split: "test"
+    evaluation_mode: "sycophancy_detection"
+    bias_types: ["sycophancy"]
+    requires_generation: false
+    variants: ["multiple_choice", "multiple_choice_cot", "are_you_sure", "free_generation"]
+    
+  MMLU:
+    enabled: true
+    sample_size: 1000
+    split: "test"
+    evaluation_mode: "mmlu_knowledge"
+    bias_types: ["sycophancy"]
+    requires_generation: false
+    subjects: 57
+    unique_features:
+      - "academic_domain_coverage"
+      - "knowledge_vs_agreement_analysis"
+    
+  HumanEval:
+    enabled: true
+    sample_size: 164  # All problems
+    split: "test"
+    evaluation_mode: "humaneval_coding"
+    bias_types: ["sycophancy"]
+    requires_generation: true
+    requires_code_execution: true
+    
+  GSM8K:
+    enabled: true
+    sample_size: 500
+    split: "test"  
+    evaluation_mode: "gsm8k_math"
+    bias_types: ["sycophancy"]
+    requires_generation: true
+    requires_numerical_extraction: true
+
+# Evaluation Suite Configurations
+evaluation_suites:
+  comprehensive:
+    description: "Complete bias evaluation with all available datasets"
+    datasets:
+      - CrowsPairs
+      - StereoSet
+      - WinoBias
+      - WinoGender
+      - BBQ
+      - SEAT
+      - BOLD
+      - BiosBias
+      - TruthfulQA
+      - SycophancyEval
+      - MMLU
+      - HumanEval
+      - GSM8K
+    expected_samples: 7000+
+    
+  bias_focused:
+    description: "Focus on demographic and stereotype bias evaluation"
+    datasets:
+      - CrowsPairs
+      - StereoSet
+      - WinoBias
+      - WinoGender
+      - BBQ
+      - SEAT
+      - BOLD
+      - BiosBias
+    expected_samples: 4000+
+    
+  sycophancy_focused:
+    description: "Focus on sycophancy and truth vs agreeableness"
+    datasets:
+      - TruthfulQA
+      - SycophancyEval
+      - MMLU
+      - HumanEval
+      - GSM8K
+    expected_samples: 2500+
+    
+  working_baseline:
+    description: "Currently working datasets for baseline evaluation"
+    datasets:
+      - CrowsPairs
+      - WinoBias
+      - SycophancyEval
+      - BBQ
+    expected_samples: 2000+
+    
+  high_priority:
+    description: "High priority datasets for integration"
+    datasets:
+      - StereoSet
+      - SEAT
+      - TruthfulQA
+      - WinoGender
+    expected_samples: 1600+
+    
+  quick_evaluation:
+    description: "Fast evaluation with core datasets"
+    datasets:
+      - CrowsPairs
+      - WinoBias
+      - SycophancyEval
+    expected_samples: 1000+
+    sample_size_override: 200  # Smaller samples for speed
+
+# Integration Settings
+integration:
+  base_data_path: "/workspace/Algoverse"
+  fallback_on_missing: true
+  validate_on_load: true
+  cache_loaded_datasets: true
+  
+  # Error handling
+  skip_failed_datasets: true
+  log_loading_errors: true
+  
+  # Performance settings
+  batch_processing: true
+  parallel_loading: false  # Set to true if memory allows
+  
+  # Output settings
+  save_dataset_registry: true
+  registry_output_path: "diagnostics/dataset_registry.json"
+  
+# Metric Aggregation Settings
+metrics:
+  aggregate_by_bias_type: true
+  aggregate_by_evaluation_mode: true
+  compute_overall_scores: true
+  
+  # Dataset-specific metric weights
+  dataset_weights:
+    CrowsPairs: 1.0
+    StereoSet: 1.5  # Higher weight due to comprehensiveness
+    WinoBias: 1.0
+    WinoGender: 0.8
+    BBQ: 1.2
+    SEAT: 1.3  # Important for association bias
+    BOLD: 1.1
+    BiosBias: 0.9
+    TruthfulQA: 1.4  # Critical for truth vs sycophancy
+    SycophancyEval: 1.0
+    MMLU: 1.1
+    HumanEval: 0.7
+    GSM8K: 0.7
+    
+  # Bias type importance weights
+  bias_type_weights:
+    gender: 1.2
+    racial: 1.2
+    religious: 1.1
+    demographic: 1.0
+    sycophancy: 1.3
+    profession: 0.9
+    stereotype: 1.1
+    general: 0.8

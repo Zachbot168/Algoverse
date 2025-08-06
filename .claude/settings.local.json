@@ -12,7 +12,10 @@
       "Bash(./pull_datasets.sh:*)",
       "Bash(rm:*)",
       "Bash(git clone:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git pull:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

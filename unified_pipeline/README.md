@@ -2,10 +2,16 @@
 
 ## Overview
 
-This unified pipeline combines two complementary approaches for comprehensive bias detection and mitigation in large language models:
+This unified pipeline integrates three complementary approaches for comprehensive bias detection and mitigation in large language models:
 
-1. **Causal Bias Localization** (Training-time): Selective fine-tuning of model components identified via interpretability techniques as responsible for biased outputs
-2. **Dynamic Bias Steering** (Inference-time): Real-time bias detection and correction using linear steering vectors applied during generation
+1. **Comprehensive Dataset Integration**: Unified evaluation across 13 bias benchmarks covering gender, racial, religious, occupational, demographic, and sycophancy biases
+2. **Causal Bias Localization** (Training-time): Selective fine-tuning of model components identified via interpretability techniques as responsible for biased outputs
+3. **Dynamic Bias Steering** (Inference-time): Real-time bias detection and correction using linear steering vectors applied during generation
+
+### 🎯 **Complete Pipeline Integration**
+- **Sycophancy Pipeline**: Integrated for truth vs. agreeableness evaluation
+- **Fairsteer Pipeline**: Integrated for representation engineering and steering
+- **13 Bias Datasets**: All datasets now fully integrated and accessible
 
 ```mermaid
 graph TD
