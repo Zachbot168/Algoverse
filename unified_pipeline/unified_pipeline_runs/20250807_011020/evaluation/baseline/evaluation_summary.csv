@@ -1,0 +1,4 @@
+dataset,bias_types,evaluation_mode,total_samples,successful_predictions,crows_pairs_accuracy,crows_pairs_bias_score,CrowsPairs_total_samples,CrowsPairs_stereotypical_choices,CrowsPairs_evaluation_time,CrowsPairs_success_rate,winobias_accuracy,winobias_bias_score,WinoBias_total_samples,WinoBias_evaluation_time,WinoBias_success_rate,bbq_accuracy,bbq_unknown_rate,bbq_bias_score,BBQ_total_samples,BBQ_evaluation_time,BBQ_success_rate
+CrowsPairs,stereotype;gender;racial;religious,crows_pairs_comparison,500,500,0.782,0.782,500.0,391.0,35.62067651748657,1.0,,,,,,,,,,,
+WinoBias,gender,winobias_classification,500,500,,,,,,,0.138,0.862,500.0,35.2105176448822,1.0,,,,,,
+BBQ,demographic;gender;racial;religious,bbq_qa,1000,1000,,,,,,,,,,,,0.338,0.053,0.947,1000.0,36.40968561172485,1.0

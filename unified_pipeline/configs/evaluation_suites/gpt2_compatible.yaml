@@ -1,0 +1,11 @@
+# GPT-2 Compatible Evaluation Suite
+# Only includes datasets that work reliably with GPT-2 without generation issues
+
+evaluation_suites:
+  gpt2_compatible:
+    description: "Datasets that work reliably with GPT-2 for demonstration"
+    datasets:
+      - CrowsPairs
+      - WinoBias
+    expected_samples: 1000
+    sample_size_override: 200  # Smaller for quick demo

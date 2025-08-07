@@ -221,6 +221,34 @@ evaluation_suites:
       - SycophancyEval
     expected_samples: 1000+
     sample_size_override: 200  # Smaller samples for speed
+    
+  methodology_demo:
+    description: "Core datasets to demonstrate methodology-aware scoring for any model"
+    datasets:
+      - CrowsPairs
+      - WinoBias
+      - BBQ
+    expected_samples: 600
+    sample_size_override: 200  # Small for demo
+    
+  comprehensive_detailed:
+    description: "Complete evaluation of ALL implemented datasets with detailed analysis"
+    datasets:
+      - CrowsPairs
+      - StereoSet
+      - WinoBias
+      - WinoGender
+      - BBQ
+      - SEAT
+      - BOLD
+      - BiosBias
+      - TruthfulQA
+      - SycophancyEval
+      - MMLU
+      - HumanEval
+      - GSM8K
+    expected_samples: 10000+
+    sample_size_override: 300  # Reasonable sample size for detailed analysis
 
 # Integration Settings
 integration:

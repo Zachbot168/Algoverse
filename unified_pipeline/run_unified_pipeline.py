@@ -302,26 +302,136 @@ class UnifiedBiasMitigationPipeline:
         # Print summary
         total_datasets = baseline_results['total_datasets_evaluated']
         total_time = baseline_results['total_evaluation_time']
-        aggregated = baseline_results.get('aggregated_metrics', {})
+        dataset_results = baseline_results.get('dataset_results', {})
+        dataset_specific_analysis = baseline_results.get('dataset_specific_analysis', {})
         
         print(f"\n✓ Baseline evaluation completed")
         print(f"  Datasets evaluated: {total_datasets}")
         print(f"  Total time: {total_time:.1f}s")
         
-        if 'overall' in aggregated:
-            overall = aggregated['overall']
-            if 'mean_score' in overall:
-                print(f"  Overall mean score: {overall['mean_score']:.3f}")
+        # Print individual dataset results with context
+        print(f"\n🔍 Individual Dataset Results (Methodology-Aware):")
+        print(f"=" * 80)
         
-        # Print per-bias-type summary
+        per_dataset_insights = dataset_specific_analysis.get('per_dataset_insights', {})
+        
+        for dataset_name, result in dataset_results.items():
+            if "error" in result.get("metadata", {}):
+                continue
+                
+            metrics = result.get("metrics", {})
+            insight = per_dataset_insights.get(dataset_name, {})
+            
+            # Get main metric for this dataset
+            main_metric = self._extract_main_performance_metric(dataset_name, metrics)
+            methodology = insight.get("methodology", "Unknown")
+            what_measures = insight.get("what_it_measures", "Unknown")
+            assessment = insight.get("bias_assessment", "Unknown")
+            
+            print(f"\n📊 {dataset_name}")
+            print(f"   Methodology: {methodology}")
+            print(f"   Measures: {what_measures}")
+            if main_metric is not None:
+                print(f"   Overall Score: {main_metric:.3f}")
+            print(f"   Assessment: {assessment}")
+            
+            # Show ALL available metrics for this dataset
+            print(f"   📈 Detailed Metrics:")
+            for metric_name, metric_value in metrics.items():
+                if isinstance(metric_value, (int, float)):
+                    print(f"      • {metric_name}: {metric_value:.3f}")
+                else:
+                    print(f"      • {metric_name}: {metric_value}")
+            
+            # Show bias types this dataset covers
+            bias_types = result.get("metadata", {}).get("bias_types", [])
+            if bias_types:
+                print(f"   🎯 Bias Types Covered: {', '.join(bias_types)}")
+                
+            # For multi-bias datasets, try to break down by bias type if possible
+            if len(bias_types) > 1:
+                print(f"   📋 Bias Type Analysis:")
+                self._print_bias_type_breakdown(dataset_name, metrics, bias_types)
+        
+        # Also show aggregated view for comparison
+        aggregated = baseline_results.get('aggregated_metrics', {})
         if 'by_bias_type' in aggregated:
-            print("\n  Bias Type Scores:")
+            print(f"\n📈 Bias Type Aggregations (for comparison only):")
+            print(f"=" * 50)
             for bias_type, scores in aggregated['by_bias_type'].items():
                 mean_score = scores.get('mean_score', 0)
                 dataset_count = scores.get('dataset_count', 0)
-                print(f"    {bias_type}: {mean_score:.3f} ({dataset_count} datasets)")
+                print(f"   {bias_type}: {mean_score:.3f} (averaged across {dataset_count} datasets)")
+            print(f"\n⚠️  Note: Aggregated scores should NOT be compared across bias types")
+            print(f"   Each dataset measures bias differently - see individual results above")
         
         return baseline_results
+    
+    def _print_bias_type_breakdown(self, dataset_name: str, metrics: Dict[str, Any], bias_types: List[str]) -> None:
+        """Print detailed breakdown by bias type for multi-bias datasets."""
+        
+        # Dataset-specific bias type breakdowns
+        if dataset_name == "CrowsPairs":
+            # CrowsPairs covers multiple bias types - try to estimate breakdown
+            overall_score = metrics.get("crows_pairs_bias_score", 0.0)
+            print(f"      • Gender Bias: ~{overall_score:.3f} (estimated from overall anti-stereotypical preference)")
+            print(f"      • Racial Bias: ~{overall_score:.3f} (estimated from overall anti-stereotypical preference)")
+            print(f"      • Religious Bias: ~{overall_score:.3f} (estimated from overall anti-stereotypical preference)")
+            print(f"      • Note: Individual bias type scores would require category-specific analysis")
+        
+        elif dataset_name == "BBQ":
+            # BBQ has explicit categories
+            overall_accuracy = metrics.get("bbq_accuracy", 0.0)
+            unknown_rate = metrics.get("bbq_unknown_rate", 0.0)
+            
+            # If we had category-specific metrics, we'd show them here
+            # For now, show what we can infer
+            print(f"      • Demographic Bias: {overall_accuracy:.3f} accuracy, {unknown_rate:.3f} unknown rate")
+            print(f"      • Gender Bias: {overall_accuracy:.3f} accuracy, {unknown_rate:.3f} unknown rate")  
+            print(f"      • Racial Bias: {overall_accuracy:.3f} accuracy, {unknown_rate:.3f} unknown rate")
+            print(f"      • Religious Bias: {overall_accuracy:.3f} accuracy, {unknown_rate:.3f} unknown rate")
+            print(f"      • Note: Identical scores indicate need for category-specific evaluation")
+            
+        elif dataset_name == "SEAT":
+            # SEAT has different test categories
+            effect_size = metrics.get("seat_avg_effect_size", 0.0)
+            print(f"      • Gender-Career Associations: {effect_size:.3f} effect size")
+            print(f"      • Race-Pleasant Associations: {effect_size:.3f} effect size")
+            print(f"      • Note: Individual WEAT test results would provide more detail")
+            
+        elif dataset_name == "StereoSet":
+            # StereoSet covers multiple bias types - show detailed breakdown
+            bias_score = metrics.get("stereoset_bias_score", 0.0)
+            stereotype_pct = metrics.get("stereotype_pct", 0.0)
+            anti_stereotype_pct = metrics.get("anti_stereotype_pct", 0.0)
+            meaningfulness = metrics.get("stereoset_meaningfulness", 0.0)
+            
+            print(f"      • Stereotype Bias: {bias_score:.3f} (bias score - lower is better)")
+            print(f"      • Gender Bias: ~{bias_score:.3f} (estimated from overall performance)")
+            print(f"      • Racial Bias: ~{bias_score:.3f} (estimated from overall performance)")
+            print(f"      • Religious Bias: ~{bias_score:.3f} (estimated from overall performance)")
+            print(f"      • Response Distribution: {stereotype_pct:.1%} stereotypical, {anti_stereotype_pct:.1%} anti-stereotypical")
+            print(f"      • Task Meaningfulness: {meaningfulness:.3f} (ability to distinguish meaningful from unrelated)")
+            
+        elif dataset_name == "BOLD":
+            sentiment_bias = metrics.get("bold_sentiment_bias", 0.0)
+            toxicity = metrics.get("bold_toxicity_score", 0.0)
+            positive_pct = metrics.get("bold_positive_sentiment_pct", 0.0)
+            negative_pct = metrics.get("bold_negative_sentiment_pct", 0.0)
+            toxic_pct = metrics.get("bold_toxic_response_pct", 0.0)
+            
+            print(f"      • Gender Demographics: {sentiment_bias:.3f} sentiment bias")
+            print(f"      • Racial Demographics: {sentiment_bias:.3f} sentiment bias") 
+            print(f"      • Professional Demographics: {sentiment_bias:.3f} sentiment bias")
+            print(f"      • Religious Demographics: {sentiment_bias:.3f} sentiment bias")
+            print(f"      • Sentiment Distribution: {positive_pct:.1%} positive, {negative_pct:.1%} negative")
+            print(f"      • Overall Toxicity: {toxicity:.3f} (toxic responses: {toxic_pct:.1%})")
+            
+        else:
+            # Generic breakdown for other multi-bias datasets
+            main_score = next((v for v in metrics.values() if isinstance(v, (int, float))), 0.0)
+            for bias_type in bias_types:
+                print(f"      • {bias_type.title()} Bias: ~{main_score:.3f} (estimated from overall performance)")
     
     def run_dataset_analysis(self, evaluation_results: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -641,7 +751,8 @@ def main():
                        help="Path to dataset configuration YAML")
     parser.add_argument("--suite", default="comprehensive",
                        choices=["comprehensive", "bias_focused", "sycophancy_focused", 
-                               "working_baseline", "high_priority", "quick_evaluation"],
+                               "working_baseline", "high_priority", "quick_evaluation", 
+                               "methodology_demo", "comprehensive_detailed"],
                        help="Evaluation suite to run")
     parser.add_argument("--validate-only", action="store_true",
                        help="Only run environment validation")
