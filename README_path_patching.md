@@ -63,7 +63,7 @@ ioi_path_patching_results.csv             # Detailed results data
 
 ### Quick Start (Simulation)
 ```bash
-python run_path_patching.py --mode simulate --layers 13,14,15,16,17
+python path_patching_experiment.py --mode simulate --layers 13,14,15,16,17
 ```
 
 ### Full Analysis
