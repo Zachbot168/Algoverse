@@ -37,7 +37,7 @@ dataset_configs:
     
   StereoSet:
     enabled: true
-    sample_size: 1000
+    sample_size: 300  # Reduced for performance 
     split: "dev"
     evaluation_mode: "stereoset_classification"
     bias_types: ["stereotype", "gender", "racial", "religious"]
@@ -45,15 +45,24 @@ dataset_configs:
     unique_features:
       - "stereotype_anti-stereotype_unrelated_triples"
       - "intersentence_intrasentence_variants"
+    # Performance optimizations
+    sample_timeout: 20  # 20 seconds per sample
+    dataset_timeout: 900  # 15 minutes for StereoSet
+    max_sample_failures: 15
     
   WinoBias:
     enabled: true
-    sample_size: 500
+    sample_size: 100  # Reduced for performance
     split: "test"
     evaluation_mode: "winobias_classification"
     bias_types: ["gender"]
     requires_generation: false
     variants: ["type1_anti", "type1_pro", "type2_anti", "type2_pro"]
+    # Aggressive performance optimizations
+    sample_timeout: 15  # 15 seconds per sample
+    dataset_timeout: 600  # 10 minutes for WinoBias
+    max_sample_failures: 10
+    memory_cleanup_interval: 25
     
   WinoGender:
     enabled: true
@@ -66,15 +75,20 @@ dataset_configs:
     
   BBQ:
     enabled: true
-    sample_size: 1000
+    sample_size: 200  # Reduced for performance
     split: "test"
-    evaluation_mode: "bbq_qa"
+    evaluation_mode: "bbq_classification"  # Changed to classification for speed
     bias_types: ["demographic", "gender", "racial", "religious"]
     requires_generation: false
+    # Performance optimizations
+    sample_timeout: 30  # 30 seconds per sample
+    dataset_timeout: 1800  # 30 minutes for BBQ
+    max_sample_failures: 20
+    memory_cleanup_interval: 50
     
   SEAT:
     enabled: true
-    sample_size: 42  # All WEAT tests
+    sample_size: 10  # Reduced for performance - just core tests
     split: "test"
     evaluation_mode: "seat_association"
     bias_types: ["gender", "racial", "religious", "demographic"]
@@ -82,6 +96,11 @@ dataset_configs:
     unique_features:
       - "word_embedding_association_tests"
       - "40_plus_weat_variants"
+    # Aggressive performance optimizations for embedding calculations
+    sample_timeout: 10  # 10 seconds per SEAT test
+    dataset_timeout: 300  # 5 minutes for SEAT
+    max_sample_failures: 3
+    memory_cleanup_interval: 5
     
   BOLD:
     enabled: true
@@ -101,7 +120,7 @@ dataset_configs:
     requires_generation: false
     fallback_if_missing: true
 
-  # SYCOPHANCY DATASETS
+  # SYCOPHANCY AND TRUTHFULNESS DATASETS (BIAS-FOCUSED)
   TruthfulQA:
     enabled: true
     sample_size: 300
@@ -120,42 +139,24 @@ dataset_configs:
     evaluation_mode: "sycophancy_detection"
     bias_types: ["sycophancy"]
     requires_generation: false
-    variants: ["multiple_choice", "multiple_choice_cot", "are_you_sure", "free_generation"]
+    bias_focused: true  # Only use bias-related sycophancy prompts
+    variants: ["bias_statements", "controversial_topics", "opinion_vs_fact"]
     
-  MMLU:
-    enabled: true
-    sample_size: 1000
-    split: "test"
-    evaluation_mode: "mmlu_knowledge"
-    bias_types: ["sycophancy"]
-    requires_generation: false
-    subjects: 57
-    unique_features:
-      - "academic_domain_coverage"
-      - "knowledge_vs_agreement_analysis"
-    
-  HumanEval:
-    enabled: true
-    sample_size: 164  # All problems
-    split: "test"
-    evaluation_mode: "humaneval_coding"
-    bias_types: ["sycophancy"]
-    requires_generation: true
-    requires_code_execution: true
-    
-  GSM8K:
-    enabled: true
-    sample_size: 500
-    split: "test"  
-    evaluation_mode: "gsm8k_math"
-    bias_types: ["sycophancy"]
-    requires_generation: true
-    requires_numerical_extraction: true
+  # NON-BIAS DATASETS (REMOVED FROM BIAS EVALUATION)
+  # These are capability tests, not bias measurements
+  # MMLU:
+  #   enabled: false  # Removed - academic knowledge is not a bias metric
+  #   
+  # HumanEval:
+  #   enabled: false  # Removed - coding ability is not a bias metric
+  #   
+  # GSM8K:
+  #   enabled: false  # Removed - math reasoning is not a bias metric
 
 # Evaluation Suite Configurations
 evaluation_suites:
   comprehensive:
-    description: "Complete bias evaluation with all available datasets"
+    description: "Complete bias evaluation with all bias-focused datasets"
     datasets:
       - CrowsPairs
       - StereoSet
@@ -167,10 +168,7 @@ evaluation_suites:
       - BiosBias
       - TruthfulQA
       - SycophancyEval
-      - MMLU
-      - HumanEval
-      - GSM8K
-    expected_samples: 7000+
+    expected_samples: 4500+
     
   bias_focused:
     description: "Focus on demographic and stereotype bias evaluation"
@@ -186,14 +184,11 @@ evaluation_suites:
     expected_samples: 4000+
     
   sycophancy_focused:
-    description: "Focus on sycophancy and truth vs agreeableness"
+    description: "Focus on sycophancy and truth vs agreeableness bias"
     datasets:
       - TruthfulQA
       - SycophancyEval
-      - MMLU
-      - HumanEval
-      - GSM8K
-    expected_samples: 2500+
+    expected_samples: 1300+
     
   working_baseline:
     description: "Currently working datasets for baseline evaluation"
@@ -217,10 +212,15 @@ evaluation_suites:
     description: "Fast evaluation with core datasets"
     datasets:
       - CrowsPairs
-      - WinoBias
-      - SycophancyEval
-    expected_samples: 1000+
-    sample_size_override: 200  # Smaller samples for speed
+    expected_samples: 200+
+    sample_size_override: 200  # Single reliable dataset
+    
+  ultra_fast:
+    description: "Ultra-fast evaluation with minimal datasets"
+    datasets:
+      - CrowsPairs
+    expected_samples: 200+
+    sample_size_override: 200  # Small but meaningful sample
     
   methodology_demo:
     description: "Core datasets to demonstrate methodology-aware scoring for any model"
@@ -232,7 +232,7 @@ evaluation_suites:
     sample_size_override: 200  # Small for demo
     
   comprehensive_detailed:
-    description: "Complete evaluation of ALL implemented datasets with detailed analysis"
+    description: "Complete evaluation of ALL bias datasets with detailed analysis"
     datasets:
       - CrowsPairs
       - StereoSet
@@ -244,10 +244,7 @@ evaluation_suites:
       - BiosBias
       - TruthfulQA
       - SycophancyEval
-      - MMLU
-      - HumanEval
-      - GSM8K
-    expected_samples: 10000+
+    expected_samples: 3000+
     sample_size_override: 300  # Reasonable sample size for detailed analysis
 
 # Integration Settings
@@ -264,6 +261,10 @@ integration:
   # Performance settings
   batch_processing: true
   parallel_loading: false  # Set to true if memory allows
+  sample_timeout: 60  # Default timeout per sample
+  dataset_timeout: 3600  # Default timeout per dataset
+  max_sample_failures: 50  # Max failed samples before stopping
+  memory_cleanup_interval: 100  # Clean memory every N samples
   
   # Output settings
   save_dataset_registry: true
@@ -275,7 +276,7 @@ metrics:
   aggregate_by_evaluation_mode: true
   compute_overall_scores: true
   
-  # Dataset-specific metric weights
+  # Dataset-specific metric weights (bias-focused only)
   dataset_weights:
     CrowsPairs: 1.0
     StereoSet: 1.5  # Higher weight due to comprehensiveness
@@ -285,11 +286,9 @@ metrics:
     SEAT: 1.3  # Important for association bias
     BOLD: 1.1
     BiosBias: 0.9
-    TruthfulQA: 1.4  # Critical for truth vs sycophancy
-    SycophancyEval: 1.0
-    MMLU: 1.1
-    HumanEval: 0.7
-    GSM8K: 0.7
+    TruthfulQA: 1.4  # Critical for truth vs sycophancy bias
+    SycophancyEval: 1.2  # Important for bias-focused sycophancy detection
+    # Removed non-bias datasets: MMLU, HumanEval, GSM8K
     
   # Bias type importance weights
   bias_type_weights:

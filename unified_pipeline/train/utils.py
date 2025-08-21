@@ -18,6 +18,22 @@ import torch
 import torch.nn as nn
 from transformers import AutoModel, AutoTokenizer
 
+# Custom JSON encoder to handle numpy/torch types  
+class FIRMJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle numpy/torch types."""
+    def default(self, obj):
+        if isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif hasattr(obj, 'item'):  # torch tensor
+            return obj.item()
+        elif hasattr(obj, 'tolist'):  # torch tensor
+            return obj.tolist()
+        return super(FIRMJSONEncoder, self).default(obj)
+
 warnings.filterwarnings('ignore')
 
 
@@ -49,7 +65,7 @@ def save_component_registry(registry: Dict[str, Any], output_path: str) -> None:
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     with open(output_path, 'w') as f:
-        json.dump(registry, f, indent=2)
+        json.dump(registry, f, indent=2, cls=FIRMJSONEncoder)
 
 
 def get_model_layer_names(model: nn.Module, model_type: str = "auto") -> List[str]:

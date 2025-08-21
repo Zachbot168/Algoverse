@@ -16,8 +16,25 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import warnings
+import numpy as np
 
 import torch
+
+# Custom JSON encoder to handle numpy/torch types  
+class FIRMJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle numpy/torch types."""
+    def default(self, obj):
+        if isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif hasattr(obj, 'item'):  # torch tensor
+            return obj.item()
+        elif hasattr(obj, 'tolist'):  # torch tensor
+            return obj.tolist()
+        return super(FIRMJSONEncoder, self).default(obj)
 import yaml
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model, TaskType
@@ -327,7 +344,7 @@ class UnifiedPinpointTuner:
         
         metadata_path = os.path.join(output_dir, "training_metadata.json")
         with open(metadata_path, 'w') as f:
-            json.dump(metadata, f, indent=2)
+            json.dump(metadata, f, indent=2, cls=FIRMJSONEncoder)
         
         print(f"Saved training metadata to: {metadata_path}")
 

@@ -19,6 +19,22 @@ from pathlib import Path
 from typing import Dict, List, Optional, Union, Any
 import numpy as np
 
+# Custom JSON encoder to handle numpy/torch types  
+class FIRMJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle numpy/torch types."""
+    def default(self, obj):
+        if isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif hasattr(obj, 'item'):  # torch tensor
+            return obj.item()
+        elif hasattr(obj, 'tolist'):  # torch tensor
+            return obj.tolist()
+        return super(FIRMJSONEncoder, self).default(obj)
+
 
 @dataclass
 class ComponentInfo:
@@ -167,7 +183,7 @@ class ComponentRegistryManager:
         filepath = self.registry_dir / filename
         
         with open(filepath, 'w') as f:
-            json.dump(registry.to_dict(), f, indent=2)
+            json.dump(registry.to_dict(), f, indent=2, cls=FIRMJSONEncoder)
         
         print(f"Saved component registry to: {filepath}")
         return str(filepath)

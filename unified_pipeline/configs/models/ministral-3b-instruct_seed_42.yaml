@@ -1,0 +1,23 @@
+chat_format: mistral
+eval_seed: 42
+fairsteer:
+  intervention_strength: 1.0
+  optimal_layer: 22
+hidden_size: 3072
+intermediate_size: 8192
+max_length: 2048
+model:
+  architecture: ministral
+  device: auto
+  name: ministral/Ministral-3b-instruct
+  torch_dtype: float16
+  trust_remote_code: true
+model_variant: baseline
+num_heads: 32
+num_layers: 32
+system_message: You are a helpful assistant.
+temperature: 0.7
+top_p: 0.9
+training:
+  seed: 42
+training_seed: 42

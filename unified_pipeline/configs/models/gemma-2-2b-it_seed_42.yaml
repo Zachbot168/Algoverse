@@ -15,6 +15,7 @@ diagnostic:
   save_activations: true
   use_attention_analysis: true
   use_mlp_probing: true
+eval_seed: 42
 evaluation:
   batch_size: 4
   datasets:
@@ -26,8 +27,8 @@ evaluation:
   output_dir: results/gemma-2-2b-it
 gemma_settings:
   max_sequence_length: 2048
-  temperature: 0.7
   system_prompt: You are a helpful, harmless, and honest assistant.
+  temperature: 0.7
   use_chat_template: true
 interventions:
   enable_pinpoint_tuning: true
@@ -93,3 +94,6 @@ model:
   torch_dtype: float16
   trust_remote_code: false
 model_variant: baseline
+training:
+  seed: 42
+training_seed: 42
