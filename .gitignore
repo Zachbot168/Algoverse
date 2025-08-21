@@ -1,5 +1,51 @@
+# Operating System
 .DS_Store
 **/.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+conda-meta/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints
 
 # Model files and directories - NEVER commit these to repository
 models/*/
@@ -10,22 +56,80 @@ models/*/
 !models/requirements.txt
 !models/test_download_system.py
 
-# HuggingFace cache
+# HuggingFace and ML caches
 .cache/
 transformers_cache/
 huggingface_hub/
+.huggingface/
+wandb/
+mlruns/
 
 # Large model files anywhere in repository
 *.bin
 *.safetensors
 *.h5
 *.onnx
+*.pt
+*.pth
+*.pkl
+*.pickle
 **/*.bin
 **/*.safetensors
 **/*.h5
 **/*.onnx
+**/*.pt
+**/*.pth
 
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
+# Pipeline results and outputs - keep recent for analysis but don't commit all
+pipeline_runs/*/
+unified_pipeline_runs/*/
+firm_pipeline_runs/*/
+sycophancy_pipeline_runs/*/
+!**/README.md
+!**/.gitkeep
+
+# Temporary and log files
+*.log
+*.tmp
+*.temp
+logs/
+temp/
+tmp/
+
+# Data files (keep small examples, exclude large datasets)
+datasets/**/data/
+datasets/**/raw/
+datasets/**/processed/
+*.csv
+*.jsonl
+*.tsv
+!datasets/**/README.md
+!datasets/**/sample_*.csv
+!datasets/**/example_*.json
+
+# Evaluation outputs
+results/
+outputs/
+evaluation_results/
+statistical_analysis_results.json
+*.png
+*.pdf
+*.svg
+!docs/**/*.png
+!docs/**/*.pdf
+
+# Training artifacts
+training/
+checkpoints/
+adapter_*/
+lora_*/
+
+# System and backup files
+*.bak
+*.backup
+*.orig
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
