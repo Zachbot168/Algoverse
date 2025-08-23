@@ -1,0 +1,38 @@
+{
+  "Qwen/Qwen2.5-3B-Instruct": {
+    "success": true,
+    "output_path": "steering_vectors/fairsteer_qwen_qwen2.5_3b_instruct.pkl",
+    "optimal_layer": 24,
+    "num_vectors": 5
+  },
+  "Qwen/Qwen2.5-1.5B-Instruct": {
+    "success": true,
+    "output_path": "steering_vectors/fairsteer_qwen_qwen2.5_1.5b_instruct.pkl",
+    "optimal_layer": 18,
+    "num_vectors": 5
+  },
+  "meta-llama/Llama-3.2-3B-Instruct": {
+    "success": true,
+    "output_path": "steering_vectors/fairsteer_meta_llama_llama_3.2_3b_instruct.pkl",
+    "optimal_layer": 18,
+    "num_vectors": 5
+  },
+  "meta-llama/Llama-3.2-1B-Instruct": {
+    "success": true,
+    "output_path": "steering_vectors/fairsteer_meta_llama_llama_3.2_1b_instruct.pkl",
+    "optimal_layer": 11,
+    "num_vectors": 5
+  },
+  "google/gemma-2-2b-it": {
+    "success": true,
+    "output_path": "steering_vectors/fairsteer_google_gemma_2_2b_it.pkl",
+    "optimal_layer": 20,
+    "num_vectors": 5
+  },
+  "ministral/Ministral-3b-instruct": {
+    "success": true,
+    "output_path": "steering_vectors/fairsteer_ministral_ministral_3b_instruct.pkl",
+    "optimal_layer": 11,
+    "num_vectors": 4
+  }
+}

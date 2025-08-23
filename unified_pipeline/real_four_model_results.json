@@ -1,0 +1,50 @@
+{
+  "pipeline_type": "real_four_model_evaluation",
+  "start_time": "2025-08-21T09:51:53.400758",
+  "end_time": "2025-08-21T09:51:59.790169",
+  "model_results": {
+    "baseline": {
+      "success": false,
+      "stdout": "Traceback (most recent call last):\n  File \"/workspace/Algoverse/unified_pipeline/run_unified_pipeline.py\", line 40, in <module>\n    from model_variant_loader import ModelVariantLoader\nModuleNotFoundError: No module named 'model_variant_loader'\n",
+      "returncode": 1,
+      "output_dir": "/workspace/Algoverse/unified_pipeline/four_model_runs/baseline_20250821_095155",
+      "evaluation_data": null,
+      "model_variant": "baseline"
+    },
+    "fairsteer": {
+      "success": false,
+      "stdout": "Traceback (most recent call last):\n  File \"/workspace/Algoverse/unified_pipeline/run_unified_pipeline.py\", line 40, in <module>\n    from model_variant_loader import ModelVariantLoader\nModuleNotFoundError: No module named 'model_variant_loader'\n",
+      "returncode": 1,
+      "output_dir": "/workspace/Algoverse/unified_pipeline/four_model_runs/fairsteer_20250821_095156",
+      "evaluation_data": null,
+      "model_variant": "fairsteer"
+    },
+    "sycophancy": {
+      "success": false,
+      "error": "Config not available"
+    },
+    "firm": {
+      "success": false,
+      "stdout": "Traceback (most recent call last):\n  File \"/workspace/Algoverse/unified_pipeline/run_unified_pipeline.py\", line 40, in <module>\n    from model_variant_loader import ModelVariantLoader\nModuleNotFoundError: No module named 'model_variant_loader'\n",
+      "returncode": 1,
+      "output_dir": "/workspace/Algoverse/unified_pipeline/four_model_runs/firm_20250821_095158",
+      "evaluation_data": null,
+      "model_variant": "firm"
+    }
+  },
+  "real_analysis": {
+    "analysis_type": "real_four_model_evaluation",
+    "timestamp": "2025-08-21T09:51:59.789697",
+    "models_evaluated": [],
+    "dataset_comparisons": {},
+    "model_performances": {},
+    "winners_by_dataset": {},
+    "overall_analysis": {}
+  },
+  "summary": {
+    "models_attempted": 4,
+    "models_successful": 0,
+    "models_failed": 4,
+    "datasets_compared": 0
+  }
+}

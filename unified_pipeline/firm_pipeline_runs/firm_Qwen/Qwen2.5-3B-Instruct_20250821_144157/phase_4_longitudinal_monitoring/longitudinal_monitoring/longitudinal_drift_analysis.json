@@ -1,0 +1,98 @@
+{
+  "timestamp": "2025-08-21T14:42:22.951654",
+  "monitoring_points": 3,
+  "drift_timeline": [
+    {
+      "iteration": "baseline",
+      "timestamp": "2025-08-21T14:42:22.951664",
+      "drift_detected": false,
+      "bias_persistence": {
+        "gender": {
+          "baseline_circuits": 10,
+          "current_circuits": 11,
+          "stability_score": 0.9
+        },
+        "race": {
+          "baseline_circuits": 10,
+          "current_circuits": 12,
+          "stability_score": 0.8
+        },
+        "religion": {
+          "baseline_circuits": 10,
+          "current_circuits": 9,
+          "stability_score": 0.9
+        }
+      },
+      "new_circuits_emerged": {},
+      "circuit_stability": {}
+    },
+    {
+      "iteration": "post_training",
+      "timestamp": "2025-08-21T14:42:22.951724",
+      "drift_detected": false,
+      "bias_persistence": {
+        "gender": {
+          "baseline_circuits": 10,
+          "current_circuits": 9,
+          "stability_score": 0.9
+        },
+        "race": {
+          "baseline_circuits": 10,
+          "current_circuits": 11,
+          "stability_score": 0.9
+        },
+        "religion": {
+          "baseline_circuits": 10,
+          "current_circuits": 12,
+          "stability_score": 0.8
+        }
+      },
+      "new_circuits_emerged": {},
+      "circuit_stability": {}
+    },
+    {
+      "iteration": "post_steering",
+      "timestamp": "2025-08-21T14:42:22.951737",
+      "drift_detected": false,
+      "bias_persistence": {
+        "gender": {
+          "baseline_circuits": 10,
+          "current_circuits": 8,
+          "stability_score": 0.8
+        },
+        "race": {
+          "baseline_circuits": 10,
+          "current_circuits": 12,
+          "stability_score": 0.8
+        },
+        "religion": {
+          "baseline_circuits": 10,
+          "current_circuits": 9,
+          "stability_score": 0.9
+        }
+      },
+      "new_circuits_emerged": {},
+      "circuit_stability": {}
+    }
+  ],
+  "persistence_analysis": {
+    "total_monitoring_points": 3,
+    "drift_events_detected": 0,
+    "persistent_bias_types": [
+      "gender",
+      "race",
+      "religion"
+    ],
+    "volatile_bias_types": [],
+    "stability_trend": "stable",
+    "bias_type_stability": {
+      "gender": 0.8666666666666667,
+      "race": 0.8333333333333334,
+      "religion": 0.8666666666666667
+    }
+  },
+  "reemergence_detection": {},
+  "recommendations": [
+    "Good stability observed - current intervention strategy effective"
+  ]
+}

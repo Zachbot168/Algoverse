@@ -1,0 +1,277 @@
+{
+  "training_type": "FIRM_causal_pinpoint_tuning",
+  "model_name": "google/gemma-2-2b-it",
+  "timestamp": "N/A",
+  "causal_analysis": {
+    "bias_types_analyzed": [
+      "gender",
+      "race",
+      "religion"
+    ],
+    "total_circuits_identified": 27,
+    "min_importance_threshold": 0.1,
+    "circuits_by_bias_type": {
+      "gender": 8,
+      "race": 9,
+      "religion": 10
+    }
+  },
+  "selected_components": [
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.8374579557288037,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.8366472876244705,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 9,
+      "importance": 0.8361437428182651,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 11,
+      "importance": 0.8297932551020227,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.8257378083549544,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 10,
+      "importance": 0.8174318547968384,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.7866054944353387,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 15,
+      "importance": 0.7846859573241194,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.7838637779871845,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 8,
+      "importance": 0.7833231841742754,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.782427312304449,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.7781564982793051,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.7776931440210492,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 15,
+      "importance": 0.7761335408980744,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 11,
+      "importance": 0.7740186658443278,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 19,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.7668242993886657,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.7624583598809883,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 8,
+      "importance": 0.7602050449475889,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 6,
+      "importance": 0.7585731391546219,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.7531303892061025,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.7507671142404164,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 15,
+      "importance": 0.7486570032201934,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 13,
+      "importance": 0.7464537492430436,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.744792631627859,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 15,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.7446764861170031,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.7436221974725535,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 21,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.743332350101129,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    }
+  ],
+  "training_config": {
+    "component_selection": {
+      "max_components": 32,
+      "min_importance": 0.05,
+      "prioritize_heads": true
+    },
+    "lora": {
+      "alpha": 32,
+      "dropout": 0.1,
+      "r": 16,
+      "target_modules": [
+        "q_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj"
+      ]
+    },
+    "training": {
+      "batch_size": 2,
+      "gradient_accumulation_steps": 8,
+      "learning_rate": "5e-5",
+      "logging_steps": 50,
+      "num_epochs": 2,
+      "output_dir": "firm_pipeline_runs/firm_gemma-2-2b-it_20250823_013807/phase_2_causal_training",
+      "save_strategy": "epoch",
+      "warmup_ratio": 0.1
+    }
+  },
+  "component_summary": {
+    "total_components": 27,
+    "attention_heads": 27,
+    "causal_circuits": 27,
+    "bias_types_covered": [
+      "gender",
+      "religion",
+      "race"
+    ]
+  }
+}

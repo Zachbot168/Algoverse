@@ -1,0 +1,92 @@
+{
+  "bias_category": "race",
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "firm_version": "1.0",
+  "alignment_strategies": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_analysis": {
+    "causal_layers": [
+      16,
+      17,
+      18,
+      20
+    ],
+    "training_layers": [
+      16,
+      17,
+      18,
+      20
+    ],
+    "total_model_layers": 36
+  },
+  "vector_statistics": {
+    "causal_aligned": {
+      "num_layers": 4,
+      "layers": [
+        16,
+        17,
+        18,
+        20
+      ],
+      "average_magnitude": 0.9998779296875,
+      "magnitude_range": [
+        0.99951171875,
+        1.0
+      ]
+    },
+    "training_aligned": {
+      "num_layers": 4,
+      "layers": [
+        16,
+        17,
+        18,
+        20
+      ],
+      "average_magnitude": 0.9998779296875,
+      "magnitude_range": [
+        0.99951171875,
+        1.0
+      ]
+    },
+    "optimal_overlap": {
+      "num_layers": 2,
+      "layers": [
+        16,
+        17
+      ],
+      "average_magnitude": 0.999755859375,
+      "magnitude_range": [
+        0.99951171875,
+        1.0
+      ]
+    },
+    "baseline_middle": {
+      "num_layers": 2,
+      "layers": [
+        18,
+        19
+      ],
+      "average_magnitude": 1.0,
+      "magnitude_range": [
+        1.0,
+        1.0
+      ]
+    },
+    "downstream": {
+      "num_layers": 1,
+      "layers": [
+        22
+      ],
+      "average_magnitude": 0.99951171875,
+      "magnitude_range": [
+        0.99951171875,
+        0.99951171875
+      ]
+    }
+  }
+}

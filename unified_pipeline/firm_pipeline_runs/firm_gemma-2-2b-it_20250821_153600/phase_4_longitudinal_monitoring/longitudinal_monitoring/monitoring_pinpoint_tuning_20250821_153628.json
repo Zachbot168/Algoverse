@@ -1,0 +1,304 @@
+{
+  "timestamp": "2025-08-21T15:36:28.747984",
+  "model_state": "post_pinpoint_tuning",
+  "checkpoint_path": "current_model",
+  "bias_circuits": {
+    "gender": [
+      {
+        "layer": 17,
+        "head": -1,
+        "importance_score": 0.8773583620417018,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": -1,
+        "importance_score": 0.8551815350073958,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": 9,
+        "importance_score": 0.8465909557217834,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 0,
+        "importance_score": 0.828262003303313,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": -1,
+        "importance_score": 0.807121924700181,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": 11,
+        "importance_score": 0.8050508694263355,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": 15,
+        "importance_score": 0.8031781988414607,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": 5,
+        "importance_score": 0.7984799542518182,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": 3,
+        "importance_score": 0.7823967380415657,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": 0,
+        "importance_score": 0.76228817503224,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      }
+    ],
+    "race": [
+      {
+        "layer": 16,
+        "head": -1,
+        "importance_score": 0.9127360434847386,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 10,
+        "importance_score": 0.9080027032597137,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 11,
+        "importance_score": 0.8497766291491848,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": -1,
+        "importance_score": 0.8448918482362207,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 9,
+        "importance_score": 0.8357924481533983,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 13,
+        "importance_score": 0.8329988617187298,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 0,
+        "importance_score": 0.8288040764064326,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 21,
+        "head": -1,
+        "importance_score": 0.8147622673876416,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 4,
+        "importance_score": 0.812595432392577,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 14,
+        "importance_score": 0.8089790506009484,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      }
+    ],
+    "religion": [
+      {
+        "layer": 17,
+        "head": -1,
+        "importance_score": 0.87484339970138,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 2,
+        "importance_score": 0.8718877773034863,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": -1,
+        "importance_score": 0.8110068015020133,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 19,
+        "head": -1,
+        "importance_score": 0.8052814566925658,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 19,
+        "head": 7,
+        "importance_score": 0.802934980944566,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 19,
+        "head": 13,
+        "importance_score": 0.7999032856333379,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 9,
+        "importance_score": 0.7901014082570286,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": -1,
+        "importance_score": 0.7829819166626507,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 14,
+        "importance_score": 0.7786328303703701,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 4,
+        "importance_score": 0.7754197772751267,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      }
+    ]
+  },
+  "circuit_statistics": {
+    "gender": {
+      "num_circuits": 10,
+      "mean_importance": 0.8165908716367796,
+      "std_importance": 0.033266960947729754,
+      "max_importance": 0.8773583620417018,
+      "layer_distribution": {
+        "17": 2,
+        "18": 7,
+        "16": 1
+      }
+    },
+    "race": {
+      "num_circuits": 10,
+      "mean_importance": 0.8449339360789585,
+      "std_importance": 0.035118792670714646,
+      "max_importance": 0.9127360434847386,
+      "layer_distribution": {
+        "16": 5,
+        "17": 4,
+        "21": 1
+      }
+    },
+    "religion": {
+      "num_circuits": 10,
+      "mean_importance": 0.8092993634342525,
+      "std_importance": 0.03392729417260334,
+      "max_importance": 0.87484339970138,
+      "layer_distribution": {
+        "17": 3,
+        "16": 3,
+        "19": 3,
+        "18": 1
+      }
+    }
+  },
+  "drift_analysis": {
+    "gender": {
+      "circuit_overlap": 0,
+      "circuits_disappeared": 6,
+      "circuits_emerged": 10,
+      "stability_ratio": 0.0,
+      "importance_drift": 0.0,
+      "drift_detected": true
+    },
+    "race": {
+      "circuit_overlap": 1,
+      "circuits_disappeared": 7,
+      "circuits_emerged": 9,
+      "stability_ratio": 0.125,
+      "importance_drift": 0.021482811156162462,
+      "drift_detected": true
+    },
+    "religion": {
+      "circuit_overlap": 2,
+      "circuits_disappeared": 8,
+      "circuits_emerged": 8,
+      "stability_ratio": 0.2,
+      "importance_drift": 0.029447486136047085,
+      "drift_detected": true
+    }
+  },
+  "robustness_metrics": {
+    "overall_stability": 0.25,
+    "intervention_effectiveness": 0.0,
+    "robustness_score": 0.125,
+    "bias_type_metrics": {
+      "gender": {
+        "effectiveness": 0.0,
+        "stability": 0.0
+      },
+      "race": {
+        "effectiveness": 0.0,
+        "stability": 0.25
+      },
+      "religion": {
+        "effectiveness": 0.0,
+        "stability": 0.5
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "model_name": "ministral/Ministral-3b-instruct",
+  "architecture": "ministral",
+  "optimal_layer": 11,
+  "model_config": {
+    "num_layers": 14,
+    "num_heads": 32,
+    "hidden_size": 3072,
+    "optimal_layer_range": [
+      9,
+      12
+    ]
+  },
+  "steering_vector_layers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "steering_vector_shapes": {
+    "9": [
+      1,
+      4096
+    ],
+    "10": [
+      1,
+      4096
+    ],
+    "11": [
+      1,
+      4096
+    ],
+    "12": [
+      1,
+      4096
+    ]
+  }
+}

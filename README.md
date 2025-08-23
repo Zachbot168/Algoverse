@@ -284,6 +284,52 @@ interventions:
       evaluation_strategy: "no"
 ```
 
+## 📊 **Results and Output**
+
+### **Results Location**
+
+All evaluation results are automatically saved to timestamped directories:
+
+```
+unified_pipeline/
+├── unified_pipeline_runs/              # Standard pipeline results
+│   └── YYYYMMDD_HHMMSS/                # Timestamped run directory
+│       ├── evaluation/baseline/        # Baseline results
+│       │   ├── evaluation_results.json # Raw evaluation data
+│       │   └── evaluation_summary.csv  # Summary statistics
+│       ├── diagnostics/                # System diagnostics
+│       └── reports/                    # Analysis reports
+├── firm_pipeline_runs/                 # FIRM pipeline results  
+│   └── YYYYMMDD_HHMMSS/               # Timestamped FIRM run
+│       ├── phase1_circuits/           # Identified bias circuits
+│       ├── phase2_training/           # Causal tuning results
+│       ├── phase3_steering/           # Steering vectors
+│       ├── phase4_monitoring/         # Longitudinal analysis
+│       └── phase5_integration/        # Multi-layer results
+└── data_science/                      # Statistical analysis tools
+    ├── statistical_analyzer.py       # Significance testing
+    ├── visualization_tools.py        # Publication plots
+    ├── experimental_design.py        # Power analysis
+    └── results_analyzer.py           # Advanced insights
+```
+
+### **Using Data Science Tools with Results**
+
+After generating evaluation results, analyze them with our comprehensive statistical tools:
+
+```bash
+cd data_science
+
+# Run complete statistical analysis
+python statistical_analyzer.py --results ../unified_pipeline_runs/latest/evaluation/baseline/evaluation_results.json
+
+# Create publication-ready visualizations
+python visualization_tools.py --results ../unified_pipeline_runs/latest/evaluation/baseline/evaluation_results.json
+
+# Generate research insights
+python results_analyzer.py --results ../unified_pipeline_runs/latest/evaluation/baseline/evaluation_results.json
+```
+
 ## 📊 **Understanding Results**
 
 ### **Scoring Metrics Guide**

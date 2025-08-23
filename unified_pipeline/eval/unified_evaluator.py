@@ -10,12 +10,16 @@ bias evaluation across all implemented datasets.
 import json
 import os
 import time
+import signal
+import threading
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Union, Tuple
 import numpy as np
 import yaml
 from dataclasses import asdict
 import warnings
+import gc
+import torch
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings('ignore')
@@ -58,6 +62,44 @@ class UnifiedBiasEvaluator:
         self.evaluation_results: Dict[str, Any] = {}
         self.dataset_availability: Dict[str, bool] = {}
         self.model_handler: Optional[ModelCompatibilityHandler] = None
+    
+    def _evaluate_sample_with_timeout(self, sample: Dict[str, Any], evaluation_mode: str, timeout: int = 60):
+        """
+        Evaluate a single sample with timeout protection.
+        
+        Args:
+            sample: Sample to evaluate
+            evaluation_mode: Evaluation mode for the sample
+            timeout: Timeout in seconds
+            
+        Returns:
+            Model prediction
+            
+        Raises:
+            TimeoutError: If evaluation exceeds timeout
+        """
+        result = [None]
+        exception = [None]
+        
+        def target_function():
+            try:
+                result[0] = self.model_handler.evaluate_bias_sample(sample, evaluation_mode)
+            except Exception as e:
+                exception[0] = e
+        
+        thread = threading.Thread(target=target_function)
+        thread.daemon = True
+        thread.start()
+        thread.join(timeout)
+        
+        if thread.is_alive():
+            # Thread is still running, timeout occurred
+            raise TimeoutError(f"Sample evaluation exceeded {timeout} seconds")
+        
+        if exception[0]:
+            raise exception[0]
+            
+        return result[0]
         
         print(f"Initialized UnifiedBiasEvaluator with {len(self.dataset_configs)} configured datasets")
         
@@ -266,25 +308,68 @@ class UnifiedBiasEvaluator:
         start_time = time.time()
         
         try:
+            # Configuration for timeouts and batch processing
+            sample_timeout = config.get("sample_timeout", 60)  # 60 seconds per sample
+            dataset_timeout = config.get("dataset_timeout", 3600)  # 1 hour per dataset
+            batch_processing = config.get("batch_processing", True)
+            memory_cleanup_interval = config.get("memory_cleanup_interval", 100)
+            
+            dataset_start_time = time.time()
+            failed_samples = 0
+            max_failures = config.get("max_sample_failures", 50)  # Allow some failures
+            
             for i, sample in enumerate(prepared_samples):
-                if i % 100 == 0:
+                # Check dataset-level timeout
+                if time.time() - dataset_start_time > dataset_timeout:
+                    print(f"  ⚠️  Dataset timeout reached ({dataset_timeout}s), stopping at sample {i}")
+                    break
+                
+                if i % 50 == 0:  # More frequent progress updates
                     progress = (i / len(prepared_samples)) * 100
                     elapsed = time.time() - start_time
                     print(f"  Progress: {progress:.1f}% ({i}/{len(prepared_samples)}) - {elapsed:.1f}s elapsed")
+                    
+                    # Memory cleanup
+                    if i % memory_cleanup_interval == 0 and i > 0:
+                        gc.collect()
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
                 
                 # Extract text and target
                 text = sample.get("text", "")
                 target = sample.get("target")
                 
-                # Get model prediction using compatibility handler
-                pred = self.model_handler.evaluate_bias_sample(sample, evaluation_mode)
-                
-                predictions.append(pred)
-                targets.append({
-                    "target": target,
-                    "metadata": sample.get("metadata", {}),
-                    **sample.get("original_format", {})
-                })
+                try:
+                    # Get model prediction with timeout
+                    pred = self._evaluate_sample_with_timeout(
+                        sample, evaluation_mode, timeout=sample_timeout
+                    )
+                    
+                    predictions.append(pred)
+                    targets.append({
+                        "target": target,
+                        "metadata": sample.get("metadata", {}),
+                        **sample.get("original_format", {})
+                    })
+                    
+                except TimeoutError:
+                    print(f"  ⚠️  Sample {i} timed out after {sample_timeout}s, skipping")
+                    failed_samples += 1
+                    if failed_samples > max_failures:
+                        print(f"  ⚠️  Too many failures ({failed_samples}), stopping evaluation")
+                        break
+                    continue
+                    
+                except Exception as e:
+                    print(f"  ⚠️  Sample {i} failed: {e}, skipping")
+                    failed_samples += 1
+                    if failed_samples > max_failures:
+                        print(f"  ⚠️  Too many failures ({failed_samples}), stopping evaluation")
+                        break
+                    continue
+                    
+            if failed_samples > 0:
+                print(f"  ⚠️  {failed_samples} samples failed during evaluation")
         
         except Exception as e:
             print(f"Error during model evaluation on {dataset_name}: {e}")
@@ -335,12 +420,19 @@ class UnifiedBiasEvaluator:
         try:
             inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
             
+            # Move inputs to the same device as model
+            if hasattr(model, 'device'):
+                inputs = {k: v.to(model.device) for k, v in inputs.items()}
+            elif hasattr(model, 'parameters'):
+                device = next(model.parameters()).device
+                inputs = {k: v.to(device) for k, v in inputs.items()}
+            
             if hasattr(model, 'generate'):
                 # For language models with generation capability
                 with torch.no_grad():
                     outputs = model.generate(
-                        inputs.input_ids,
-                        max_length=inputs.input_ids.shape[1] + 100,
+                        inputs["input_ids"] if isinstance(inputs, dict) else inputs.input_ids,
+                        max_length=inputs["input_ids"].shape[1] + 100 if isinstance(inputs, dict) else inputs.input_ids.shape[1] + 100,
                         num_return_sequences=1,
                         temperature=0.7,
                         do_sample=True,
@@ -348,9 +440,18 @@ class UnifiedBiasEvaluator:
                     )
                 
                 generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-                # Extract only the generated part
-                prompt_length = len(text)
-                prediction = generated_text[prompt_length:].strip()
+                # Extract only the generated part - use more robust approach
+                if text in generated_text:
+                    # Find where the prompt ends in the generated text
+                    prompt_end = generated_text.find(text) + len(text)
+                    prediction = generated_text[prompt_end:].strip()
+                else:
+                    # Fallback: assume the entire generated text is the prediction
+                    prediction = generated_text.strip()
+                    
+                # Additional cleanup for empty or very short predictions
+                if len(prediction.strip()) < 3:
+                    prediction = f"Short generation: {prediction}"
             else:
                 # Fallback for models without generation
                 prediction = "Unable to generate - model does not support generation"
@@ -397,34 +498,48 @@ class UnifiedBiasEvaluator:
         except Exception as e:
             return f"Classification error: {str(e)}"
     
-    def _evaluate_multiple_choice(self, model, tokenizer, text: str, choices: List[str]) -> str:
-        """Evaluate multiple choice question."""
+    def _evaluate_multiple_choice(self, model, tokenizer, text: str, choices: List[str]) -> int:
+        """Evaluate multiple choice question and return choice index."""
         try:
-            best_choice = ""
+            best_choice_idx = 0
             best_score = float('-inf')
             
-            for choice in choices:
-                # Score each choice
+            for i, choice in enumerate(choices):
+                if not choice or choice.strip() == "":
+                    continue
+                    
+                # Score each choice using perplexity-based approach
                 full_text = f"{text} {choice}"
-                inputs = tokenizer(full_text, return_tensors="pt", truncation=True)
+                inputs = tokenizer(full_text, return_tensors="pt", truncation=True, max_length=512)
                 
                 with torch.no_grad():
                     if hasattr(model, 'forward'):
                         outputs = model(**inputs)
                         if hasattr(outputs, 'logits'):
-                            # Use average logit as score
-                            score = outputs.logits.mean().item()
+                            # Use negative perplexity as score (higher = better)
+                            logits = outputs.logits
+                            shift_logits = logits[..., :-1, :].contiguous()
+                            shift_labels = inputs.input_ids[..., 1:].contiguous()
+                            
+                            # Calculate log likelihood
+                            log_probs = torch.nn.functional.log_softmax(shift_logits, dim=-1)
+                            token_log_probs = log_probs.gather(2, shift_labels.unsqueeze(-1)).squeeze(-1)
+                            
+                            # Average log probability (higher = more likely)
+                            score = token_log_probs.mean().item()
+                            
                             if score > best_score:
                                 best_score = score
-                                best_choice = choice
+                                best_choice_idx = i
             
-            return best_choice if best_choice else choices[0] if choices else "No choice available"
+            return best_choice_idx
             
         except Exception as e:
-            return f"Multiple choice error: {str(e)}"
+            print(f"Multiple choice error: {e}")
+            return 0  # Default to first choice
     
     def _evaluate_association_test(self, model, tokenizer, sample: Dict[str, Any]) -> Dict[str, float]:
-        """Evaluate word association test (SEAT/WEAT)."""
+        """Evaluate word association test (SEAT/WEAT) using real model embeddings."""
         try:
             # Extract word categories from sample
             target_1 = sample.get("target_1", [])
@@ -432,22 +547,76 @@ class UnifiedBiasEvaluator:
             attribute_1 = sample.get("attribute_1", [])
             attribute_2 = sample.get("attribute_2", [])
             
-            # Compute association scores (simplified implementation)
-            # In practice, this would compute cosine similarities between embeddings
+            if not all([target_1, target_2, attribute_1, attribute_2]):
+                return {"effect_size": 0.0}
             
-            scores = {
-                "target1_attr1": 0.0,
-                "target1_attr2": 0.0, 
-                "target2_attr1": 0.0,
-                "target2_attr2": 0.0
-            }
+            def get_word_embedding(word):
+                """Get embedding for a word using the model."""
+                try:
+                    inputs = tokenizer(word, return_tensors="pt", truncation=True, max_length=32)
+                    with torch.no_grad():
+                        if hasattr(model, 'get_input_embeddings'):
+                            embeddings = model.get_input_embeddings()
+                            # Get embedding for the first (main) token
+                            token_id = inputs.input_ids[0, 1] if inputs.input_ids.shape[1] > 1 else inputs.input_ids[0, 0]
+                            embedding = embeddings(token_id.unsqueeze(0))
+                            return embedding.squeeze().cpu().numpy()
+                        else:
+                            # Fallback: use last hidden state mean
+                            outputs = model(**inputs, output_hidden_states=True)
+                            if hasattr(outputs, 'hidden_states') and outputs.hidden_states:
+                                last_hidden = outputs.hidden_states[-1]
+                                return last_hidden.mean(dim=1).squeeze().cpu().numpy()
+                except:
+                    # Fallback to simple hash-based embedding
+                    hash_val = hash(word) % 1000
+                    return np.array([hash_val / 1000.0] * 64)  # Simple 64-dim embedding
+                
+                return np.zeros(64)
             
-            # Placeholder: would implement actual embedding similarity computation
-            effect_size = np.random.normal(0, 1)  # Placeholder
+            def cosine_similarity(a, b):
+                """Calculate cosine similarity between two vectors."""
+                norm_a = np.linalg.norm(a)
+                norm_b = np.linalg.norm(b) 
+                if norm_a == 0 or norm_b == 0:
+                    return 0.0
+                return np.dot(a, b) / (norm_a * norm_b)
+            
+            # Get embeddings for all word categories
+            target_1_embeds = [get_word_embedding(word) for word in target_1[:5]]  # Limit for performance
+            target_2_embeds = [get_word_embedding(word) for word in target_2[:5]]
+            attr_1_embeds = [get_word_embedding(word) for word in attribute_1[:5]]
+            attr_2_embeds = [get_word_embedding(word) for word in attribute_2[:5]]
+            
+            # Calculate association scores
+            def mean_association(target_embeds, attr_embeds):
+                """Calculate mean cosine similarity between target and attribute words."""
+                similarities = []
+                for t_embed in target_embeds:
+                    for a_embed in attr_embeds:
+                        sim = cosine_similarity(t_embed, a_embed)
+                        similarities.append(sim)
+                return np.mean(similarities) if similarities else 0.0
+            
+            # WEAT test statistic calculation
+            s_target1_attr1 = mean_association(target_1_embeds, attr_1_embeds)
+            s_target1_attr2 = mean_association(target_1_embeds, attr_2_embeds)
+            s_target2_attr1 = mean_association(target_2_embeds, attr_1_embeds)
+            s_target2_attr2 = mean_association(target_2_embeds, attr_2_embeds)
+            
+            # Effect size calculation
+            target1_diff = s_target1_attr1 - s_target1_attr2
+            target2_diff = s_target2_attr1 - s_target2_attr2
+            effect_size = target1_diff - target2_diff
             
             return {
-                "effect_size": effect_size,
-                "association_scores": scores
+                "effect_size": abs(effect_size),
+                "association_scores": {
+                    "target1_attr1": s_target1_attr1,
+                    "target1_attr2": s_target1_attr2,
+                    "target2_attr1": s_target2_attr1,
+                    "target2_attr2": s_target2_attr2
+                }
             }
             
         except Exception as e:

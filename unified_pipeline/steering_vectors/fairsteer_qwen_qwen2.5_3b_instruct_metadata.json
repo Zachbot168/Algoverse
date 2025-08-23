@@ -1,0 +1,43 @@
+{
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "architecture": "qwen2",
+  "optimal_layer": 24,
+  "model_config": {
+    "num_layers": 36,
+    "num_heads": 16,
+    "hidden_size": 2048,
+    "optimal_layer_range": [
+      24,
+      30
+    ]
+  },
+  "steering_vector_layers": [
+    24,
+    25,
+    26,
+    27,
+    28
+  ],
+  "steering_vector_shapes": {
+    "24": [
+      1,
+      2048
+    ],
+    "25": [
+      1,
+      2048
+    ],
+    "26": [
+      1,
+      2048
+    ],
+    "27": [
+      1,
+      2048
+    ],
+    "28": [
+      1,
+      2048
+    ]
+  }
+}

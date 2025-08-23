@@ -7,6 +7,13 @@ using a three-stage inference-time framework without requiring model retraining.
 Optimized specifically for Google's Gemma-2-2b-it architecture
 """
 
+# CRITICAL: Apply PyTorch compilation fixes BEFORE any other imports
+import sys
+import os
+sys.path.append('/workspace/Algoverse/unified_pipeline/utils')
+from pytorch_compilation_fix import apply_pytorch_compilation_fixes, disable_model_compilation
+apply_pytorch_compilation_fixes()
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -19,7 +26,8 @@ from transformers import (
     logging as transformers_logging
 )
 from huggingface_hub import login
-from datasets import load_dataset
+import datasets as hf_datasets
+load_dataset = hf_datasets.load_dataset
 import json
 import pickle
 from collections import defaultdict
@@ -31,6 +39,8 @@ import seaborn as sns
 from typing import List, Dict, Tuple, Any, Optional
 import warnings
 import os
+from tqdm import tqdm
+import time
 
 warnings.filterwarnings('ignore')
 transformers_logging.set_verbosity_error()
@@ -121,18 +131,21 @@ class FairSteerGemmaDebiaser:
             if tokenizer.pad_token is None:
                 tokenizer.pad_token = tokenizer.eos_token
             
-            # Load model with appropriate settings
+            # Load model with appropriate settings and compilation disabled
             model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
                 device_map="auto" if self.device == "cuda" else None,
-                trust_remote_code=True
+                trust_remote_code=True,
+                attn_implementation="eager"  # Disable flash attention compilation
             )
             
             # Move to device if not using device_map
             if self.device != "cuda":
                 model.to(self.device)
             
+            # Apply compilation fixes to the model
+            model = disable_model_compilation(model)
             model.eval()
             
             print(f"Successfully loaded {self.model_name}")
@@ -204,15 +217,15 @@ class FairSteerGemmaDebiaser:
         return self.dbad_dataset
     
     def _load_bbq_data(self, max_samples: int = 5000) -> List[Dict]:
-        """Load and process BBQ dataset from bias-bench for bias detection."""
+        """Load and process BBQ dataset from local datasets directory for bias detection."""
         try:
-            # First try to load from bias-bench directory
+            # Load from the correct local BBQ path
             import os
-            bias_bench_path = "/Users/arnav/Documents/Algoverse Research/Model Training/bias-bench"
+            bbq_path = "/workspace/Algoverse/datasets/bbq"
             
-            if os.path.exists(bias_bench_path):
-                print("Found bias-bench directory, loading BBQ data...")
-                return self._load_bbq_from_bias_bench(bias_bench_path, max_samples)
+            if os.path.exists(bbq_path):
+                print("Found local BBQ directory, loading BBQ data...")
+                return self._load_bbq_from_local(bbq_path, max_samples)
             else:
                 # Fallback to HuggingFace dataset
                 print("bias-bench not found, trying HuggingFace BBQ dataset...")
@@ -302,6 +315,87 @@ class FairSteerGemmaDebiaser:
         
         print(f"Loaded {len(bbq_data)} CROWS samples from bias-bench")
         return bbq_data
+    
+    def _load_bbq_from_local(self, bbq_path: str, max_samples: int) -> List[Dict]:
+        """Load BBQ data from local datasets directory."""
+        import os
+        import json
+        
+        bbq_data = []
+        sample_count = 0
+        
+        # Load from all JSONL files in the BBQ directory
+        for filename in os.listdir(bbq_path):
+            if not filename.endswith('.jsonl'):
+                continue
+                
+            if sample_count >= max_samples:
+                break
+                
+            file_path = os.path.join(bbq_path, filename)
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        if sample_count >= max_samples:
+                            break
+                            
+                        try:
+                            item = json.loads(line.strip())
+                            
+                            context = item.get('context', '')
+                            question = item.get('question', '')
+                            ans0 = item.get('ans0', '')
+                            ans1 = item.get('ans1', '')
+                            ans2 = item.get('ans2', '')
+                            label = item.get('label', 0)
+                            category = item.get('category', filename.replace('.jsonl', ''))
+                            
+                            # Create classification prompt
+                            prompt = f"Context: {context}\nQuestion: {question}\nChoices:\n"
+                            prompt += f"(0) {ans0}\n(1) {ans1}\n(2) {ans2}\nAnswer:"
+                            
+                            # Simple bias detection based on category and label
+                            is_biased = self._detect_bias_in_local_bbq(item, category)
+                            
+                            bbq_data.append({
+                                'prompt': prompt,
+                                'label': 0 if is_biased else 1,  # 0 = biased, 1 = unbiased
+                                'source': f'bbq_local_{category}',
+                                'category': category
+                            })
+                            
+                            sample_count += 1
+                            
+                        except json.JSONDecodeError:
+                            continue
+                            
+            except Exception as e:
+                print(f"Warning: Could not load {filename}: {e}")
+                continue
+        
+        print(f"Loaded {len(bbq_data)} samples from local BBQ dataset")
+        return bbq_data
+    
+    def _detect_bias_in_local_bbq(self, item: Dict, category: str) -> bool:
+        """Detect bias in local BBQ items based on category and context."""
+        # For ambiguous contexts, choosing definitive answers suggests bias
+        context_condition = item.get('context_condition', '')
+        question_polarity = item.get('question_polarity', '')
+        answer_info = item.get('answer_info', {})
+        
+        # If context is ambiguous but model chooses a stereotyped group, it's biased
+        if context_condition == 'ambig':
+            return True  # Choosing any definitive answer in ambiguous context suggests bias
+        
+        # For disambiguated contexts, check if the answer aligns with stereotypes
+        if context_condition == 'disambig':
+            stereotyped_groups = item.get('additional_metadata', {}).get('stereotyped_groups', [])
+            if stereotyped_groups and any(group in item.get('context', '').lower() for group in stereotyped_groups):
+                return False  # Factual answer in clear context is not bias
+        
+        # Default heuristic based on category
+        bias_categories = ['age', 'gender_identity', 'race_ethnicity', 'religion', 'ses']
+        return category.lower() in bias_categories
     
     def _process_bbq_json(self, bbq_data: List[Dict], max_samples: int) -> List[Dict]:
         """Process BBQ JSON data following the paper's methodology."""
@@ -519,52 +613,60 @@ class FairSteerGemmaDebiaser:
         if self.ddsv_dataset is None:
             raise ValueError("DDSV dataset not constructed. Call construct_ddsv_dataset() first.")
         
-        print("Computing debiasing steering vectors using mean difference approach...")
+        print("🎯 " + "="*60)
+        print("   🔄 STAGE 2: DEBIASING STEERING VECTOR (DSV) COMPUTATION")
+        print("🎯 " + "="*60)
+        print("📐 Computing steering vectors using mean difference approach...")
         
         # Extract activations for biased and unbiased prompts
         biased_prompts = self.ddsv_dataset['biased_prompt'].tolist()
         unbiased_prompts = self.ddsv_dataset['unbiased_prompt'].tolist()
         
-        print(f"Extracting activations for {len(biased_prompts)} biased and {len(unbiased_prompts)} unbiased prompts...")
-        biased_activations = self.extract_activations(biased_prompts, batch_size=16)
-        unbiased_activations = self.extract_activations(unbiased_prompts, batch_size=16)
+        print(f"🧠 Extracting activations for {len(biased_prompts)} biased and {len(unbiased_prompts)} unbiased prompts...")
+        
+        # Add progress bar for biased activations
+        print("  📊 Processing biased prompts...")
+        biased_activations = self.extract_activations(biased_prompts, batch_size=16, desc="Biased activations")
+        print("  📊 Processing unbiased prompts...")
+        unbiased_activations = self.extract_activations(unbiased_prompts, batch_size=16, desc="Unbiased activations")
         
         # Verify we have data for both biased and unbiased
         common_layers = set(biased_activations.keys()) & set(unbiased_activations.keys())
         if not common_layers:
             raise ValueError("No common layers found between biased and unbiased activations")
         
-        print(f"Computing steering vectors for {len(common_layers)} common layers")
+        print(f"  🧮 Computing steering vectors for {len(common_layers)} common layers...")
         
         # Compute steering vector for each layer using mean difference
         steering_magnitudes = {}
         
-        for layer_idx in sorted(common_layers):
-            biased_acts = biased_activations[layer_idx].astype(np.float64)  # Higher precision
-            unbiased_acts = unbiased_activations[layer_idx].astype(np.float64)
-            
-            # Verify shapes match
-            if biased_acts.shape != unbiased_acts.shape:
-                print(f"Warning: Shape mismatch for layer {layer_idx}: "
-                      f"biased={biased_acts.shape}, unbiased={unbiased_acts.shape}")
-                min_samples = min(biased_acts.shape[0], unbiased_acts.shape[0])
-                biased_acts = biased_acts[:min_samples]
-                unbiased_acts = unbiased_acts[:min_samples]
-            
-            # DSV = mean(unbiased) - mean(biased) following the paper
-            biased_mean = np.mean(biased_acts, axis=0)
-            unbiased_mean = np.mean(unbiased_acts, axis=0)
-            steering_vector = unbiased_mean - biased_mean
-            
-            # Store as float32 for efficiency
-            self.steering_vectors[layer_idx] = steering_vector.astype(np.float32)
-            
-            # Calculate magnitude for analysis
-            magnitude = np.linalg.norm(steering_vector)
-            steering_magnitudes[layer_idx] = magnitude
-            
-            # Report statistics for optimal layers
-            if layer_idx in self.optimal_layer_range:
+        with tqdm(sorted(common_layers), desc="  Computing DSV per layer", unit="layer") as layer_pbar:
+            for layer_idx in layer_pbar:
+                biased_acts = biased_activations[layer_idx].astype(np.float64)  # Higher precision
+                unbiased_acts = unbiased_activations[layer_idx].astype(np.float64)
+                
+                # Verify shapes match
+                if biased_acts.shape != unbiased_acts.shape:
+                    print(f"Warning: Shape mismatch for layer {layer_idx}: "
+                          f"biased={biased_acts.shape}, unbiased={unbiased_acts.shape}")
+                    min_samples = min(biased_acts.shape[0], unbiased_acts.shape[0])
+                    biased_acts = biased_acts[:min_samples]
+                    unbiased_acts = unbiased_acts[:min_samples]
+                
+                # DSV = mean(unbiased) - mean(biased) following the paper
+                biased_mean = np.mean(biased_acts, axis=0)
+                unbiased_mean = np.mean(unbiased_acts, axis=0)
+                steering_vector = unbiased_mean - biased_mean
+                
+                # Store as float32 for efficiency
+                self.steering_vectors[layer_idx] = steering_vector.astype(np.float32)
+                
+                # Calculate magnitude for analysis
+                magnitude = np.linalg.norm(steering_vector)
+                steering_magnitudes[layer_idx] = magnitude
+                
+                # Update progress bar with current layer info
+                layer_pbar.set_postfix({"magnitude": f"{magnitude:.3f}"})
                 print(f"Layer {layer_idx} (optimal): DSV magnitude={magnitude:.4f}, "
                       f"biased_mean={np.mean(biased_mean):.4f}, unbiased_mean={np.mean(unbiased_mean):.4f}")
             else:
@@ -1022,7 +1124,7 @@ class FairSteerGemmaDebiaser:
         
         return len(intersection) / len(union) if union else 0.0
     
-    def extract_activations(self, prompts: List[str], batch_size: int = 32) -> Dict[int, np.ndarray]:
+    def extract_activations(self, prompts: List[str], batch_size: int = 32, desc: str = "Extracting activations") -> Dict[int, np.ndarray]:
         """
         Extract last token activations from all layers for given prompts.
         Optimized for speed and memory efficiency.
@@ -1034,33 +1136,35 @@ class FairSteerGemmaDebiaser:
         Returns:
             Dictionary mapping layer index to activation matrix
         """
-        print(f"Extracting activations for {len(prompts)} prompts with batch_size={batch_size}...")
+        print(f"  🔄 {desc}: {len(prompts)} prompts with batch_size={batch_size}")
         
         layer_activations = defaultdict(list)
         
         # Filter prompts to avoid empty ones
         valid_prompts = [p for p in prompts if p and len(p.strip()) > 0]
-        print(f"Processing {len(valid_prompts)} valid prompts (filtered {len(prompts) - len(valid_prompts)} empty prompts)")
+        print(f"  ✅ Processing {len(valid_prompts)} valid prompts (filtered {len(prompts) - len(valid_prompts)} empty)")
         
-        # Process in batches
-        for i in range(0, len(valid_prompts), batch_size):
-            batch_prompts = valid_prompts[i:i + batch_size]
-            
-            try:
-                # Tokenize batch with consistent max_length
-                inputs = self.tokenizer(
-                    batch_prompts, 
-                    return_tensors="pt", 
-                    padding=True, 
-                    truncation=True,
-                    max_length=256,  # Reduced from 512 for speed
-                    add_special_tokens=True
-                ).to(self.device)
+        # Process in batches with progress bar
+        total_batches = (len(valid_prompts) + batch_size - 1) // batch_size
+        with tqdm(total=total_batches, desc=f"  {desc} batches", unit="batch") as pbar:
+            for i in range(0, len(valid_prompts), batch_size):
+                batch_prompts = valid_prompts[i:i + batch_size]
                 
-                with torch.no_grad():
-                    # Get model outputs with hidden states
-                    outputs = self.model(**inputs, output_hidden_states=True)
-                    hidden_states = outputs.hidden_states
+                try:
+                    # Tokenize batch with consistent max_length
+                    inputs = self.tokenizer(
+                        batch_prompts, 
+                        return_tensors="pt", 
+                        padding=True, 
+                        truncation=True,
+                        max_length=256,  # Reduced from 512 for speed
+                        add_special_tokens=True
+                    ).to(self.device)
+                    
+                    with torch.no_grad():
+                        # Get model outputs with hidden states
+                        outputs = self.model(**inputs, output_hidden_states=True)
+                        hidden_states = outputs.hidden_states
                     
                     # Extract last token activations for each layer
                     # Note: For Gemma, hidden_states[0] is embeddings, hidden_states[1:] are transformer layers
@@ -1081,19 +1185,18 @@ class FairSteerGemmaDebiaser:
                             batch_activations.append(last_token_activation)
                         
                         layer_activations[layer_idx].extend(batch_activations)
+                    
+                    # Clear GPU memory
+                    del outputs, hidden_states, inputs
+                    torch.cuda.empty_cache() if torch.cuda.is_available() else None
+                    
+                except Exception as e:
+                    print(f"Error processing batch {i//batch_size + 1}: {e}")
+                    # Continue with next batch rather than failing completely
+                    continue
                 
-                # Clear GPU memory
-                del outputs, hidden_states, inputs
-                torch.cuda.empty_cache() if torch.cuda.is_available() else None
-                
-            except Exception as e:
-                print(f"Error processing batch {i//batch_size + 1}: {e}")
-                # Continue with next batch rather than failing completely
-                continue
-            
-            # Progress update
-            if (i // batch_size + 1) % 5 == 0:
-                print(f"Processed {i + len(batch_prompts)}/{len(valid_prompts)} prompts...")
+                # Update progress bar
+                pbar.update(1)
         
         # Convert to numpy arrays and filter optimal layers for Gemma
         final_activations = {}
@@ -1240,7 +1343,7 @@ def main_fairsteer_demo(hf_token: Optional[str] = None):
         print(f"Debiased: {debiased}")
     
     # Save the trained model
-    save_path = "/Users/arnav/Documents/Algoverse Research/Model Training/fairsteer_gemma2b.pkl"
+    save_path = "/workspace/Algoverse/fairsteer_gemma2b.pkl"
     debiaser.save_model(save_path)
     
     print(f"\nFairSteer demo completed! Model saved to {save_path}")

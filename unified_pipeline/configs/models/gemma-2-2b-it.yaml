@@ -16,7 +16,7 @@ diagnostic:
   use_attention_analysis: true
   use_mlp_probing: true
 evaluation:
-  batch_size: 4
+  batch_size: 8  # Optimized for H200 GPU (143GB VRAM)
   datasets:
   - sycophancy_eval
   - bias_bench

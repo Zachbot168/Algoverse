@@ -1,0 +1,256 @@
+{
+  "training_type": "FIRM_causal_pinpoint_tuning",
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "timestamp": "N/A",
+  "causal_analysis": {
+    "bias_types_analyzed": [
+      "gender",
+      "race",
+      "religion"
+    ],
+    "total_circuits_identified": 24,
+    "min_importance_threshold": 0.1,
+    "circuits_by_bias_type": {
+      "gender": 6,
+      "race": 8,
+      "religion": 10
+    }
+  },
+  "selected_components": [
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.8736361719199687,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.8647786487902918,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.856425704695571,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 3,
+      "importance": 0.8547546043676496,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 9,
+      "importance": 0.8527062775600738,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 7,
+      "importance": 0.8446436679242956,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 14,
+      "importance": 0.8440205362180295,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 8,
+      "importance": 0.8344688251474809,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": 1,
+      "importance": 0.8192314823423054,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.8176757534146191,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 15,
+      "importance": 0.817361596599852,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.8171382661999818,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.8166211296316389,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.8157389650278936,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 8,
+      "importance": 0.815632373243518,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 13,
+      "importance": 0.806801563043594,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 9,
+      "importance": 0.8050087704838194,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 2,
+      "importance": 0.8040312272544252,
+      "bias_type": "race",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 16,
+      "type": "head",
+      "head_index": 10,
+      "importance": 0.797392986203456,
+      "bias_type": "gender",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.7960359709976347,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 5,
+      "importance": 0.7938066209502039,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 20,
+      "type": "head",
+      "head_index": 0,
+      "importance": 0.7611318468677951,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 18,
+      "type": "head",
+      "head_index": 10,
+      "importance": 0.757157194734999,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    },
+    {
+      "layer": 17,
+      "type": "head",
+      "head_index": -1,
+      "importance": 0.7534242784671857,
+      "bias_type": "religion",
+      "source": "causal_analysis"
+    }
+  ],
+  "training_config": {
+    "component_selection": {
+      "max_components": 32,
+      "min_importance": 0.05,
+      "prioritize_heads": true
+    },
+    "lora": {
+      "alpha": 16,
+      "bias": "none",
+      "dropout": 0.1,
+      "r": 8,
+      "target_modules": [
+        "q_proj",
+        "v_proj",
+        "k_proj",
+        "o_proj"
+      ],
+      "task_type": "CAUSAL_LM"
+    },
+    "training": {
+      "batch_size": 2,
+      "evaluation_strategy": "no",
+      "gradient_accumulation_steps": 4,
+      "learning_rate": "5e-5",
+      "logging_steps": 10,
+      "num_epochs": 3,
+      "output_dir": "firm_pipeline_runs/firm_Qwen/Qwen2.5-3B-Instruct_20250821_144511/phase_2_causal_training",
+      "per_device_train_batch_size": 1,
+      "save_strategy": "epoch",
+      "warmup_ratio": 0.1,
+      "warmup_steps": 100
+    }
+  },
+  "component_summary": {
+    "total_components": 24,
+    "attention_heads": 24,
+    "causal_circuits": 24,
+    "bias_types_covered": [
+      "race",
+      "gender",
+      "religion"
+    ]
+  }
+}

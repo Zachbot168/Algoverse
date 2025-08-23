@@ -1,0 +1,28 @@
+{
+  "evaluation_config": {
+    "training_seeds": [
+      42
+    ],
+    "evaluation_seeds": [
+      100
+    ],
+    "dataset_sample_sizes": {
+      "default": 200
+    },
+    "statistical_tests": [
+      "t_test",
+      "mann_whitney",
+      "effect_size"
+    ],
+    "confidence_level": 0.95
+  },
+  "aggregated_results": {},
+  "statistical_significance": {},
+  "metadata": {
+    "timestamp": "20250821_085847",
+    "model_name": "gemma-2-2b-it",
+    "suite": "comprehensive",
+    "robustness_level": "quick",
+    "total_evaluations": 0
+  }
+}

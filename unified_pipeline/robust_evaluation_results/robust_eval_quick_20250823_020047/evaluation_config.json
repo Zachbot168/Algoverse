@@ -1,0 +1,19 @@
+{
+  "training_seeds": [
+    42,
+    123
+  ],
+  "evaluation_seeds": [
+    100,
+    200
+  ],
+  "dataset_sample_sizes": {
+    "default": 300
+  },
+  "statistical_tests": [
+    "t_test",
+    "mann_whitney",
+    "effect_size"
+  ],
+  "confidence_level": 0.95
+}

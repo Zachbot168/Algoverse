@@ -1,0 +1,13 @@
+{
+  "model_name_or_path": "google/gemma-2-2b-it",
+  "model_type": "gemma2",
+  "path_patching_path": "/workspace/Algoverse/unified_pipeline/sycophancy_pipeline_runs/sycophancy_gemma-2-2b-it_20250821_085847/path_patching_results/path_patching_results.json",
+  "precise_level": 1,
+  "peft_type": "lora",
+  "output_dir": "/workspace/Algoverse/unified_pipeline/sycophancy_pipeline_runs/sycophancy_gemma-2-2b-it_20250821_085847/pinpoint_tuning_results",
+  "num_train_epochs": 3,
+  "per_device_train_batch_size": 4,
+  "learning_rate": 5e-05,
+  "train_topk": true,
+  "train_kv": false
+}

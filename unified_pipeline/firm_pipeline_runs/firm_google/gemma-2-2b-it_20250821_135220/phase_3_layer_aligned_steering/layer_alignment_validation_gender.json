@@ -1,0 +1,113 @@
+{
+  "bias_category": "gender",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.34452191761561807,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.2191762924194336,
+        0.30731563568115233,
+        0.5082626342773438,
+        0.5082626342773438,
+        0.3066123962402344,
+        0.21750191279820033
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.34452191761561807,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.2191762924194336,
+        0.30731563568115233,
+        0.5082626342773438,
+        0.5082626342773438,
+        0.3066123962402344,
+        0.21750191279820033
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.3449181874593099,
+      "layers_tested": [
+        16,
+        17,
+        18
+      ],
+      "individual_scores": [
+        0.2191762924194336,
+        0.30731563568115233,
+        0.5082626342773438
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.12895181962660143,
+      "layers_tested": [
+        13,
+        14
+      ],
+      "individual_scores": [
+        0.11810816251314603,
+        0.13979547674005682
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.1384103081443093,
+      "layers_tested": [
+        23
+      ],
+      "individual_scores": [
+        0.1384103081443093
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.3449181874593099
+    },
+    {
+      "strategy": "causal_aligned",
+      "score": 0.34452191761561807
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.34452191761561807
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.1384103081443093
+    },
+    {
+      "strategy": "baseline_middle",
+      "score": 0.12895181962660143
+    }
+  ],
+  "alignment_hypothesis_supported": true,
+  "best_strategy": "optimal_overlap",
+  "hypothesis_evidence": {
+    "best_aligned_score": 0.3449181874593099,
+    "baseline_score": 0.12895181962660143,
+    "improvement": 0.21596636783270848
+  }
+}

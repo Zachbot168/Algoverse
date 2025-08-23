@@ -1,0 +1,107 @@
+{
+  "bias_category": "gender",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.35042363802591964,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "individual_scores": [
+        0.22005208333333334,
+        0.32763671875,
+        0.658203125,
+        0.32845282554626465,
+        0.2177734375
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.35042363802591964,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "individual_scores": [
+        0.22005208333333334,
+        0.32763671875,
+        0.658203125,
+        0.32845282554626465,
+        0.2177734375
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.2738444010416667,
+      "layers_tested": [
+        16,
+        17
+      ],
+      "individual_scores": [
+        0.22005208333333334,
+        0.32763671875
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.14798583984375,
+      "layers_tested": [
+        14,
+        15
+      ],
+      "individual_scores": [
+        0.13154296875,
+        0.1644287109375
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.1322265625,
+      "layers_tested": [
+        22
+      ],
+      "individual_scores": [
+        0.1322265625
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "causal_aligned",
+      "score": 0.35042363802591964
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.35042363802591964
+    },
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.2738444010416667
+    },
+    {
+      "strategy": "baseline_middle",
+      "score": 0.14798583984375
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.1322265625
+    }
+  ],
+  "alignment_hypothesis_supported": true,
+  "best_strategy": "causal_aligned",
+  "hypothesis_evidence": {
+    "best_aligned_score": 0.35042363802591964,
+    "baseline_score": 0.14798583984375,
+    "improvement": 0.20243779818216964
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "bias_category": "religion",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.35681476726398603,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20
+      ],
+      "individual_scores": [
+        0.25159801136363635,
+        0.3984375,
+        0.559375,
+        0.21784855769230768
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.35681476726398603,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20
+      ],
+      "individual_scores": [
+        0.25159801136363635,
+        0.3984375,
+        0.559375,
+        0.21784855769230768
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.3250177556818182,
+      "layers_tested": [
+        16,
+        17
+      ],
+      "individual_scores": [
+        0.25159801136363635,
+        0.3984375
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.4357204861111111,
+      "layers_tested": [
+        18,
+        19
+      ],
+      "individual_scores": [
+        0.559375,
+        0.3120659722222222
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.13625372023809523,
+      "layers_tested": [
+        22
+      ],
+      "individual_scores": [
+        0.13625372023809523
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "baseline_middle",
+      "score": 0.4357204861111111
+    },
+    {
+      "strategy": "causal_aligned",
+      "score": 0.35681476726398603
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.35681476726398603
+    },
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.3250177556818182
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.13625372023809523
+    }
+  ],
+  "alignment_hypothesis_supported": false,
+  "best_strategy": "baseline_middle"
+}

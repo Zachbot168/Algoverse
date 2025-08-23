@@ -63,7 +63,15 @@ class CausalPinpointTuner(UnifiedPinpointTuner):
     def initialize_circuit_tracer(self, model, tokenizer) -> None:
         """Initialize the bias circuit tracer with loaded model."""
         print("Initializing bias circuit tracer...")
-        self.circuit_tracer = BiasCircuitTracer(model, tokenizer, self.device)
+        # Create proper config dict for circuit tracer
+        circuit_config = {
+            "device": self.device,
+            "num_layers": getattr(model.config, 'num_hidden_layers', 26),
+            "num_heads": getattr(model.config, 'num_attention_heads', 8),
+            "intervention_threshold": self.min_causal_importance,
+            "top_k_components": 10
+        }
+        self.circuit_tracer = BiasCircuitTracer(model, tokenizer, circuit_config)
         print("✅ Circuit tracer initialized")
     
     def identify_causal_circuits(self, output_dir: str) -> Dict[Tuple[int, int], CircuitComponent]:

@@ -1,0 +1,357 @@
+{
+  "phase": "circuit_identification",
+  "timestamp": "2025-08-21T13:33:48.929303",
+  "bias_circuits": {
+    "gender": [
+      {
+        "layer": 16,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.8862428661250081,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 5,
+        "component_type": "attention_head",
+        "importance_score": 0.8548827785121543,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 14,
+        "component_type": "attention_head",
+        "importance_score": 0.8190952101954102,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 3,
+        "component_type": "attention_head",
+        "importance_score": 0.8172828307760679,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 9,
+        "component_type": "attention_head",
+        "importance_score": 0.7913748547717047,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 6,
+        "component_type": "attention_head",
+        "importance_score": 0.7897018311278975,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 20,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.776819912255798,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 20,
+        "head": 15,
+        "component_type": "attention_head",
+        "importance_score": 0.7760545728776115,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 10,
+        "component_type": "attention_head",
+        "importance_score": 0.7758686837516047,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 20,
+        "head": 6,
+        "component_type": "attention_head",
+        "importance_score": 0.7682977640408664,
+        "bias_type": "gender",
+        "logit_diff_contribution": 0.0
+      }
+    ],
+    "race": [
+      {
+        "layer": 16,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.8266807415655294,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 12,
+        "component_type": "attention_head",
+        "importance_score": 0.8161921377775069,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 15,
+        "component_type": "attention_head",
+        "importance_score": 0.7767632771558519,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 20,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.7559004580340625,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.7550816344782304,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 3,
+        "component_type": "attention_head",
+        "importance_score": 0.7523200299394142,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 7,
+        "component_type": "attention_head",
+        "importance_score": 0.7433611735765926,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 20,
+        "head": 14,
+        "component_type": "attention_head",
+        "importance_score": 0.7354602960828749,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 20,
+        "head": 9,
+        "component_type": "attention_head",
+        "importance_score": 0.7353741363225851,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.7312219145861996,
+        "bias_type": "race",
+        "logit_diff_contribution": 0.0
+      }
+    ],
+    "religion": [
+      {
+        "layer": 16,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.8902993833317472,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 2,
+        "component_type": "attention_head",
+        "importance_score": 0.8692736275427742,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 13,
+        "component_type": "attention_head",
+        "importance_score": 0.8596344758195769,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.8238683154068662,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 14,
+        "component_type": "attention_head",
+        "importance_score": 0.8169742853718761,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": -1,
+        "component_type": "mlp",
+        "importance_score": 0.8154482365896548,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 0,
+        "component_type": "attention_head",
+        "importance_score": 0.8133148223739343,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 17,
+        "head": 8,
+        "component_type": "attention_head",
+        "importance_score": 0.8061736651198117,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 18,
+        "head": 11,
+        "component_type": "attention_head",
+        "importance_score": 0.8047597462631153,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      },
+      {
+        "layer": 16,
+        "head": 0,
+        "component_type": "attention_head",
+        "importance_score": 0.799381076091051,
+        "bias_type": "religion",
+        "logit_diff_contribution": 0.0
+      }
+    ]
+  },
+  "circuit_analysis": {
+    "gender": {
+      "layer_distribution": {
+        "16": 7,
+        "20": 3
+      },
+      "layer_importance": {
+        "16": 5.734449055259847,
+        "20": 2.3211722491742757
+      },
+      "head_distribution": {
+        "5": 1,
+        "14": 1,
+        "3": 1,
+        "9": 1,
+        "6": 2,
+        "15": 1,
+        "10": 1
+      },
+      "component_type_distribution": {
+        "mlp": 2,
+        "attention_head": 8
+      },
+      "importance_statistics": {
+        "mean": 0.8055621304434123,
+        "std": 0.036989727256273086,
+        "min": 0.7682977640408664,
+        "max": 0.8862428661250081,
+        "median": 0.7905383429498011
+      },
+      "summary": "Identified 10 circuit components across 2 layers. Top layers by importance: [16, 20]",
+      "total_components": 10,
+      "layers_with_circuits": 2
+    },
+    "race": {
+      "layer_distribution": {
+        "16": 4,
+        "20": 3,
+        "17": 2,
+        "18": 1
+      },
+      "layer_importance": {
+        "16": 3.1629973300754806,
+        "20": 2.2267348904395226,
+        "17": 1.5074016644176447,
+        "18": 0.7312219145861996
+      },
+      "head_distribution": {
+        "12": 1,
+        "15": 1,
+        "3": 1,
+        "7": 1,
+        "14": 1,
+        "9": 1
+      },
+      "component_type_distribution": {
+        "mlp": 4,
+        "attention_head": 6
+      },
+      "importance_statistics": {
+        "mean": 0.7628355799518848,
+        "std": 0.03196579022486791,
+        "min": 0.7312219145861996,
+        "max": 0.8266807415655294,
+        "median": 0.7537008322088223
+      },
+      "summary": "Identified 10 circuit components across 4 layers. Top layers by importance: [16, 20, 17]",
+      "total_components": 10,
+      "layers_with_circuits": 4
+    },
+    "religion": {
+      "layer_distribution": {
+        "16": 5,
+        "18": 2,
+        "17": 3
+      },
+      "layer_importance": {
+        "16": 4.235562848157025,
+        "18": 1.6286280616699815,
+        "17": 2.434936724083401
+      },
+      "head_distribution": {
+        "2": 1,
+        "13": 1,
+        "14": 1,
+        "0": 2,
+        "8": 1,
+        "11": 1
+      },
+      "component_type_distribution": {
+        "mlp": 3,
+        "attention_head": 7
+      },
+      "importance_statistics": {
+        "mean": 0.8299127633910407,
+        "std": 0.029826596214709823,
+        "min": 0.799381076091051,
+        "max": 0.8902993833317472,
+        "median": 0.8162112609807655
+      },
+      "summary": "Identified 10 circuit components across 3 layers. Top layers by importance: [16, 17, 18]",
+      "total_components": 10,
+      "layers_with_circuits": 3
+    }
+  }
+}

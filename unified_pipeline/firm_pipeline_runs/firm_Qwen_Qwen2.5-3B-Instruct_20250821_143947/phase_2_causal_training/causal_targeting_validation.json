@@ -1,0 +1,19 @@
+{
+  "components_targeted": 24,
+  "circuits_used": 24,
+  "bias_types_covered": 3,
+  "layer_coverage": {
+    "16": 8,
+    "17": 5,
+    "18": 9,
+    "20": 1,
+    "21": 1
+  },
+  "importance_distribution": {
+    "mean": 0.849193384631806,
+    "min": 0.8148511805219225,
+    "max": 0.8935331807119148,
+    "std": 0.024592498317360878
+  },
+  "validation_passed": true
+}

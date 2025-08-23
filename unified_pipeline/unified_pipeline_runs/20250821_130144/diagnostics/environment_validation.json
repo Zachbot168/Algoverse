@@ -1,0 +1,435 @@
+{
+  "timestamp": "2025-08-21T13:01:44.887998",
+  "model_accessible": true,
+  "datasets_available": {
+    "CrowsPairs": true,
+    "StereoSet": true,
+    "WinoBias": true,
+    "WinoGender": true,
+    "BBQ": true,
+    "SEAT": true,
+    "BOLD": true,
+    "BiosBias": true,
+    "TruthfulQA": true,
+    "SycophancyEval": true,
+    "MMLU": true,
+    "HumanEval": true,
+    "GSM8K": true
+  },
+  "total_datasets": 13,
+  "available_datasets": 13,
+  "validation_errors": [],
+  "coverage_report": {
+    "total_datasets": 13,
+    "working_datasets": 4,
+    "high_priority_datasets": 4,
+    "medium_priority_datasets": 3,
+    "low_priority_datasets": 2,
+    "coverage_by_bias_type": {
+      "gender": {
+        "count": 8,
+        "datasets": [
+          "CrowsPairs",
+          "StereoSet",
+          "WinoBias",
+          "WinoGender",
+          "BBQ",
+          "SEAT",
+          "BOLD",
+          "BiosBias"
+        ]
+      },
+      "racial": {
+        "count": 5,
+        "datasets": [
+          "CrowsPairs",
+          "StereoSet",
+          "BBQ",
+          "SEAT",
+          "BOLD"
+        ]
+      },
+      "religious": {
+        "count": 4,
+        "datasets": [
+          "CrowsPairs",
+          "StereoSet",
+          "BBQ",
+          "SEAT"
+        ]
+      },
+      "demographic": {
+        "count": 3,
+        "datasets": [
+          "BBQ",
+          "SEAT",
+          "BOLD"
+        ]
+      },
+      "sycophancy": {
+        "count": 5,
+        "datasets": [
+          "TruthfulQA",
+          "SycophancyEval",
+          "MMLU",
+          "HumanEval",
+          "GSM8K"
+        ]
+      },
+      "profession": {
+        "count": 2,
+        "datasets": [
+          "BOLD",
+          "BiosBias"
+        ]
+      },
+      "stereotype": {
+        "count": 2,
+        "datasets": [
+          "CrowsPairs",
+          "StereoSet"
+        ]
+      },
+      "general": {
+        "count": 0,
+        "datasets": []
+      }
+    },
+    "coverage_by_evaluation_mode": {
+      "multiple_choice": {
+        "count": 3,
+        "datasets": [
+          "StereoSet",
+          "SycophancyEval",
+          "MMLU"
+        ]
+      },
+      "sentence_completion": {
+        "count": 1,
+        "datasets": [
+          "CrowsPairs"
+        ]
+      },
+      "generation": {
+        "count": 3,
+        "datasets": [
+          "BOLD",
+          "HumanEval",
+          "GSM8K"
+        ]
+      },
+      "classification": {
+        "count": 4,
+        "datasets": [
+          "WinoBias",
+          "WinoGender",
+          "BBQ",
+          "BiosBias"
+        ]
+      },
+      "association_test": {
+        "count": 1,
+        "datasets": [
+          "SEAT"
+        ]
+      },
+      "qa": {
+        "count": 0,
+        "datasets": []
+      },
+      "truthfulness": {
+        "count": 1,
+        "datasets": [
+          "TruthfulQA"
+        ]
+      }
+    },
+    "dataset_details": {
+      "CrowsPairs": {
+        "name": "CrowsPairs",
+        "bias_types": [
+          "BiasType.STEREOTYPE",
+          "BiasType.GENDER",
+          "BiasType.RACIAL",
+          "BiasType.RELIGIOUS"
+        ],
+        "evaluation_mode": "EvaluationMode.SENTENCE_COMPLETION",
+        "size": 1508,
+        "description": "Crowdsourced stereotype pairs for bias evaluation",
+        "citation": "Nangia et al. CrowS-Pairs: A Challenge Dataset for Measuring Social Biases in Masked Language Models",
+        "data_format": "csv",
+        "unique_features": [
+          "stereotyped_minimal_pairs",
+          "direct_bias_measurement"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": false,
+        "has_demographics": true
+      },
+      "StereoSet": {
+        "name": "StereoSet",
+        "bias_types": [
+          "BiasType.STEREOTYPE",
+          "BiasType.GENDER",
+          "BiasType.RACIAL",
+          "BiasType.RELIGIOUS"
+        ],
+        "evaluation_mode": "EvaluationMode.MULTIPLE_CHOICE",
+        "size": 17000,
+        "description": "Comprehensive stereotype evaluation with stereotype/anti-stereotype/unrelated choices",
+        "citation": "Nadeem et al. StereoSet: Measuring stereotypical bias in pretrained language models",
+        "data_format": "json",
+        "unique_features": [
+          "stereotype_anti-stereotype_unrelated_triples",
+          "multiple_bias_categories",
+          "intersentence_intrasentence"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": true,
+        "has_demographics": true
+      },
+      "WinoBias": {
+        "name": "WinoBias",
+        "bias_types": [
+          "BiasType.GENDER"
+        ],
+        "evaluation_mode": "EvaluationMode.CLASSIFICATION",
+        "size": 3168,
+        "description": "Gender bias evaluation using Winograd schemas",
+        "citation": "Zhao et al. Gender bias in coreference resolution",
+        "data_format": "json",
+        "unique_features": [
+          "winograd_schema",
+          "pro_anti_stereotypical",
+          "type1_type2_variants"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": true,
+        "has_demographics": true
+      },
+      "WinoGender": {
+        "name": "WinoGender",
+        "bias_types": [
+          "BiasType.GENDER"
+        ],
+        "evaluation_mode": "EvaluationMode.CLASSIFICATION",
+        "size": 720,
+        "description": "Gender bias evaluation using Winograd schema with occupational stereotypes",
+        "citation": "Rudinger et al. Gender bias in coreference resolution",
+        "data_format": "tsv",
+        "unique_features": [
+          "winograd_schema",
+          "occupational_stereotypes",
+          "coreference_resolution"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": true,
+        "has_demographics": true
+      },
+      "BBQ": {
+        "name": "BBQ",
+        "bias_types": [
+          "BiasType.DEMOGRAPHIC",
+          "BiasType.GENDER",
+          "BiasType.RACIAL",
+          "BiasType.RELIGIOUS"
+        ],
+        "evaluation_mode": "EvaluationMode.CLASSIFICATION",
+        "size": 58492,
+        "description": "QA bias benchmark across multiple demographic dimensions (optimized)",
+        "citation": "Parrish et al. BBQ: A hand-built bias benchmark for question answering",
+        "data_format": "json",
+        "unique_features": [
+          "question_answering_bias",
+          "ambiguous_disambiguated_pairs",
+          "multiple_demographics",
+          "optimized_classification"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": true,
+        "has_demographics": true
+      },
+      "SEAT": {
+        "name": "SEAT",
+        "bias_types": [
+          "BiasType.GENDER",
+          "BiasType.RACIAL",
+          "BiasType.RELIGIOUS",
+          "BiasType.DEMOGRAPHIC"
+        ],
+        "evaluation_mode": "EvaluationMode.ASSOCIATION_TEST",
+        "size": 42,
+        "description": "Word Embedding Association Tests for implicit bias detection",
+        "citation": "Caliskan et al. Semantics derived automatically from language corpora contain human-like biases",
+        "data_format": "jsonl",
+        "unique_features": [
+          "word_association_tests",
+          "embedding_bias_detection",
+          "multiple_test_variants"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": false,
+        "has_demographics": true
+      },
+      "BOLD": {
+        "name": "BOLD",
+        "bias_types": [
+          "BiasType.DEMOGRAPHIC",
+          "BiasType.GENDER",
+          "BiasType.RACIAL",
+          "BiasType.PROFESSION"
+        ],
+        "evaluation_mode": "EvaluationMode.GENERATION",
+        "size": 23679,
+        "description": "Bias evaluation through open-ended text generation",
+        "citation": "Dhamala et al. BOLD: Dataset and Metrics for Measuring Biases in Open-Ended Language Generation",
+        "data_format": "json",
+        "unique_features": [
+          "generation_bias_evaluation",
+          "demographic_prompts",
+          "bias_in_continuations"
+        ],
+        "requires_generation": true,
+        "supports_few_shot": true,
+        "has_demographics": true
+      },
+      "BiosBias": {
+        "name": "BiosBias",
+        "bias_types": [
+          "BiasType.PROFESSION",
+          "BiasType.GENDER"
+        ],
+        "evaluation_mode": "EvaluationMode.CLASSIFICATION",
+        "size": 397340,
+        "description": "Professional bias evaluation using biographical texts",
+        "citation": "De-Arteaga et al. Bias in bios: A case study of semantic representation bias",
+        "data_format": "pickle",
+        "unique_features": [
+          "biographical_texts",
+          "profession_classification",
+          "gender_bias_in_occupations"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": true,
+        "has_demographics": true
+      },
+      "TruthfulQA": {
+        "name": "TruthfulQA",
+        "bias_types": [
+          "BiasType.SYCOPHANCY"
+        ],
+        "evaluation_mode": "EvaluationMode.TRUTHFULNESS",
+        "size": 817,
+        "description": "Truthfulness evaluation to measure truth vs sycophancy tradeoff",
+        "citation": "Lin et al. TruthfulQA: Measuring How Models Mimic Human Falsehoods",
+        "data_format": "csv",
+        "unique_features": [
+          "truthfulness_evaluation",
+          "human_falsehood_detection",
+          "truth_vs_agreeableness"
+        ],
+        "requires_generation": true,
+        "supports_few_shot": true,
+        "has_demographics": false
+      },
+      "SycophancyEval": {
+        "name": "SycophancyEval",
+        "bias_types": [
+          "BiasType.SYCOPHANCY"
+        ],
+        "evaluation_mode": "EvaluationMode.MULTIPLE_CHOICE",
+        "size": 10997,
+        "description": "Agreement-seeking bias evaluation across multiple choice scenarios",
+        "citation": "Sycophancy interpretability analysis dataset",
+        "data_format": "jsonl",
+        "unique_features": [
+          "sycophantic_agreement_detection",
+          "human_preference_mimicking"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": true,
+        "has_demographics": false
+      },
+      "MMLU": {
+        "name": "MMLU",
+        "bias_types": [
+          "BiasType.SYCOPHANCY"
+        ],
+        "evaluation_mode": "EvaluationMode.MULTIPLE_CHOICE",
+        "size": 14042,
+        "description": "Academic knowledge evaluation across 57 subjects for sycophancy detection",
+        "citation": "Hendrycks et al. Measuring Massive Multitask Language Understanding",
+        "data_format": "csv",
+        "unique_features": [
+          "academic_domain_coverage",
+          "57_subjects",
+          "knowledge_vs_agreement"
+        ],
+        "requires_generation": false,
+        "supports_few_shot": true,
+        "has_demographics": false
+      },
+      "HumanEval": {
+        "name": "HumanEval",
+        "bias_types": [
+          "BiasType.SYCOPHANCY"
+        ],
+        "evaluation_mode": "EvaluationMode.GENERATION",
+        "size": 164,
+        "description": "Coding task evaluation for task-specific sycophancy",
+        "citation": "Chen et al. Evaluating Large Language Models Trained on Code",
+        "data_format": "jsonl",
+        "unique_features": [
+          "code_generation",
+          "task_specific_sycophancy",
+          "functional_correctness"
+        ],
+        "requires_generation": true,
+        "supports_few_shot": true,
+        "has_demographics": false
+      },
+      "GSM8K": {
+        "name": "GSM8K",
+        "bias_types": [
+          "BiasType.SYCOPHANCY"
+        ],
+        "evaluation_mode": "EvaluationMode.GENERATION",
+        "size": 1319,
+        "description": "Grade school math problems for task-specific sycophancy",
+        "citation": "Cobbe et al. Training Verifiers to Solve Math Word Problems",
+        "data_format": "jsonl",
+        "unique_features": [
+          "math_word_problems",
+          "numerical_reasoning",
+          "task_specific_sycophancy"
+        ],
+        "requires_generation": true,
+        "supports_few_shot": true,
+        "has_demographics": false
+      }
+    },
+    "implementation_status": {
+      "working": [
+        "CrowsPairs",
+        "WinoBias",
+        "SycophancyEval",
+        "BBQ"
+      ],
+      "high_priority_pending": [
+        "StereoSet",
+        "SEAT",
+        "TruthfulQA",
+        "WinoGender"
+      ],
+      "medium_priority_pending": [
+        "BOLD",
+        "BiosBias",
+        "MMLU"
+      ],
+      "low_priority_pending": [
+        "HumanEval",
+        "GSM8K"
+      ]
+    }
+  }
+}

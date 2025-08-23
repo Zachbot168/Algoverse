@@ -1,0 +1,107 @@
+{
+  "bias_category": "race",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.32461616592760684,
+      "layers_tested": [
+        16,
+        17,
+        19,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.21927396456400544,
+        0.3029339130108171,
+        0.5529638699122843,
+        0.3210798899332684,
+        0.22682919221765865
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.32461616592760684,
+      "layers_tested": [
+        16,
+        17,
+        19,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.21927396456400544,
+        0.3029339130108171,
+        0.5529638699122843,
+        0.3210798899332684,
+        0.22682919221765865
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.2611039387874113,
+      "layers_tested": [
+        16,
+        17
+      ],
+      "individual_scores": [
+        0.21927396456400544,
+        0.3029339130108171
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.13066186275317035,
+      "layers_tested": [
+        13,
+        14
+      ],
+      "individual_scores": [
+        0.12004794496478453,
+        0.14127578054155618
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.14173313423439313,
+      "layers_tested": [
+        23
+      ],
+      "individual_scores": [
+        0.14173313423439313
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "causal_aligned",
+      "score": 0.32461616592760684
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.32461616592760684
+    },
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.2611039387874113
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.14173313423439313
+    },
+    {
+      "strategy": "baseline_middle",
+      "score": 0.13066186275317035
+    }
+  ],
+  "alignment_hypothesis_supported": true,
+  "best_strategy": "causal_aligned",
+  "hypothesis_evidence": {
+    "best_aligned_score": 0.32461616592760684,
+    "baseline_score": 0.13066186275317035,
+    "improvement": 0.1939543031744365
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "bias_category": "religion",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.37311197916666666,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "individual_scores": [
+        0.23063151041666666,
+        0.3486328125,
+        0.69921875,
+        0.35107421875,
+        0.23600260416666666
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.37311197916666666,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "individual_scores": [
+        0.23063151041666666,
+        0.3486328125,
+        0.69921875,
+        0.35107421875,
+        0.23600260416666666
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.2896321614583333,
+      "layers_tested": [
+        16,
+        17
+      ],
+      "individual_scores": [
+        0.23063151041666666,
+        0.3486328125
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.525146484375,
+      "layers_tested": [
+        18,
+        19
+      ],
+      "individual_scores": [
+        0.69921875,
+        0.35107421875
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.14306640625,
+      "layers_tested": [
+        22
+      ],
+      "individual_scores": [
+        0.14306640625
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "baseline_middle",
+      "score": 0.525146484375
+    },
+    {
+      "strategy": "causal_aligned",
+      "score": 0.37311197916666666
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.37311197916666666
+    },
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.2896321614583333
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.14306640625
+    }
+  ],
+  "alignment_hypothesis_supported": false,
+  "best_strategy": "baseline_middle"
+}

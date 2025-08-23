@@ -1,0 +1,107 @@
+{
+  "bias_category": "religion",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.3396771473847938,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.24197241839240588,
+        0.34331758817036967,
+        0.5818469183785581,
+        0.30969583071195145,
+        0.22155298127068404
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.3396771473847938,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.24197241839240588,
+        0.34331758817036967,
+        0.5818469183785581,
+        0.30969583071195145,
+        0.22155298127068404
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.29264500328138776,
+      "layers_tested": [
+        16,
+        17
+      ],
+      "individual_scores": [
+        0.24197241839240588,
+        0.34331758817036967
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.14258267840853447,
+      "layers_tested": [
+        13,
+        14
+      ],
+      "individual_scores": [
+        0.13030074536800387,
+        0.15486461144906508
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.14179902417319157,
+      "layers_tested": [
+        23
+      ],
+      "individual_scores": [
+        0.14179902417319157
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "causal_aligned",
+      "score": 0.3396771473847938
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.3396771473847938
+    },
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.29264500328138776
+    },
+    {
+      "strategy": "baseline_middle",
+      "score": 0.14258267840853447
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.14179902417319157
+    }
+  ],
+  "alignment_hypothesis_supported": true,
+  "best_strategy": "causal_aligned",
+  "hypothesis_evidence": {
+    "best_aligned_score": 0.3396771473847938,
+    "baseline_score": 0.14258267840853447,
+    "improvement": 0.19709446897625935
+  }
+}

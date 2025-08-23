@@ -1,0 +1,96 @@
+{
+  "bias_category": "gender",
+  "model_name": "google/gemma-2-2b-it",
+  "firm_version": "1.0",
+  "alignment_strategies": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_analysis": {
+    "causal_layers": [
+      16,
+      17,
+      18,
+      20,
+      21
+    ],
+    "training_layers": [
+      16,
+      17,
+      18,
+      20,
+      21
+    ],
+    "total_model_layers": 26
+  },
+  "vector_statistics": {
+    "causal_aligned": {
+      "num_layers": 5,
+      "layers": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "average_magnitude": 1.2,
+      "magnitude_range": [
+        1.19921875,
+        1.2001953125
+      ]
+    },
+    "training_aligned": {
+      "num_layers": 5,
+      "layers": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "average_magnitude": 1.2,
+      "magnitude_range": [
+        1.19921875,
+        1.2001953125
+      ]
+    },
+    "optimal_overlap": {
+      "num_layers": 2,
+      "layers": [
+        16,
+        17
+      ],
+      "average_magnitude": 1.2001953125,
+      "magnitude_range": [
+        1.2001953125,
+        1.2001953125
+      ]
+    },
+    "baseline_middle": {
+      "num_layers": 2,
+      "layers": [
+        13,
+        14
+      ],
+      "average_magnitude": 1.2001953125,
+      "magnitude_range": [
+        1.2001953125,
+        1.2001953125
+      ]
+    },
+    "downstream": {
+      "num_layers": 1,
+      "layers": [
+        23
+      ],
+      "average_magnitude": 1.2001953125,
+      "magnitude_range": [
+        1.2001953125,
+        1.2001953125
+      ]
+    }
+  }
+}

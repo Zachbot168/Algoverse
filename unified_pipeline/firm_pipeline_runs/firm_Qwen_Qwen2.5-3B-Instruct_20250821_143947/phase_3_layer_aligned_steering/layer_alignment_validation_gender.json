@@ -1,0 +1,102 @@
+{
+  "bias_category": "gender",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.27384157789718466,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.1918658088235295,
+        0.2718098958333335,
+        0.4663085937500005,
+        0.25503305288461525,
+        0.18419053819444436
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.27384157789718466,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "individual_scores": [
+        0.1918658088235295,
+        0.2718098958333335,
+        0.4663085937500005,
+        0.25503305288461525,
+        0.18419053819444436
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.2318378523284315,
+      "layers_tested": [
+        16,
+        17
+      ],
+      "individual_scores": [
+        0.1918658088235295,
+        0.2718098958333335
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.43853759765625006,
+      "layers_tested": [
+        18,
+        19
+      ],
+      "individual_scores": [
+        0.4663085937500005,
+        0.4107666015624996
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.11936732700892855,
+      "layers_tested": [
+        23
+      ],
+      "individual_scores": [
+        0.11936732700892855
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "baseline_middle",
+      "score": 0.43853759765625006
+    },
+    {
+      "strategy": "causal_aligned",
+      "score": 0.27384157789718466
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.27384157789718466
+    },
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.2318378523284315
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.11936732700892855
+    }
+  ],
+  "alignment_hypothesis_supported": false,
+  "best_strategy": "baseline_middle"
+}

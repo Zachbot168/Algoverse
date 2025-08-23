@@ -86,8 +86,9 @@ class ModelVariantLoader:
                 print("   ⚠️  Empty steering vectors, using baseline model")
                 return self.base_model, self.tokenizer
             
-            # Apply steering vectors using DAS wrapper
-            das_model = DynamicActivationSteering(
+            # Create a simple steering wrapper for FairSteer
+            from steer.simple_fairsteer_wrapper import SimpleFairSteerWrapper
+            das_model = SimpleFairSteerWrapper(
                 model=self.base_model,
                 steering_vectors=steering_vectors,
                 optimal_layer=optimal_layer,
@@ -147,7 +148,8 @@ class ModelVariantLoader:
                 optimal_layer = fairsteer_data.get('optimal_layer', 15)
                 
                 if steering_vectors:
-                    model = DynamicActivationSteering(
+                    from steer.simple_fairsteer_wrapper import SimpleFairSteerWrapper
+                    model = SimpleFairSteerWrapper(
                         model=model,
                         steering_vectors=steering_vectors,
                         optimal_layer=optimal_layer,
@@ -165,14 +167,24 @@ class ModelVariantLoader:
             return self.base_model, self.tokenizer
     
     def _find_fairsteer_path(self) -> Optional[str]:
-        """Find FairSteer steering vectors file."""
-        # Check multiple possible locations
+        """Find model-agnostic FairSteer steering vectors file."""
+        # Generate model-specific filename based on actual model name
+        safe_model_name = self.model_name.replace('/', '_').replace('-', '_').lower()
+        
+        # Primary check: Look for existing model-specific steering vectors
+        steering_vectors_dir = Path(__file__).parent.parent / "steering_vectors"
+        primary_path = steering_vectors_dir / f"fairsteer_{safe_model_name}.pkl"
+        
+        if primary_path.exists():
+            print(f"   📁 Found model-specific FairSteer vectors: {primary_path}")
+            return str(primary_path)
+        
+        # Secondary check: Look in common locations with various naming conventions
         possible_paths = [
+            f"steering_vectors/fairsteer_{safe_model_name}.pkl",
+            f"fairsteer_{safe_model_name}.pkl",
             f"fairsteer_{self.model_name.split('/')[-1].lower()}.pkl",
             f"fairsteer_{self.model_name.split('/')[-1].lower().replace('-', '_')}.pkl",
-            "fairsteer_gemma2b.pkl",  # Legacy path
-            f"steering_vectors/{self.model_name.split('/')[-1].lower()}.pkl",
-            f"steer/steering_vectors_{self.model_name.split('/')[-1].lower()}.pkl"
         ]
         
         # Check current directory and parent directories
@@ -180,7 +192,36 @@ class ModelVariantLoader:
             for possible_path in possible_paths:
                 full_path = base_path / possible_path
                 if full_path.exists():
+                    print(f"   📁 Found FairSteer vectors: {full_path}")
                     return str(full_path)
+        
+        # If no model-specific vectors found, create them using model-agnostic FairSteer
+        print(f"   ⚠️  No FairSteer vectors found for {self.model_name}")
+        print(f"   🔧 Creating model-specific FairSteer vectors using model-agnostic implementation...")
+        
+        try:
+            # Import and use model-agnostic FairSteer
+            sys.path.append(str(Path(__file__).parent))
+            from steer.model_agnostic_fairsteer import ModelAgnosticFairSteer, generate_bias_pairs
+            
+            # Create steering vectors for this specific model
+            fairsteer = ModelAgnosticFairSteer(self.model_name, self.base_model, self.tokenizer)
+            bias_pairs = generate_bias_pairs()
+            steering_vectors = fairsteer.compute_steering_vectors(bias_pairs)
+            
+            if steering_vectors and hasattr(fairsteer, 'optimal_layer'):
+                # Save for future use
+                steering_vectors_dir.mkdir(exist_ok=True)
+                output_path = steering_vectors_dir / f"fairsteer_{safe_model_name}.pkl"
+                fairsteer.save_steering_vectors(str(output_path))
+                print(f"   ✅ Created and saved model-specific FairSteer vectors: {output_path}")
+                return str(output_path)
+            else:
+                print(f"   ❌ Failed to generate valid steering vectors for {self.model_name}")
+        except Exception as e:
+            print(f"   ❌ Failed to create FairSteer vectors: {e}")
+            import traceback
+            traceback.print_exc()
         
         return None
     

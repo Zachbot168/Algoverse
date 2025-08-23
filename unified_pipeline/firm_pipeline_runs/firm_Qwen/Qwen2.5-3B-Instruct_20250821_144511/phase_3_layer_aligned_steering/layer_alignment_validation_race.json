@@ -1,0 +1,98 @@
+{
+  "bias_category": "race",
+  "timestamp": "N/A",
+  "strategies_tested": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_alignment_scores": {
+    "causal_aligned": {
+      "average_effectiveness": 0.34554075132478607,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20
+      ],
+      "individual_scores": [
+        0.2463285272771662,
+        0.3853236607142857,
+        0.540625,
+        0.20988581730769232
+      ]
+    },
+    "training_aligned": {
+      "average_effectiveness": 0.34554075132478607,
+      "layers_tested": [
+        16,
+        17,
+        18,
+        20
+      ],
+      "individual_scores": [
+        0.2463285272771662,
+        0.3853236607142857,
+        0.540625,
+        0.20988581730769232
+      ]
+    },
+    "optimal_overlap": {
+      "average_effectiveness": 0.3158260939957259,
+      "layers_tested": [
+        16,
+        17
+      ],
+      "individual_scores": [
+        0.2463285272771662,
+        0.3853236607142857
+      ]
+    },
+    "baseline_middle": {
+      "average_effectiveness": 0.420703125,
+      "layers_tested": [
+        18,
+        19
+      ],
+      "individual_scores": [
+        0.540625,
+        0.30078125
+      ]
+    },
+    "downstream": {
+      "average_effectiveness": 0.13116732097807385,
+      "layers_tested": [
+        22
+      ],
+      "individual_scores": [
+        0.13116732097807385
+      ]
+    }
+  },
+  "effectiveness_ranking": [
+    {
+      "strategy": "baseline_middle",
+      "score": 0.420703125
+    },
+    {
+      "strategy": "causal_aligned",
+      "score": 0.34554075132478607
+    },
+    {
+      "strategy": "training_aligned",
+      "score": 0.34554075132478607
+    },
+    {
+      "strategy": "optimal_overlap",
+      "score": 0.3158260939957259
+    },
+    {
+      "strategy": "downstream",
+      "score": 0.13116732097807385
+    }
+  ],
+  "alignment_hypothesis_supported": false,
+  "best_strategy": "baseline_middle"
+}

@@ -1,0 +1,96 @@
+{
+  "bias_category": "gender",
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "firm_version": "1.0",
+  "alignment_strategies": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_analysis": {
+    "causal_layers": [
+      16,
+      17,
+      18,
+      20,
+      21
+    ],
+    "training_layers": [
+      16,
+      17,
+      18,
+      20,
+      21
+    ],
+    "total_model_layers": 36
+  },
+  "vector_statistics": {
+    "causal_aligned": {
+      "num_layers": 5,
+      "layers": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "average_magnitude": 1.0,
+      "magnitude_range": [
+        1.0,
+        1.0
+      ]
+    },
+    "training_aligned": {
+      "num_layers": 5,
+      "layers": [
+        16,
+        17,
+        18,
+        20,
+        21
+      ],
+      "average_magnitude": 1.0,
+      "magnitude_range": [
+        1.0,
+        1.0
+      ]
+    },
+    "optimal_overlap": {
+      "num_layers": 2,
+      "layers": [
+        16,
+        17
+      ],
+      "average_magnitude": 1.0,
+      "magnitude_range": [
+        1.0,
+        1.0
+      ]
+    },
+    "baseline_middle": {
+      "num_layers": 2,
+      "layers": [
+        18,
+        19
+      ],
+      "average_magnitude": 1.0,
+      "magnitude_range": [
+        1.0,
+        1.0
+      ]
+    },
+    "downstream": {
+      "num_layers": 1,
+      "layers": [
+        23
+      ],
+      "average_magnitude": 1.0,
+      "magnitude_range": [
+        1.0,
+        1.0
+      ]
+    }
+  }
+}

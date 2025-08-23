@@ -36,6 +36,9 @@ import logging
 # Import torch AFTER setting environment variables
 import torch
 
+# Import model variant loader for four-model evaluation
+from model_variant_loader import ModelVariantLoader
+
 # Immediately disable torch dynamo after import
 try:
     torch._dynamo.config.suppress_errors = True
@@ -214,13 +217,30 @@ class UnifiedBiasMitigationPipeline:
     
     def load_model(self) -> tuple:
         """
-        Load model and tokenizer.
+        Load model and tokenizer with support for different variants.
+        
+        Supports: baseline, fairsteer, sycophancy, firm
         
         Returns:
             Tuple of (model, tokenizer)
         """
         print(f"\n=== Loading Model ===")
-        print(f"Loading {self.model_name}... (suppressing compilation warnings)")
+        
+        # Check model variant
+        model_variant = self.config.get('model_variant', 'baseline')
+        print(f"🔧 Model variant: {model_variant}")
+        
+        # Check if this is a legacy Fairsteer debiased model
+        is_fairsteer_debiased = self.config.get('fairsteer_debiased', False)
+        if is_fairsteer_debiased and model_variant == 'baseline':
+            model_variant = 'fairsteer'
+            print("🔄 Legacy fairsteer_debiased flag detected - using fairsteer variant")
+        
+        if model_variant != 'baseline':
+            print(f"Loading {model_variant} variant of {self.model_name}...")
+            print(f"🎯 Applying {model_variant} interventions for bias mitigation")
+        else:
+            print(f"Loading {self.model_name}... (baseline - no interventions)")
         
         try:
             # Load tokenizer
@@ -240,7 +260,7 @@ class UnifiedBiasMitigationPipeline:
                 except:
                     pass
                 
-                model = AutoModelForCausalLM.from_pretrained(
+                base_model = AutoModelForCausalLM.from_pretrained(
                     self.model_name,
                     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
                     device_map="auto" if torch.cuda.is_available() else None,
@@ -250,12 +270,21 @@ class UnifiedBiasMitigationPipeline:
                 
                 # Ensure model doesn't get compiled
                 try:
-                    if hasattr(torch, 'compiler') and hasattr(model, 'forward'):
-                        model.forward = torch.compiler.disable(model.forward)
+                    if hasattr(torch, 'compiler') and hasattr(base_model, 'forward'):
+                        base_model.forward = torch.compiler.disable(base_model.forward)
                 except:
                     pass  # Older torch versions
             
-            print(f"✓ Model loaded successfully")
+            # Apply model variant if specified
+            if model_variant != 'baseline':
+                print(f"🔧 Applying {model_variant} variant modifications...")
+                variant_loader = ModelVariantLoader(base_model, tokenizer, self.config)
+                model, tokenizer = variant_loader.load_variant_model()
+            else:
+                model = base_model
+            
+            model_type = f"{model_variant.capitalize()}" if model_variant != 'baseline' else "Baseline"
+            print(f"✓ {model_type} model loaded successfully")
             print(f"  Model type: {type(model).__name__}")
             print(f"  Parameters: ~{sum(p.numel() for p in model.parameters()) // 1_000_000}M")
             print(f"  Device: {next(model.parameters()).device}")
@@ -264,7 +293,6 @@ class UnifiedBiasMitigationPipeline:
             
         except Exception as e:
             raise RuntimeError(f"Failed to load model {self.model_name}: {e}")
-    
     def run_baseline_evaluation(
         self,
         model,

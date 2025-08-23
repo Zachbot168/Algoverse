@@ -44,13 +44,17 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 sys.path.append(str(Path(__file__).parent.parent.parent / "sycophancy-interpretability"))
 
 try:
-    # Import from sycophancy-interpretability
-    from sycophancy_interpretability.pinpoint_tuning.train import main as original_train
-    from sycophancy_interpretability.pinpoint_tuning.utils.arguments import get_args
-    from sycophancy_interpretability.pinpoint_tuning.model.model_peft import get_peft_model_with_registry
-except ImportError:
-    print("Warning: Could not import from sycophancy-interpretability")
+    # Import from sycophancy-interpretability with correct path
+    sys.path.append(str(Path(__file__).parent.parent.parent / "sycophancy-interpretability"))
+    from pinpoint_tuning.train import main as original_train
+    from pinpoint_tuning.utils.arguments import get_args
+    from pinpoint_tuning.model.model_peft import get_peft_model_with_registry
+    SYCOPHANCY_AVAILABLE = True
+    print("✅ Successfully imported from sycophancy-interpretability")
+except ImportError as e:
+    print(f"Warning: Could not import from sycophancy-interpretability: {e}")
     print("Falling back to standalone implementation")
+    SYCOPHANCY_AVAILABLE = False
 
 # Local imports
 from .component_registry import ComponentRegistryManager, ComponentInfo

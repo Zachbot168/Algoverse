@@ -1,0 +1,43 @@
+{
+  "model_name": "meta-llama/Llama-3.2-1B-Instruct",
+  "architecture": "llama",
+  "optimal_layer": 11,
+  "model_config": {
+    "num_layers": 16,
+    "num_heads": 32,
+    "hidden_size": 2048,
+    "optimal_layer_range": [
+      10,
+      14
+    ]
+  },
+  "steering_vector_layers": [
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "steering_vector_shapes": {
+    "10": [
+      1,
+      2048
+    ],
+    "11": [
+      1,
+      2048
+    ],
+    "12": [
+      1,
+      2048
+    ],
+    "13": [
+      1,
+      2048
+    ],
+    "14": [
+      1,
+      2048
+    ]
+  }
+}

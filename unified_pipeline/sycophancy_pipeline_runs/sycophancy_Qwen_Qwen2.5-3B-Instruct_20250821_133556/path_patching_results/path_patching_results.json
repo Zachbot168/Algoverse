@@ -1,0 +1,6 @@
+{
+  "path_patching_results": "extracted_from_sycophancy_interpretability",
+  "identified_heads": [],
+  "importance_scores": {},
+  "source": "sycophancy-interpretability path_patching_hf.py"
+}

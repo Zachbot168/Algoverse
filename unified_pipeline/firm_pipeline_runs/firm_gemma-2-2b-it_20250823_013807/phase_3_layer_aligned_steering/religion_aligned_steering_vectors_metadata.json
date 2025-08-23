@@ -1,0 +1,105 @@
+{
+  "bias_category": "religion",
+  "model_name": "google/gemma-2-2b-it",
+  "firm_version": "1.0",
+  "alignment_strategies": [
+    "causal_aligned",
+    "training_aligned",
+    "optimal_overlap",
+    "baseline_middle",
+    "downstream"
+  ],
+  "layer_analysis": {
+    "causal_layers": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "training_layers": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "total_model_layers": 26
+  },
+  "vector_statistics": {
+    "causal_aligned": {
+      "num_layers": 7,
+      "layers": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "average_magnitude": 1.1999162946428572,
+      "magnitude_range": [
+        1.19921875,
+        1.2001953125
+      ]
+    },
+    "training_aligned": {
+      "num_layers": 7,
+      "layers": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "average_magnitude": 1.1999162946428572,
+      "magnitude_range": [
+        1.19921875,
+        1.2001953125
+      ]
+    },
+    "optimal_overlap": {
+      "num_layers": 3,
+      "layers": [
+        15,
+        16,
+        17
+      ],
+      "average_magnitude": 1.1995442708333333,
+      "magnitude_range": [
+        1.19921875,
+        1.2001953125
+      ]
+    },
+    "baseline_middle": {
+      "num_layers": 2,
+      "layers": [
+        13,
+        14
+      ],
+      "average_magnitude": 1.2001953125,
+      "magnitude_range": [
+        1.2001953125,
+        1.2001953125
+      ]
+    },
+    "downstream": {
+      "num_layers": 1,
+      "layers": [
+        23
+      ],
+      "average_magnitude": 1.2001953125,
+      "magnitude_range": [
+        1.2001953125,
+        1.2001953125
+      ]
+    }
+  }
+}

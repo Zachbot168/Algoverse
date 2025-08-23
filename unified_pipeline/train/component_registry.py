@@ -502,5 +502,24 @@ def main():
     print(f"Optimal steering layer: {manager.get_optimal_steering_layer()}")
 
 
+class FIRMPipeline:
+    """Simple wrapper for FIRM pipeline functionality."""
+    
+    def __init__(self, config_path: str):
+        """Initialize FIRM pipeline with model config."""
+        self.config_path = Path(config_path)
+        if not self.config_path.exists():
+            raise FileNotFoundError(f"Config file not found: {config_path}")
+        print(f"✅ FIRM Pipeline initialized with config: {config_path}")
+    
+    def run_pipeline(self, model_name: str, output_dir: str = None) -> Dict[str, Any]:
+        """Run FIRM pipeline (placeholder for full implementation)."""
+        return {
+            "status": "initialized",
+            "model_name": model_name,
+            "config_path": str(self.config_path)
+        }
+
+
 if __name__ == "__main__":
     main()

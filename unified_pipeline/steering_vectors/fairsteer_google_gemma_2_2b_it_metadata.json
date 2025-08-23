@@ -1,0 +1,43 @@
+{
+  "model_name": "google/gemma-2-2b-it",
+  "architecture": "gemma",
+  "optimal_layer": 20,
+  "model_config": {
+    "num_layers": 26,
+    "num_heads": 8,
+    "hidden_size": 2304,
+    "optimal_layer_range": [
+      16,
+      22
+    ]
+  },
+  "steering_vector_layers": [
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "steering_vector_shapes": {
+    "16": [
+      1,
+      2304
+    ],
+    "17": [
+      1,
+      2304
+    ],
+    "18": [
+      1,
+      2304
+    ],
+    "19": [
+      1,
+      2304
+    ],
+    "20": [
+      1,
+      2304
+    ]
+  }
+}

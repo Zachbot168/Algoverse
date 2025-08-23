@@ -1,0 +1,273 @@
+{
+  "evaluation_config": {
+    "training_seeds": [
+      42
+    ],
+    "evaluation_seeds": [
+      100
+    ],
+    "dataset_sample_sizes": {
+      "default": 200
+    },
+    "statistical_tests": [
+      "t_test",
+      "mann_whitney",
+      "effect_size"
+    ],
+    "confidence_level": 0.95
+  },
+  "aggregated_results": {
+    "baseline": {
+      "model_variant": "baseline",
+      "mean_bias_score": 0.6153134945793425,
+      "std_bias_score": 0.0,
+      "confidence_interval": [
+        0.6153134945793425,
+        0.6153134945793425
+      ],
+      "dataset_means": {
+        "WinoGender": 0.4583333333333333,
+        "TruthfulQA": 0.9633333333333334,
+        "WinoBias": 0.73,
+        "StereoSet": 0.5688073394495413,
+        "SEAT": 0.5899999999999999,
+        "BOLD": 0.0,
+        "BiosBias": 0.95,
+        "SycophancyEval": 0.5231568627450983,
+        "CrowsPairs": 0.73,
+        "BBQ": 0.4444444444444444
+      },
+      "dataset_stds": {
+        "WinoGender": 0.0,
+        "TruthfulQA": 0.0,
+        "WinoBias": 0.0,
+        "StereoSet": 0.0,
+        "SEAT": 0.0,
+        "BOLD": 0.0,
+        "BiosBias": 0.0,
+        "SycophancyEval": 0.0,
+        "CrowsPairs": 0.0,
+        "BBQ": 0.0
+      },
+      "n_evaluations": 1,
+      "seed_results": [
+        {
+          "training_seed": 42,
+          "evaluation_seed": 100,
+          "model_variant": "baseline",
+          "dataset_results": {
+            "CrowsPairs": 0.73,
+            "StereoSet": 0.5688073394495413,
+            "WinoBias": 0.73,
+            "WinoGender": 0.4583333333333333,
+            "BBQ": 0.4444444444444444,
+            "SEAT": 0.5899999999999999,
+            "BOLD": 0.0,
+            "BiosBias": 0.95,
+            "TruthfulQA": 0.9633333333333334,
+            "SycophancyEval": 0.5231568627450983
+          },
+          "overall_bias_score": 0.6153134945793424,
+          "evaluation_time": 703.2129542827606,
+          "metadata": {
+            "suite": "comprehensive",
+            "real_evaluation": true,
+            "total_datasets": 10
+          }
+        }
+      ],
+      "statistical_significance": {}
+    },
+    "fairsteer": {
+      "model_variant": "fairsteer",
+      "mean_bias_score": 0.008208935781451638,
+      "std_bias_score": 0.0,
+      "confidence_interval": [
+        0.008208935781451638,
+        0.008208935781451638
+      ],
+      "dataset_means": {
+        "WinoGender": 0.49166666666666664,
+        "TruthfulQA": 0.9766666666666667,
+        "WinoBias": 0.8,
+        "StereoSet": 0.6206896551724138,
+        "SEAT": 0.508,
+        "BOLD": 0.0008305647840531561,
+        "BiosBias": 0.94,
+        "SycophancyEval": 0.6634117647058826,
+        "CrowsPairs": 0.842,
+        "BBQ": 0.3939393939393939
+      },
+      "dataset_stds": {
+        "WinoGender": 0.0,
+        "TruthfulQA": 0.0,
+        "WinoBias": 0.0,
+        "StereoSet": 0.0,
+        "SEAT": 0.0,
+        "BOLD": 0.0,
+        "BiosBias": 0.0,
+        "SycophancyEval": 0.0,
+        "CrowsPairs": 0.0,
+        "BBQ": 0.0
+      },
+      "n_evaluations": 1,
+      "seed_results": [
+        {
+          "training_seed": 42,
+          "evaluation_seed": 100,
+          "model_variant": "fairsteer",
+          "dataset_results": {
+            "CrowsPairs": 0.842,
+            "StereoSet": 0.6206896551724138,
+            "WinoBias": 0.8,
+            "WinoGender": 0.49166666666666664,
+            "BBQ": 0.3939393939393939,
+            "SEAT": 0.508,
+            "BOLD": 0.0008305647840531561,
+            "BiosBias": 0.94,
+            "TruthfulQA": 0.9766666666666667,
+            "SycophancyEval": 0.6634117647058826
+          },
+          "overall_bias_score": 0.008208935781451638,
+          "evaluation_time": 731.3618352413177,
+          "metadata": {
+            "suite": "comprehensive",
+            "real_evaluation": true,
+            "total_datasets": 10
+          }
+        }
+      ],
+      "statistical_significance": {}
+    },
+    "sycophancy": {
+      "model_variant": "sycophancy",
+      "mean_bias_score": 0.012028829974685325,
+      "std_bias_score": 0.0,
+      "confidence_interval": [
+        0.012028829974685325,
+        0.012028829974685325
+      ],
+      "dataset_means": {
+        "WinoGender": 0.475,
+        "TruthfulQA": 0.9666666666666667,
+        "WinoBias": 0.74,
+        "StereoSet": 0.5665024630541872,
+        "SEAT": 0.7999999999999999,
+        "BOLD": 0.0012239902080783353,
+        "BiosBias": 0.95,
+        "SycophancyEval": 0.609509803921569,
+        "CrowsPairs": 0.742,
+        "BBQ": 0.35858585858585856
+      },
+      "dataset_stds": {
+        "WinoGender": 0.0,
+        "TruthfulQA": 0.0,
+        "WinoBias": 0.0,
+        "StereoSet": 0.0,
+        "SEAT": 0.0,
+        "BOLD": 0.0,
+        "BiosBias": 0.0,
+        "SycophancyEval": 0.0,
+        "CrowsPairs": 0.0,
+        "BBQ": 0.0
+      },
+      "n_evaluations": 1,
+      "seed_results": [
+        {
+          "training_seed": 42,
+          "evaluation_seed": 100,
+          "model_variant": "sycophancy",
+          "dataset_results": {
+            "CrowsPairs": 0.742,
+            "StereoSet": 0.5665024630541872,
+            "WinoBias": 0.74,
+            "WinoGender": 0.475,
+            "BBQ": 0.35858585858585856,
+            "SEAT": 0.7999999999999999,
+            "BOLD": 0.0012239902080783353,
+            "BiosBias": 0.95,
+            "TruthfulQA": 0.9666666666666667,
+            "SycophancyEval": 0.609509803921569
+          },
+          "overall_bias_score": 0.012028829974685325,
+          "evaluation_time": 970.4082486629486,
+          "metadata": {
+            "suite": "comprehensive",
+            "real_evaluation": true,
+            "total_datasets": 10
+          }
+        }
+      ],
+      "statistical_significance": {}
+    },
+    "firm": {
+      "model_variant": "firm",
+      "mean_bias_score": 0.00996583288185371,
+      "std_bias_score": 0.0,
+      "confidence_interval": [
+        0.00996583288185371,
+        0.00996583288185371
+      ],
+      "dataset_means": {
+        "WinoGender": 0.475,
+        "TruthfulQA": 0.97,
+        "WinoBias": 0.72,
+        "StereoSet": 0.5898617511520737,
+        "SEAT": 0.5837037037037037,
+        "BOLD": 0.0010111223458038423,
+        "BiosBias": 0.95,
+        "SycophancyEval": 0.6036862745098042,
+        "CrowsPairs": 0.7,
+        "BBQ": 0.42424242424242425
+      },
+      "dataset_stds": {
+        "WinoGender": 0.0,
+        "TruthfulQA": 0.0,
+        "WinoBias": 0.0,
+        "StereoSet": 0.0,
+        "SEAT": 0.0,
+        "BOLD": 0.0,
+        "BiosBias": 0.0,
+        "SycophancyEval": 0.0,
+        "CrowsPairs": 0.0,
+        "BBQ": 0.0
+      },
+      "n_evaluations": 1,
+      "seed_results": [
+        {
+          "training_seed": 42,
+          "evaluation_seed": 100,
+          "model_variant": "firm",
+          "dataset_results": {
+            "CrowsPairs": 0.7,
+            "StereoSet": 0.5898617511520737,
+            "WinoBias": 0.72,
+            "WinoGender": 0.475,
+            "BBQ": 0.42424242424242425,
+            "SEAT": 0.5837037037037037,
+            "BOLD": 0.0010111223458038423,
+            "BiosBias": 0.95,
+            "TruthfulQA": 0.97,
+            "SycophancyEval": 0.6036862745098042
+          },
+          "overall_bias_score": 0.009965832881853712,
+          "evaluation_time": 732.4521081447601,
+          "metadata": {
+            "suite": "comprehensive",
+            "real_evaluation": true,
+            "total_datasets": 10
+          }
+        }
+      ],
+      "statistical_significance": {}
+    }
+  },
+  "statistical_significance": {},
+  "metadata": {
+    "timestamp": "20250821_153557",
+    "model_name": "gemma-2-2b-it",
+    "suite": "comprehensive",
+    "robustness_level": "quick",
+    "total_evaluations": 4
+  }
+}

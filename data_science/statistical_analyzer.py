@@ -48,22 +48,91 @@ class FIRMStatisticalAnalyzer:
         """
         Extract dataset scores into a structured DataFrame.
         
+        Handles both 4-variant format and single evaluation format.
+        
         Returns:
             DataFrame with columns: technique, dataset, score, model, seed
         """
         data = []
         
-        for technique in self.techniques:
-            if technique in results:
-                for seed_data in results[technique]:
-                    scores = seed_data.get('dataset_scores', {})
-                    for dataset, score in scores.items():
+        # Check if this is a 4-variant comparison format
+        if any(technique in results for technique in self.techniques):
+            # 4-variant format: {'baseline': [...], 'fairsteer': [...], etc.}
+            for technique in self.techniques:
+                if technique in results:
+                    for seed_data in results[technique]:
+                        scores = seed_data.get('dataset_scores', {})
+                        for dataset, score in scores.items():
+                            data.append({
+                                'technique': technique,
+                                'dataset': dataset,
+                                'score': score,
+                                'model': seed_data.get('model', 'unknown'),
+                                'seed': seed_data.get('seed', 0)
+                            })
+        else:
+            # Single evaluation format: unified pipeline results
+            technique = 'baseline'  # Default technique name
+            model = results.get('model_name', 'unknown')
+            seed = results.get('seed', 0)
+            
+            # Extract scores from dataset_results or aggregated_metrics
+            if 'dataset_results' in results:
+                for dataset, dataset_data in results['dataset_results'].items():
+                    # Get the main metric for this dataset
+                    if 'metrics' in dataset_data:
+                        metrics = dataset_data['metrics']
+                        
+                        # Find the primary score metric for each dataset
+                        score = None
+                        if dataset == 'CrowsPairs':
+                            score = metrics.get('crows_pairs_accuracy', metrics.get('crows_pairs_bias_score'))
+                        elif dataset == 'StereoSet':
+                            score = metrics.get('stereoset_bias_score')
+                        elif dataset == 'WinoBias':
+                            score = metrics.get('winobias_accuracy')
+                        elif dataset == 'WinoGender':
+                            score = metrics.get('winogender_accuracy')
+                        elif dataset == 'BBQ':
+                            score = metrics.get('bbq_accuracy')
+                        elif dataset == 'SEAT':
+                            score = metrics.get('seat_effect_size')
+                        elif dataset == 'BOLD':
+                            score = metrics.get('bold_bias_score')
+                        elif dataset == 'BiosBias':
+                            score = metrics.get('biosbias_accuracy')
+                        elif dataset == 'TruthfulQA':
+                            score = metrics.get('truthfulqa_accuracy')
+                        elif dataset == 'SycophancyEval':
+                            score = metrics.get('sycophancy_score')
+                        
+                        # If no specific metric found, try to find any score-like metric
+                        if score is None:
+                            for key, value in metrics.items():
+                                if 'score' in key.lower() or 'accuracy' in key.lower():
+                                    score = value
+                                    break
+                        
+                        if score is not None:
+                            data.append({
+                                'technique': technique,
+                                'dataset': dataset,
+                                'score': score,
+                                'model': model,
+                                'seed': seed
+                            })
+            
+            # Also check aggregated_metrics.dataset_summary for additional data
+            elif 'aggregated_metrics' in results and 'dataset_summary' in results['aggregated_metrics']:
+                for dataset, dataset_data in results['aggregated_metrics']['dataset_summary'].items():
+                    score = dataset_data.get('main_metric')
+                    if score is not None:
                         data.append({
                             'technique': technique,
                             'dataset': dataset,
                             'score': score,
-                            'model': seed_data.get('model', 'unknown'),
-                            'seed': seed_data.get('seed', 0)
+                            'model': model,
+                            'seed': seed
                         })
         
         return pd.DataFrame(data)
@@ -313,22 +382,47 @@ def main():
     # Initialize analyzer
     analyzer = FIRMStatisticalAnalyzer()
     
-    # Example: analyze results from a specific file
-    results_file = "evaluation_results.json"
+    # Look for recent results files
+    results_file = None
+    
+    # Check for recent unified pipeline results
+    unified_runs = Path("../unified_pipeline/unified_pipeline_runs")
+    if unified_runs.exists():
+        run_dirs = sorted([d for d in unified_runs.iterdir() if d.is_dir()], reverse=True)
+        for run_dir in run_dirs:
+            potential_file = run_dir / "evaluation" / "baseline" / "evaluation_results.json"
+            if potential_file.exists():
+                results_file = str(potential_file)
+                break
+    
+    # Fallback to example file
+    if not results_file:
+        results_file = "evaluation_results.json"
     
     if Path(results_file).exists():
+        print(f"📊 Analyzing results from: {results_file}")
+        
         # Run complete analysis
         results = analyzer.run_complete_analysis(results_file)
         
         # Save results
-        analyzer.save_analysis_results(results, "statistical_analysis_results.json")
+        output_file = "statistical_analysis_results.json"
+        analyzer.save_analysis_results(results, output_file)
         
         # Print key findings
         print("\n📈 KEY STATISTICAL FINDINGS:")
         print("="*50)
         
+        # Data overview
+        data_info = results['data_info']
+        print(f"\n📋 Data Overview:")
+        print(f"   Total observations: {data_info['total_observations']}")
+        print(f"   Techniques analyzed: {', '.join(data_info['techniques'])}")
+        print(f"   Datasets evaluated: {', '.join(data_info['datasets'])}")
+        print(f"   Models: {', '.join(data_info['models'])}")
+        
         # Summary by technique
-        for technique in analyzer.techniques:
+        for technique in data_info['techniques']:
             if technique in results['summary_statistics']:
                 print(f"\n🎯 {technique.upper()} Summary:")
                 tech_stats = results['summary_statistics'][technique]
@@ -336,27 +430,35 @@ def main():
                 if dataset_means:
                     print(f"   Average across datasets: {np.mean(dataset_means):.3f}")
                     print(f"   Standard deviation: {np.std(dataset_means):.3f}")
-                    print(f"   Best performing dataset: {max(tech_stats.items(), key=lambda x: x[1].get('mean', 0))[0]}")
-                    print(f"   Worst performing dataset: {min(tech_stats.items(), key=lambda x: x[1].get('mean', 1))[0]}")
+                    if len(tech_stats) > 1:
+                        print(f"   Best performing dataset: {max(tech_stats.items(), key=lambda x: x[1].get('mean', 0))[0]}")
+                        print(f"   Worst performing dataset: {min(tech_stats.items(), key=lambda x: x[1].get('mean', 1))[0]}")
         
-        # Significance findings
-        sig_results = results['statistical_significance']
-        significant_comparisons = []
-        
-        for dataset, tests in sig_results.items():
-            if 'pairwise' in tests:
-                for comparison, result in tests['pairwise'].items():
-                    if result.get('significant', False):
-                        significant_comparisons.append((dataset, comparison, result['p_value'], result['effect_size']))
-        
-        print(f"\n📊 Found {len(significant_comparisons)} statistically significant differences (p < 0.05)")
-        
-        for dataset, comparison, p_val, effect_size in significant_comparisons[:5]:  # Show top 5
-            print(f"   {dataset}: {comparison} (p={p_val:.4f}, Cohen's d={effect_size:.3f})")
+        # Significance findings (only for multi-technique comparisons)
+        if len(data_info['techniques']) > 1:
+            sig_results = results['statistical_significance']
+            significant_comparisons = []
+            
+            for dataset, tests in sig_results.items():
+                if 'pairwise' in tests:
+                    for comparison, result in tests['pairwise'].items():
+                        if result.get('significant', False):
+                            significant_comparisons.append((dataset, comparison, result['p_value'], result['effect_size']))
+            
+            print(f"\n📊 Found {len(significant_comparisons)} statistically significant differences (p < 0.05)")
+            
+            for dataset, comparison, p_val, effect_size in significant_comparisons[:5]:  # Show top 5
+                print(f"   {dataset}: {comparison} (p={p_val:.4f}, Cohen's d={effect_size:.3f})")
+        else:
+            print(f"\n📊 Single technique analysis - no statistical comparisons performed")
+            print("   To compare techniques, run 4-variant evaluation with run_integrated_pipeline.py")
     
     else:
         print(f"❌ Results file not found: {results_file}")
-        print("Please provide a valid evaluation results JSON file.")
+        print("📝 To generate results, run:")
+        print("   cd ../unified_pipeline")
+        print("   CUDA_VISIBLE_DEVICES=0 python run_unified_pipeline.py --model-config configs/models/qwen2.5-3b-instruct.yaml --suite quick_evaluation")
+        print("   Then rerun this analysis.")
 
 if __name__ == "__main__":
     main()
