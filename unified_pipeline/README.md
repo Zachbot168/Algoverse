@@ -53,19 +53,90 @@ Each robustness level provides different statistical confidence for research val
 | **standard** | 4 seeds | 4 seeds | **16 evaluations** | Good (p<0.05) | 3-4 hours | **Research Validation** |
 | **publication** | 6 seeds | 6 seeds | **36 evaluations** | High (p<0.01) | 8-12 hours | **Publication Results** |
 
-#### **Per-Model Robustness Validation Commands**
+#### **Ready-to-Run Test Commands for All 6 Models**
 
-All 6 models support the same robustness levels with full statistical validation:
+Each command tests all 4 variants (Baseline, FairSteer, Sycophancy, FIRM) with automatic component creation if needed:
+
+**🚀 Qwen 2.5-3B (Best Performance)**
+```bash
+CUDA_VISIBLE_DEVICES=0 python run_integrated_pipeline.py \
+    --model-config configs/models/qwen2.5-3b-instruct.yaml \
+    --model-name "Qwen/Qwen2.5-3B-Instruct" \
+    --suite comprehensive \
+    --robust \
+    --robustness-level quick
+```
+
+**⚡ Qwen 2.5-1.5B (Fast & Efficient)**
+```bash
+CUDA_VISIBLE_DEVICES=0 python run_integrated_pipeline.py \
+    --model-config configs/models/qwen2.5-1.5b-instruct.yaml \
+    --model-name "Qwen/Qwen2.5-1.5B-Instruct" \
+    --suite comprehensive \
+    --robust \
+    --robustness-level quick
+```
+
+**🦙 Llama 3.2-3B (Publication Quality)**
+```bash
+CUDA_VISIBLE_DEVICES=0 python run_integrated_pipeline.py \
+    --model-config configs/models/llama-3.2-3b-instruct.yaml \
+    --model-name "meta-llama/Llama-3.2-3B-Instruct" \
+    --suite comprehensive \
+    --robust \
+    --robustness-level quick
+```
+
+**🦙 Llama 3.2-1B (Lightweight)**
+```bash
+CUDA_VISIBLE_DEVICES=0 python run_integrated_pipeline.py \
+    --model-config configs/models/llama-3.2-1b-instruct.yaml \
+    --model-name "meta-llama/Llama-3.2-1B-Instruct" \
+    --suite comprehensive \
+    --robust \
+    --robustness-level quick
+```
+
+**💎 Gemma 2-2B (Memory Efficient)**
+```bash
+CUDA_VISIBLE_DEVICES=0 python run_integrated_pipeline.py \
+    --model-config configs/models/gemma-2-2b-it.yaml \
+    --model-name "google/gemma-2-2b-it" \
+    --suite comprehensive \
+    --robust \
+    --robustness-level quick
+```
+
+**🔥 Ministral-3B (Latest Architecture)**
+```bash
+CUDA_VISIBLE_DEVICES=0 python run_integrated_pipeline.py \
+    --model-config configs/models/ministral-3b-instruct.yaml \
+    --model-name "ministral/Ministral-3b-instruct" \
+    --suite comprehensive \
+    --robust \
+    --robustness-level quick
+```
+
+#### **Automatic Component Creation**
+
+✅ **FairSteer Steering Vectors**: Automatically created if not found (uses model-agnostic implementation)
+✅ **Sycophancy Components**: Automatically generated via path patching if not available  
+✅ **FIRM Pipeline**: Creates all 5 phases (circuit ID, causal tuning, steering alignment, monitoring, multi-layer) as needed
+✅ **Baseline Evaluation**: Always available for any supported model
+
+#### **Robustness Level Options**
+
+Change `--robustness-level` for different statistical confidence:
 
 ```bash
-# QUICK ROBUSTNESS (2×2=4 evaluations, ~60-90 minutes)
-python run_integrated_pipeline.py --model-config configs/models/MODEL.yaml --model-name "MODEL_NAME" --suite comprehensive --robust --robustness-level quick
+# QUICK ROBUSTNESS (2×2=4 evaluations, ~60-90 minutes) - Development & Testing
+--robustness-level quick
 
 # STANDARD ROBUSTNESS (4×4=16 evaluations, ~3-4 hours) - RECOMMENDED FOR RESEARCH
-python run_integrated_pipeline.py --model-config configs/models/MODEL.yaml --model-name "MODEL_NAME" --suite comprehensive --robust --robustness-level standard
+--robustness-level standard
 
 # PUBLICATION ROBUSTNESS (6×6=36 evaluations, ~8-12 hours) - HIGHEST STATISTICAL CONFIDENCE
-python run_integrated_pipeline.py --model-config configs/models/MODEL.yaml --model-name "MODEL_NAME" --suite comprehensive --robust --robustness-level publication
+--robustness-level publication
 ```
 
 #### **Research Validation Features**
