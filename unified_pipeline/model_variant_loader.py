@@ -44,7 +44,12 @@ class ModelVariantLoader:
         self.base_model = base_model
         self.tokenizer = tokenizer
         self.config = config
-        self.model_name = config.get('model_name', '')
+        # Normalize model name to fix character encoding issues
+        model_name = config.get('model_name', '')
+        model_name = model_name.replace('–', '-').replace('—', '-')  # Replace em-dashes with hyphens
+        model_name = model_name.replace('\u2013', '-').replace('\u2014', '-')  # Unicode em-dashes
+        model_name = model_name.strip('"').strip("'").strip('\u201c').strip('\u201d')  # Remove quotes
+        self.model_name = model_name
         self.model_variant = config.get('model_variant', 'baseline')
     
     def load_variant_model(self) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:

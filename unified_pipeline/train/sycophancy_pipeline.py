@@ -51,6 +51,11 @@ class SycophancyPipelineManager:
         Returns:
             Full HuggingFace model name
         """
+        # Fix character encoding issues first (em-dashes to regular hyphens)
+        model_name = model_name.replace('–', '-').replace('—', '-')  # Replace em-dashes with hyphens
+        model_name = model_name.replace('\u2013', '-').replace('\u2014', '-')  # Unicode em-dashes
+        model_name = model_name.strip('"').strip("'").strip('\u201c').strip('\u201d')  # Remove quotes
+        
         # Fix common model name issues
         if model_name == "gemma-2-2b-it":
             return "google/gemma-2-2b-it"
