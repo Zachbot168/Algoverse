@@ -311,15 +311,16 @@ class BiasRobustnessMonitor:
                 prev_results = self.monitoring_history[-1]
                 
                 for bias_type in ['gender', 'race', 'religion']:
-                    # Simulate some drift metrics
+                    # TODO: Implement real drift detection based on actual circuit re-identification
                     baseline_count = len(prev_results.get("bias_circuits", {}).get(bias_type, []))
-                    simulated_current_count = max(0, baseline_count + np.random.randint(-2, 3))
+                    # For now, assume no drift (replace with real measurement)
+                    current_count = baseline_count
                     
-                    circuit_stability = max(0.0, 1.0 - abs(simulated_current_count - baseline_count) / max(baseline_count, 1))
+                    circuit_stability = max(0.0, 1.0 - abs(current_count - baseline_count) / max(baseline_count, 1))
                     
                     iteration_results["bias_persistence"][bias_type] = {
                         "baseline_circuits": baseline_count,
-                        "current_circuits": simulated_current_count,
+                        "current_circuits": current_count,
                         "stability_score": float(circuit_stability)
                     }
                     
@@ -329,7 +330,7 @@ class BiasRobustnessMonitor:
                         drift_tracking_results["reemergence_detection"][bias_type] = {
                             "iteration": iteration,
                             "severity": float(1.0 - circuit_stability),
-                            "circuit_change": simulated_current_count - baseline_count
+                            "circuit_change": current_count - baseline_count
                         }
             
             drift_tracking_results["drift_timeline"].append(iteration_results)

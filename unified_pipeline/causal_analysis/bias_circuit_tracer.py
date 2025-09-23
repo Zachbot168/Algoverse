@@ -123,7 +123,9 @@ class BiasCircuitTracer:
             if importance_score > self.config["intervention_threshold"]:
                 # Add attention heads for this layer
                 for head_idx in range(self.config["num_heads"]):
-                    head_importance = importance_score * np.random.uniform(0.5, 1.0)  # Simplified
+                    # TODO: Implement real head importance calculation
+                    # For now, use layer importance as baseline (needs real activation analysis)
+                    head_importance = importance_score * 0.8  # Placeholder: replace with real head analysis
                     
                     component = CircuitComponent(
                         layer=layer_idx,
@@ -264,9 +266,9 @@ class BiasCircuitTracer:
         else:
             base_importance = 0.4 - (layer_idx - 22) * 0.1  # Declining importance
             
-        # Add some randomness to simulate real variation
-        variation = np.random.uniform(-0.1, 0.1)
-        importance = max(0.0, min(1.0, base_importance + variation))
+        # TODO: Replace with actual activation difference calculation
+        # For now, use deterministic importance based on layer position
+        importance = max(0.0, min(1.0, base_importance))
         
         return importance
     

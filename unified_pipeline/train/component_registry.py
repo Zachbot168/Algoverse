@@ -463,9 +463,9 @@ def main():
     # Create example registry
     manager = ComponentRegistryManager()
     
-    # Example diagnostic results
+    # Example diagnostic results (for demo only - replace with real data)
     example_path_results = {
-        "head_importance": np.random.random((12, 8)),  # 12 layers, 8 heads
+        "head_importance": np.zeros((12, 8)),  # TODO: Replace with real head importance data
         "num_samples": 1000
     }
     

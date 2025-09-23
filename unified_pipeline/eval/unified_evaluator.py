@@ -567,11 +567,15 @@ class UnifiedBiasEvaluator:
                             if hasattr(outputs, 'hidden_states') and outputs.hidden_states:
                                 last_hidden = outputs.hidden_states[-1]
                                 return last_hidden.mean(dim=1).squeeze().cpu().numpy()
-                except:
-                    # Fallback to simple hash-based embedding
+                except Exception as e:
+                    # Log the failure and use deterministic fallback
+                    print(f"Warning: Could not get embedding for '{word}': {e}")
+                    # Use deterministic hash-based embedding as fallback
                     hash_val = hash(word) % 1000
                     return np.array([hash_val / 1000.0] * 64)  # Simple 64-dim embedding
                 
+                # Should not reach here, but provide safe fallback
+                print(f"Warning: No embedding method worked for '{word}', using zero vector")
                 return np.zeros(64)
             
             def cosine_similarity(a, b):

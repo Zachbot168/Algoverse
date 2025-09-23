@@ -59,8 +59,9 @@ class BiasActivationDetector:
         best_score = 0.0
         
         for layer_idx, classifier in self.classifiers.items():
-            # Try to get stored accuracy, fallback to random score
-            score = getattr(classifier, 'accuracy_', 0.5 + np.random.random() * 0.3)
+            # Try to get stored accuracy, fallback to baseline score
+            # TODO: Implement proper classifier evaluation instead of fallback
+            score = getattr(classifier, 'accuracy_', 0.5)  # Baseline random performance
             if score > best_score:
                 best_score = score
                 best_layer = layer_idx
@@ -427,9 +428,12 @@ def load_bad_classifiers(bad_path: str) -> Dict[int, LogisticRegression]:
 def load_steering_vectors(dsv_path: str) -> Dict[str, torch.Tensor]:
     """Load steering vectors from file."""
     if not os.path.exists(dsv_path):
-        print(f"Warning: Steering vectors not found at {dsv_path}")
-        # Create dummy steering vectors
-        return {"general": torch.randn(1024) * 0.01}  # Small random vector
+        raise FileNotFoundError(
+            f"Steering vectors not found at {dsv_path}. "
+            f"Please ensure steering vectors have been computed and saved using "
+            f"real_steering_vectors.py before attempting to load them. "
+            f"No fake or random vectors will be generated."
+        )
     
     with open(dsv_path, 'rb') as f:
         steering_data = pickle.load(f)

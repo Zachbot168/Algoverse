@@ -25,6 +25,7 @@ class BiasType(Enum):
     SYCOPHANCY = "sycophancy"
     PROFESSION = "profession"
     STEREOTYPE = "stereotype"
+    MISINFORMATION = "misinformation"
     GENERAL = "general"
 
 
