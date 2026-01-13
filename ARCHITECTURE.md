@@ -6,7 +6,7 @@ The FIRM (Fairness Interventions at Runtime and Model-training) framework implem
 
 ## Core Components
 
-### 📁 Directory Structure
+### Directory Structure
 
 ```
 unified_pipeline/
@@ -35,6 +35,7 @@ unified_pipeline/
 ## 5-Phase FIRM Methodology
 
 ### Phase 1: Bias Circuit Identification
+
 **Goal**: Identify specific model components responsible for biased outputs
 
 **Components**:
@@ -50,6 +51,7 @@ unified_pipeline/
 **Output**: List of bias-related attention heads and MLP layers
 
 ### Phase 2: Causal Pinpoint Tuning
+
 **Goal**: Selectively fine-tune only bias-causing components
 
 **Components**:
@@ -65,6 +67,7 @@ unified_pipeline/
 **Output**: Fine-tuned model with targeted bias reduction
 
 ### Phase 3: Layer-Aligned Steering Vectors
+
 **Goal**: Compute steering vectors aligned with causal insights
 
 **Components**:
@@ -80,6 +83,7 @@ unified_pipeline/
 **Output**: Validated steering vectors for runtime bias mitigation
 
 ### Phase 4: Longitudinal Robustness Monitoring
+
 **Goal**: Monitor intervention persistence and detect bias drift
 
 **Components**:
@@ -95,6 +99,7 @@ unified_pipeline/
 **Output**: Continuous monitoring reports and drift detection
 
 ### Phase 5: Multi-Layer Intervention Framework
+
 **Goal**: Joint optimization across multiple intervention strategies
 
 **Components**:
@@ -113,17 +118,17 @@ unified_pipeline/
 
 ```
 Input Text
-    ↓
+    |
 [Phase 1] Circuit Identification
-    ↓ (identified circuits)
-[Phase 2] Causal Training  →  [Phase 3] Steering Vectors
-    ↓ (fine-tuned model)       ↓ (steering vectors)
+    | (identified circuits)
+[Phase 2] Causal Training  ->  [Phase 3] Steering Vectors
+    | (fine-tuned model)       | (steering vectors)
 [Combined Model with Runtime Steering]
-    ↓
+    |
 [Phase 4] Longitudinal Monitoring
-    ↓
+    |
 [Phase 5] Scientific Validation
-    ↓
+    |
 Bias-Mitigated Output
 ```
 
@@ -152,6 +157,7 @@ Bias-Mitigated Output
 ## Configuration System
 
 ### Model Configs (`configs/models/`)
+
 ```yaml
 model:
   name: "model-org/model-name"
@@ -168,6 +174,7 @@ interventions:
 ```
 
 ### Dataset Configs (`configs/datasets.yaml`)
+
 ```yaml
 datasets:
   CrowsPairs:
@@ -177,6 +184,7 @@ datasets:
 ```
 
 ### Evaluation Suites (`configs/evaluation_suites/`)
+
 ```yaml
 comprehensive:
   datasets: ["CrowsPairs", "WinoBias", "BBQ"]
@@ -244,5 +252,3 @@ comprehensive:
 - Performance metrics tracking
 - Error handling and recovery
 - Progress visualization
-
-This architecture ensures scientific rigor, computational efficiency, and practical applicability for bias mitigation research in large language models.
